@@ -21,8 +21,7 @@ class _SelectFiscalYearScreenState extends State<SelectFiscalYearScreen> {
     final branchProvider = Provider.of<BranchProvider>(context, listen: false);
 
     if (branchProvider.branches.isNotEmpty) {
-      int branchId =
-          branchProvider.branches.first.branchId; // Ensure branchId exists
+      int branchId = branchProvider.branches.first.branchId;
       Provider.of<FiscalYearProvider>(context, listen: false)
           .fetchFiscalYears(branchId);
     } else {
@@ -36,6 +35,9 @@ class _SelectFiscalYearScreenState extends State<SelectFiscalYearScreen> {
       appBar: AppBar(
         backgroundColor: primarySwatch[900],
         toolbarHeight: 0,
+        leading: BackButton(
+          color: Colors.blue,
+        ),
       ),
       body: SafeArea(
         child: Padding(
@@ -46,20 +48,17 @@ class _SelectFiscalYearScreenState extends State<SelectFiscalYearScreen> {
                 return Center(child: CircularProgressIndicator());
               }
 
-              // Show error message if there was an issue fetching data
               if (fiscalYearProvider.errorMessage.isNotEmpty) {
                 return Center(child: Text(fiscalYearProvider.errorMessage));
               }
 
-              // Show message if no fiscal years are available
               if (fiscalYearProvider.fiscalYears.isEmpty) {
                 return Center(child: Text("No fiscal years available"));
               }
 
               // Extract the fiscal year names for dropdown
               List<String> fiscalYearNames = fiscalYearProvider.fiscalYears
-                  .map((fiscalYear) =>
-                      fiscalYear.financialYearCode) // Correct property name
+                  .map((fiscalYear) => fiscalYear.financialYearCode)
                   .toList();
 
               return Column(
@@ -90,12 +89,10 @@ class _SelectFiscalYearScreenState extends State<SelectFiscalYearScreen> {
                   GestureDetector(
                     onTap: selectedFiscalYear != null
                         ? () {
-                            // Navigate to the HomeScreen when selected fiscal year is not null
-                            Navigator.pushReplacement(
+                            Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      HomeScreen()), // Replace HomeScreen with your desired screen
+                                  builder: (context) => HomeScreen()),
                             );
                           }
                         : null,

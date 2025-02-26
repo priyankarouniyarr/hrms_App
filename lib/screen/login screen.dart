@@ -125,9 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: authProvider.loading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
+                      ? Center(
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
                             color: Colors.white,

@@ -16,7 +16,7 @@ class _SelectBranchScreenState extends State<SelectBranchScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch branches when the screen is initialized
+
     Provider.of<BranchProvider>(context, listen: false).fetchUserBranches();
   }
 

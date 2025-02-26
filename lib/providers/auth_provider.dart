@@ -8,7 +8,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class AuthProvider with ChangeNotifier {
   bool _loading = false;
   String _errorMessage = '';
-  String? _token; // Store the token in memory
+  String? _token;
 
   final FlutterSecureStorage _secureStorage =
       FlutterSecureStorage(); // Secure storage instance
@@ -17,7 +17,7 @@ class AuthProvider with ChangeNotifier {
   String get errorMessage => _errorMessage;
   String? get token => _token;
 
-  // ✅ Login Method with Secure Token Storage
+  // Login Method with Secure Token Storage
   Future<void> login(
       String username, String password, BuildContext context) async {
     _setLoading(true);
@@ -57,7 +57,6 @@ class AuthProvider with ChangeNotifier {
         _token = token;
         notifyListeners();
 
-        //Navigate to another screen (Uncomment if needed)
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => SelectBranchScreen()));
       } else {

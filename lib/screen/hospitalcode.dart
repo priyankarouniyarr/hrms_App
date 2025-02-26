@@ -84,23 +84,15 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
                 fieldWidth: 50,
                 margin: const EdgeInsets.symmetric(horizontal: 6),
                 onCodeChanged: (code) {
-                  // Only allow numeric code and update the enteredCode state
-                  if (RegExp(r'^[0-9]*$').hasMatch(code)) {
-                    setState(() {
-                      enteredCode =
-                          code; // Update entered OTP code with numbers only
-                    });
-                  }
+                  setState(() {
+                    enteredCode = code; // Update entered OTP code
+                  });
                   _clearErrorMessage(); // Clear error message
                 },
                 onSubmit: (code) {
-                  // Only allow numeric code when submitting
-                  if (RegExp(r'^[0-9]*$').hasMatch(code)) {
-                    setState(() {
-                      enteredCode =
-                          code; // Update entered OTP code with numbers only
-                    });
-                  }
+                  setState(() {
+                    enteredCode = code; // Update entered OTP code
+                  });
                 },
               ),
               SizedBox(height: 20),

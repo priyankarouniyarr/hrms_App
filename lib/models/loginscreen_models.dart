@@ -7,7 +7,6 @@ class LoginScreenModel {
     required this.password,
   });
 
-  // Factory method to create a model from JSON
   factory LoginScreenModel.fromJson(Map<String, dynamic> json) {
     return LoginScreenModel(
       username: json["Username"],
@@ -15,7 +14,6 @@ class LoginScreenModel {
     );
   }
 
-  // Method to convert the model to JSON
   Map<String, dynamic> toJson() {
     return {
       "Username": username,

@@ -12,7 +12,6 @@ class BranchModel {
     );
   }
 
-  // Convert BranchModel object to JSON (if needed for other API calls)
   Map<String, dynamic> toJson() {
     return {
       'branchId': branchId,

@@ -42,7 +42,6 @@ class BranchProvider with ChangeNotifier {
       if (response.statusCode == 200) {
         List<dynamic> jsonData = json.decode(response.body);
 
-        // Convert JSON data to List<BranchModel>
         _branches =
             jsonData.map((branch) => BranchModel.fromJson(branch)).toList();
         notifyListeners();
