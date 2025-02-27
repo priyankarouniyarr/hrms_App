@@ -31,19 +31,18 @@ class _SelectFiscalYearScreenState extends State<SelectFiscalYearScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final fiscalYearProvider =
+        Provider.of<FiscalYearProvider>(context, listen: true);
+
     return Scaffold(
       appBar: AppBar(
-        // backgroundColor: primarySwatch[900],
-        // toolbarHeight: 0,
-        leading: BackButton(
-          color: Colors.blue,
-        ),
+        leading: BackButton(color: Colors.blue),
       ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Consumer<FiscalYearProvider>(
-            builder: (context, fiscalYearProvider, child) {
+          child: Builder(
+            builder: (context) {
               if (fiscalYearProvider.loading) {
                 return Center(child: CircularProgressIndicator());
               }

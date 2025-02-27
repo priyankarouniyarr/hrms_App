@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hrms_app/constants/colors.dart';
+import 'package:hrms_app/providers/check_in_provider.dart';
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
 
 class CheckInScreen extends StatelessWidget {
@@ -13,11 +15,9 @@ class CheckInScreen extends StatelessWidget {
       return;
     }
 
-    // Check for permission to access location
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied ||
         permission == LocationPermission.deniedForever) {
-      // If permission is denied, request it
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
@@ -28,11 +28,9 @@ class CheckInScreen extends StatelessWidget {
       }
     }
 
-    // Get the current position
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
     print('Live Location: ${position.latitude}, ${position.longitude}');
-    // Show the location in a snackbar (or do something else with it)
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
           content: Text(
@@ -42,56 +40,79 @@ class CheckInScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: cardBackgroundColor,
-      appBar: CustomAppBarProfile(title: "Check In"),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Expanded(
-                    // For Punch Post
-                    child: GestureDetector(
-                      onTap: () {
-                        // When tapped, show the live location
-                        print("Punch Post tapped");
+    return Consumer<CheckInProvider>(
+      builder: (context, checkInProvider, child) {
+        // Show success popup if there's a success message
+        if (checkInProvider.successMessage != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text("Success"),
+                  content: Text(checkInProvider.successMessage!),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text("OK"),
+                    ),
+                  ],
+                );
+              },
+            );
+          });
+        }
 
-                        _getLiveLocation(context);
-                      },
-                      child: IconTextContainer(
-                        icon: Icons.fingerprint,
-                        text: 'Punch Post',
-                        iconColor: Colors.blue,
-                        containerColor: Colors.blue[50]!,
+        return Scaffold(
+          backgroundColor: cardBackgroundColor,
+          appBar: CustomAppBarProfile(title: "Check In"),
+          body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            print("Punch Post tapped");
+                            checkInProvider.punchPost();
+                          },
+                          child: IconTextContainer(
+                            icon: Icons.fingerprint,
+                            text: 'Punch Post',
+                            iconColor: Colors.blue,
+                            containerColor: Colors.blue[50]!,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  SizedBox(width: 16),
-                  // For Shared Live Location
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        print("Shared Live Location tapped");
-                      },
-                      child: IconTextContainer(
-                        icon: Icons.my_location_outlined,
-                        text: 'Shared Live Location',
-                        iconColor: Colors.green,
-                        containerColor: Colors.green[50]!,
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            print("Shared Live Location tapped");
+                          },
+                          child: IconTextContainer(
+                            icon: Icons.my_location_outlined,
+                            text: 'Shared Live Location',
+                            iconColor: Colors.green,
+                            containerColor: Colors.green[50]!,
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

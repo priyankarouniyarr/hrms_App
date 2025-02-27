@@ -8,21 +8,27 @@ class BranchProvider with ChangeNotifier {
   bool _loading = false;
   String _errorMessage = '';
   List<BranchModel> _branches = [];
+  String? _selectedBranchId; // Track the selected branchId
 
   final FlutterSecureStorage _secureStorage = FlutterSecureStorage();
 
   bool get loading => _loading;
   String get errorMessage => _errorMessage;
   List<BranchModel> get branches => _branches;
+  String? get selectedBranchId => _selectedBranchId; // Expose selected branchId
+
+  // Set selected branch
+  void setSelectedBranch(String branchId) {
+    _selectedBranchId = branchId;
+    notifyListeners();
+  }
 
   // Fetch User Branches
   Future<void> fetchUserBranches() async {
     _setLoading(true);
 
     try {
-      // Retrieve token from secure storage
       String? token = await _secureStorage.read(key: 'auth_token');
-
       if (token == null) {
         _setErrorMessage("No token found. Please log in again.");
         return;
@@ -37,11 +43,10 @@ class BranchProvider with ChangeNotifier {
       );
 
       print('Branch Fetch Status Code: ${response.statusCode}');
-      print('Branch Fetch Status Code: ${response.body}');
+      print('Branch Fetch Response: ${response.body}');
 
       if (response.statusCode == 200) {
         List<dynamic> jsonData = json.decode(response.body);
-
         _branches =
             jsonData.map((branch) => BranchModel.fromJson(branch)).toList();
         notifyListeners();
