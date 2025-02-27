@@ -2,33 +2,40 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hrms_app/models/branch_id_models.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:hrms_app/storage/branch_id_storage.dart';
 
 class BranchProvider with ChangeNotifier {
   bool _loading = false;
   String _errorMessage = '';
   List<BranchModel> _branches = [];
-  String? _selectedBranchId; // Track the selected branchId
+  String? _selectedBranchId;
 
-  final FlutterSecureStorage _secureStorage = FlutterSecureStorage();
+  final SecureStorageService _secureStorageService = SecureStorageService();
 
   bool get loading => _loading;
   String get errorMessage => _errorMessage;
   List<BranchModel> get branches => _branches;
-  String? get selectedBranchId => _selectedBranchId; // Expose selected branchId
-
-  // Set selected branch
-  void setSelectedBranch(String branchId) {
+  String? get selectedBranchId => _selectedBranchId;
+  Future<void> setSelectedBranch(String branchId) async {
     _selectedBranchId = branchId;
+    await _secureStorageService.writeData('workingBranchId', branchId);
     notifyListeners();
   }
 
-  // Fetch User Branches
+  Future<void> loadSelectedBranch() async {
+    String? storedBranchId =
+        await _secureStorageService.readData('workingBranchId');
+    if (storedBranchId != null) {
+      _selectedBranchId = storedBranchId;
+    }
+    notifyListeners();
+  }
+
   Future<void> fetchUserBranches() async {
     _setLoading(true);
-
     try {
-      String? token = await _secureStorage.read(key: 'auth_token');
+      String? token = await _secureStorageService
+          .readData('auth_token'); // Use service to read token
       if (token == null) {
         _setErrorMessage("No token found. Please log in again.");
         return;
@@ -41,9 +48,7 @@ class BranchProvider with ChangeNotifier {
           "Authorization": "Bearer $token",
         },
       );
-
-      print('Branch Fetch Status Code: ${response.statusCode}');
-      print('Branch Fetch Response: ${response.body}');
+      print(response.body);
 
       if (response.statusCode == 200) {
         List<dynamic> jsonData = json.decode(response.body);

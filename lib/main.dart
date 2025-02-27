@@ -15,8 +15,7 @@ void main() {
         ChangeNotifierProvider(create: (context) => AuthProvider()),
         ChangeNotifierProvider(create: (context) => BranchProvider()),
         ChangeNotifierProvider(create: (context) => FiscalYearProvider()),
-        ChangeNotifierProvider(
-            create: (context) => CheckInProvider(BranchProvider())),
+        ChangeNotifierProvider(create: (context) => CheckInProvider()),
       ],
       child: MyApp(),
     ),

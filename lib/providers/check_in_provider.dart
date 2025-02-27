@@ -2,67 +2,61 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
-import 'package:hrms_app/models/check_inmodels.dart';
-import 'package:hrms_app/providers/branch_id_provider.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:hrms_app/storage/branch_id_storage.dart';
 
 class CheckInProvider with ChangeNotifier {
   bool _loading = false;
   String _errorMessage = '';
   String? _successMessage;
 
-  final FlutterSecureStorage _secureStorage = FlutterSecureStorage();
-  final BranchProvider _branchProvider;
+  final SecureStorageService _secureStorageService = SecureStorageService();
 
   bool get loading => _loading;
   String get errorMessage => _errorMessage;
   String? get successMessage => _successMessage;
 
-  CheckInProvider(this._branchProvider);
-
   Future<void> punchPost() async {
     _setLoading(true);
-
     try {
-      String? token = await _secureStorage.read(key: 'auth_token');
+      // Fetch token from secure storage
+      String? token = await _secureStorageService.readData('auth_token');
+      print(token);
       if (token == null) {
         _setErrorMessage("No token found. Please log in again.");
         return;
       }
 
-      String? branchId = _branchProvider.selectedBranchId;
+      // Fetch selected branch ID from secure storage
+      String? branchId =
+          await _secureStorageService.readData('workingBranchId');
+      print("branch_id :$branchId");
       if (branchId == null) {
-        _setErrorMessage("No branch selected.");
+        _setErrorMessage("No branch selected. Please select a branch.");
         return;
       }
 
+      // Fetch current location
       Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
 
-      CheckIn checkInData = CheckIn(
-        latitude: position.latitude.toString(),
-        longitude: position.longitude.toString(),
-      );
-
+      // Send API request
       final response = await http.post(
         Uri.parse('http://45.117.153.90:5004/api/Employee/PunchPost'),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
-          "BranchId": branchId,
+          "workingBranchId": branchId,
         },
-        body: json.encode(checkInData.toJson()),
+        body: json.encode({
+          "latitude": position.latitude.toString(),
+          "longitude": position.longitude.toString(),
+        }),
       );
 
-      print('Punch Post Status Code: ${response.statusCode}');
-      print('Punch Post Response: ${response.body}');
-
       if (response.statusCode == 200) {
-        _setSuccessMessage(
-            "Check-in successful! Location: ${position.latitude}, ${position.longitude}");
-        print('Location: ${position.latitude}, ${position.longitude}');
+        _setSuccessMessage("Check-in successful!");
       } else {
-        _setErrorMessage("Failed to submit check-in");
+        _setErrorMessage("Failed to submit check-in: ${response.statusCode}");
       }
     } catch (e) {
       _setErrorMessage("Error: $e");
@@ -84,12 +78,5 @@ class CheckInProvider with ChangeNotifier {
   void _setSuccessMessage(String message) {
     _successMessage = message;
     notifyListeners();
-  }
-
-  void clearErrorMessage() {
-    if (_errorMessage.isNotEmpty) {
-      _errorMessage = '';
-      notifyListeners();
-    }
   }
 }

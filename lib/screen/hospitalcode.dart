@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/login%20screen.dart';
 import 'package:hrms_app/providers/hosptial_code_provider.dart';
-import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 
 class HospitalCodeScreen extends StatefulWidget {
   @override
@@ -11,6 +10,12 @@ class HospitalCodeScreen extends StatefulWidget {
 }
 
 class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
+  // Create a controller for each OTP field
+  final List<TextEditingController> controllers =
+      List.generate(6, (_) => TextEditingController());
+  final List<FocusNode> focusNodes = List.generate(6, (_) => FocusNode());
+  // Track readonly state
+
   String enteredCode = ''; // Store entered OTP code
 
   // Function to validate and submit the entered OTP
@@ -18,7 +23,6 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
     if (enteredCode.length == 6) {
       final provider =
           Provider.of<HospitalCodeProvider>(context, listen: false);
-
       await provider.fetchBaseUrl(enteredCode);
       if (provider.baseUrl.isNotEmpty) {
         Navigator.push(
@@ -29,17 +33,40 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
     }
   }
 
-  // Function to clear OTP field
   void _clearOtpField() {
     setState(() {
       enteredCode = ''; // Reset OTP field
+
+      for (var i = 0; i < controllers.length; i++) {
+        controllers[i].clear();
+      }
     });
+
+    FocusScope.of(context).requestFocus(focusNodes[0]);
+    _clearErrorMessage(); // Clear any error messages
   }
 
-  // Function to clear any error messages
+  //
   void _clearErrorMessage() {
     final provider = Provider.of<HospitalCodeProvider>(context, listen: false);
-    provider.clearError(); // Method to clear error message
+    provider.clearError();
+  }
+
+  // Function to handle text input and move focus automatically
+  void _onChanged(String value, int index) {
+    setState(() {
+      enteredCode = controllers.map((controller) => controller.text).join();
+    });
+
+    if (value.isNotEmpty && index < 5) {
+      FocusScope.of(context).requestFocus(focusNodes[index + 1]);
+    }
+  }
+
+  void _onBackspace(int index) {
+    if (controllers[index].text.isEmpty && index > 0) {
+      FocusScope.of(context).requestFocus(focusNodes[index - 1]);
+    }
   }
 
   @override
@@ -72,30 +99,53 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
               const SizedBox(height: 30),
 
               // OTP Input Field
-              OtpTextField(
-                fillColor: cardBackgroundColor,
-                borderRadius: BorderRadius.circular(10),
-                focusedBorderColor: primarySwatch,
-                enabledBorderColor: lightColor,
-                filled: true,
-                numberOfFields: 6,
-                showFieldAsBox: true,
-                keyboardType: TextInputType.number,
-                fieldWidth: 50,
-                margin: const EdgeInsets.symmetric(horizontal: 6),
-                onCodeChanged: (code) {
-                  setState(() {
-                    enteredCode = code; // Update entered OTP code
-                  });
-                  _clearErrorMessage(); // Clear error message
-                },
-                onSubmit: (code) {
-                  setState(() {
-                    enteredCode = code; // Update entered OTP code
-                  });
-                },
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: List.generate(6, (index) {
+                  return SizedBox(
+                    width: 56,
+                    child: TextField(
+                      controller: controllers[index],
+                      focusNode: focusNodes[index],
+                      cursorColor: primarySwatch[900],
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLength: 1,
+                      onChanged: (value) => _onChanged(value, index),
+                      onEditingComplete: () {
+                        if (index < 5 && controllers[index].text.isNotEmpty) {
+                          FocusScope.of(context)
+                              .requestFocus(focusNodes[index + 1]);
+                        }
+                      },
+                      onSubmitted: (value) {
+                        if (value.isEmpty && index > 0) {
+                          FocusScope.of(context)
+                              .requestFocus(focusNodes[index - 1]);
+                        }
+                      },
+                      decoration: InputDecoration(
+                        counterText: '', // Hide the length counter
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(
+                            color: lightColor,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: primarySwatch,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Row(
                 children: [
                   Expanded(
@@ -108,9 +158,8 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        onPressed: enteredCode.length == 6
-                            ? _validateAndSubmit
-                            : null, // Only enabled when 6 digits are entered
+                        onPressed:
+                            enteredCode.length == 6 ? _validateAndSubmit : null,
                         child: const Text(
                           "Continue Login",
                           style: TextStyle(
@@ -133,8 +182,7 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        onPressed:
-                            _clearOtpField, // Clear OTP when Cancel is pressed
+                        onPressed: _clearOtpField,
                         child: const Text(
                           "Cancel",
                           style: TextStyle(
@@ -155,9 +203,15 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
               if (hospitalProvider.errorMessage.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    hospitalProvider.errorMessage,
-                    style: const TextStyle(fontSize: 16, color: accentColor),
+                  child: Column(
+                    children: [
+                      Text(
+                        hospitalProvider.errorMessage,
+                        style:
+                            const TextStyle(fontSize: 16, color: accentColor),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
                   ),
                 ),
             ],

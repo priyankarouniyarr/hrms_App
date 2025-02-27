@@ -3,20 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hrms_app/screen/branch_id.dart';
 import 'package:hrms_app/models/loginscreen_models.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:hrms_app/storage/token_storage.dart'; // Import the TokenStorage
 
 class AuthProvider with ChangeNotifier {
   bool _loading = false;
   String _errorMessage = '';
   String? _token;
 
-  final FlutterSecureStorage _secureStorage =
-      FlutterSecureStorage(); // Secure storage instance
+  final TokenStorage _tokenStorage = TokenStorage();
 
   bool get loading => _loading;
   String get errorMessage => _errorMessage;
   String? get token => _token;
 
+  // Login function with access and refresh token handling
   Future<void> login(
       String username, String password, BuildContext context) async {
     _setLoading(true);
@@ -49,9 +49,9 @@ class AuthProvider with ChangeNotifier {
         print('Token: $token');
         print('RefreshToken: $refreshToken');
 
-        // Store tokens securely
-        await _secureStorage.write(key: 'auth_token', value: token);
-        await _secureStorage.write(key: 'refresh_token', value: refreshToken);
+        // Store tokens securely using TokenStorage
+        await _tokenStorage.storeToken(token);
+        await _tokenStorage.storeRefreshToken(refreshToken);
 
         _token = token;
         notifyListeners();
@@ -68,16 +68,55 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  // Retrieve Token Securely
+  // Load access token securely
   Future<void> loadToken() async {
-    _token = await _secureStorage.read(key: 'auth_token');
+    _token = await _tokenStorage.getToken();
     notifyListeners();
   }
 
-  //  (Remove Token)
+  // Load refresh token securely
+  Future<void> loadRefreshToken() async {
+    String? refreshToken = await _tokenStorage.getRefreshToken();
+    if (refreshToken != null) {
+      print("Loaded Refresh Token: $refreshToken");
+    }
+  }
+
+  // Refresh the access token using the refresh token
+  Future<void> refreshAccessToken() async {
+    String? refreshToken = await _tokenStorage.getRefreshToken();
+
+    if (refreshToken != null) {
+      final response = await http.post(
+        Uri.parse('http://45.117.153.90:5004/Account/RefreshToken/'),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: json.encode({
+          "refreshToken": refreshToken,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        final newToken = responseData['token'];
+
+        // Store new access token
+        await _tokenStorage.storeToken(newToken);
+        _token = newToken;
+        notifyListeners();
+      } else {
+        _setErrorMessage("Failed to refresh token");
+      }
+    } else {
+      _setErrorMessage("No refresh token available");
+    }
+  }
+
+  // Logout and remove both access and refresh tokens
   Future<void> logout() async {
-    await _secureStorage.delete(key: 'auth_token');
-    await _secureStorage.delete(key: 'refresh_token');
+    await _tokenStorage.removeToken();
+    await _tokenStorage.removeRefreshToken();
     _token = null;
     notifyListeners();
   }

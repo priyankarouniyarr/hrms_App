@@ -18,15 +18,18 @@ class _SelectFiscalYearScreenState extends State<SelectFiscalYearScreen> {
   void initState() {
     super.initState();
 
-    final branchProvider = Provider.of<BranchProvider>(context, listen: false);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final branchProvider =
+          Provider.of<BranchProvider>(context, listen: false);
 
-    if (branchProvider.branches.isNotEmpty) {
-      int branchId = branchProvider.branches.first.branchId;
-      Provider.of<FiscalYearProvider>(context, listen: false)
-          .fetchFiscalYears(branchId);
-    } else {
-      print("No branch ID available.");
-    }
+      if (branchProvider.branches.isNotEmpty) {
+        int branchId = branchProvider.branches.first.branchId;
+        Provider.of<FiscalYearProvider>(context, listen: false)
+            .fetchFiscalYears(branchId);
+      } else {
+        print("No branch ID available.");
+      }
+    });
   }
 
   @override
@@ -78,9 +81,11 @@ class _SelectFiscalYearScreenState extends State<SelectFiscalYearScreen> {
                     items: fiscalYearNames,
                     hintText: "Select Fiscal Year",
                     onChanged: (value) {
-                      setState(() {
-                        selectedFiscalYear = value;
-                      });
+                      if (value != selectedFiscalYear) {
+                        setState(() {
+                          selectedFiscalYear = value;
+                        });
+                      }
                     },
                   ),
                   const SizedBox(height: 20),
@@ -104,7 +109,7 @@ class _SelectFiscalYearScreenState extends State<SelectFiscalYearScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Center(
-                        child: const Text(
+                        child: Text(
                           "Next",
                           style: TextStyle(
                               color: backgroundColor,
