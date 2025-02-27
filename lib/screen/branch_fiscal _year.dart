@@ -33,8 +33,8 @@ class _SelectFiscalYearScreenState extends State<SelectFiscalYearScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: primarySwatch[900],
-        toolbarHeight: 0,
+        // backgroundColor: primarySwatch[900],
+        // toolbarHeight: 0,
         leading: BackButton(
           color: Colors.blue,
         ),
@@ -56,7 +56,6 @@ class _SelectFiscalYearScreenState extends State<SelectFiscalYearScreen> {
                 return Center(child: Text("No fiscal years available"));
               }
 
-              // Extract the fiscal year names for dropdown
               List<String> fiscalYearNames = fiscalYearProvider.fiscalYears
                   .map((fiscalYear) => fiscalYear.financialYearCode)
                   .toList();

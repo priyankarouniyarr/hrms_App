@@ -15,14 +15,12 @@ class FiscalYearProvider with ChangeNotifier {
   String get errorMessage => _errorMessage;
   List<FiscalYearModel> get fiscalYears => _fiscalYears;
 
-  // Assuming you get branchId from secure storage or another source
   Future<void> fetchFiscalYears(int branchId) async {
     _setLoading(true);
 
     try {
-      // Retrieve token from secure storage
       String? token = await _secureStorage.read(key: 'auth_token');
-      print("Token: $token"); // Log token to check if it's correct
+      print("Token: $token");
 
       if (token == null) {
         _setErrorMessage("No token found. Please log in again.");
@@ -34,8 +32,7 @@ class FiscalYearProvider with ChangeNotifier {
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
-          if (branchId != null)
-            "workingBranchId": branchId.toString(), // Ensure proper format
+          if (branchId != null) "workingBranchId": branchId.toString(),
         },
       );
       print('Fiscal Year Fetch Status Code: ${response.statusCode}');
@@ -47,7 +44,6 @@ class FiscalYearProvider with ChangeNotifier {
         if (jsonData.isEmpty) {
           _setErrorMessage("No fiscal years found.");
         } else {
-          // Convert JSON data to List<FiscalYearModel>
           _fiscalYears = jsonData
               .map((fiscalYear) => FiscalYearModel.fromJson(fiscalYear))
               .toList();

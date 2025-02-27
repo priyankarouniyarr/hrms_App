@@ -25,13 +25,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-          // primaryColor: primarySwatch[900],
-          //   brightness: Brightness.light,
-          ),
-      // darkTheme: ThemeData(brightness: Brightness.dark),
-      // themeMode: ThemeMode.system,
       home: OnboardScreen(),
-    ); // Show Onboarding First
+    );
   }
 }

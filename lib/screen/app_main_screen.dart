@@ -20,10 +20,12 @@ class _AppMainScreenState extends State<AppMainScreen> {
     LeavesScreen(),
     ProfileScreen(),
   ];
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index; // Update the selected index
     });
+    print("Selected Index: $_selectedIndex"); // Debug print
   }
 
   @override
@@ -34,12 +36,11 @@ class _AppMainScreenState extends State<AppMainScreen> {
         backgroundColor: backgroundColor,
         selectedItemColor: primarySwatch[900],
         unselectedItemColor: primarySwatch.withOpacity(0.6),
-        showUnselectedLabels: true, //only selected portion will show
+        showUnselectedLabels: true,
         type: BottomNavigationBarType.fixed,
         elevation: 10,
         currentIndex: _selectedIndex,
-        onTap: _onItemTapped, // Handle tap event
-
+        onTap: _onItemTapped,
         items: [
           BottomNavigationBarItem(
             icon: Icon(
@@ -69,7 +70,7 @@ class _AppMainScreenState extends State<AppMainScreen> {
           ),
         ],
       ),
-      body: pages[_selectedIndex],
+      body: pages[_selectedIndex], // Display selected page
     );
   }
 }

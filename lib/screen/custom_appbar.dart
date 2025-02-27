@@ -15,7 +15,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
       ),
       centerTitle: true,
-      automaticallyImplyLeading: false, //hiding the backbutton
+      automaticallyImplyLeading: false,
     );
   }
 
