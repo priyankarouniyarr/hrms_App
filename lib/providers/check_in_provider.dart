@@ -11,6 +11,7 @@ class CheckInProvider with ChangeNotifier {
   String? _latitude;
   String? _longitude;
   String? _branchId;
+  String? _userId; // Declare userId
 
   final SecureStorageService _secureStorageService = SecureStorageService();
 
@@ -24,6 +25,7 @@ class CheckInProvider with ChangeNotifier {
   Future<void> punchPost() async {
     _setLoading(true);
     try {
+      // Fetch auth token
       String? token = await _secureStorageService.readData('auth_token');
       if (token == null) {
         _setErrorMessage("No token found. Please log in again.");
@@ -65,7 +67,7 @@ class CheckInProvider with ChangeNotifier {
       _longitude = position.longitude.toString();
       print("Latitude: $_latitude, Longitude: $_longitude");
 
-      // Send API request with branch ID
+      // Send API request with userId and branchId
       final response = await http.post(
         Uri.parse('http://45.117.153.90:5004/api/Employee/PunchPost'),
         headers: {
@@ -74,6 +76,7 @@ class CheckInProvider with ChangeNotifier {
           "workingBranchId": _branchId!,
         },
         body: json.encode({
+          "user_id": _userId, // Add user_id here
           "latitude": _latitude,
           "longitude": _longitude,
         }),

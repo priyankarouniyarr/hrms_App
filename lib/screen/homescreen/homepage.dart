@@ -57,40 +57,41 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(25.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Hey, Priyanka 👋",
-                    style: TextStyle(
-                      color: secondaryTextColor,
-                      fontSize: 25,
-                      fontWeight: FontWeight.w800,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(25.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Hey, Priyanka 👋",
+                      style: TextStyle(
+                        color: secondaryTextColor,
+                        fontSize: 25,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    "What do you want to do today?",
-                    style: TextStyle(
-                      color: secondaryTextColor,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
+                    SizedBox(height: 10),
+                    Text(
+                      "What do you want to do today?",
+                      style: TextStyle(
+                        color: secondaryTextColor,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: 10),
-            //shifting screen
-            ShiftScreen(),
-            SizedBox(height: 20),
-            Expanded(
-              child: Container(
+              SizedBox(height: 10),
+              // Shifting screen
+              ShiftScreen(),
+              SizedBox(height: 20),
+              Container(
+                height: MediaQuery.of(context).size.height,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
@@ -101,11 +102,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: EdgeInsets.all(16),
                 child: GridView.builder(
                   shrinkWrap: true,
-                  //physics: NeverScrollableScrollPhysics(),
+                  // Set physics to NeverScrollableScrollPhysics to avoid scrolling conflicts
+                  physics: NeverScrollableScrollPhysics(),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
                     childAspectRatio: 0.9,
                   ),
                   itemCount: menuItems.length,
@@ -115,8 +117,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -166,12 +168,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   MaterialPageRoute(builder: (context) => NoticesScreen()),
                 );
               }
-              ;
             },
             borderRadius: BorderRadius.circular(16),
             splashColor: item['color'].withOpacity(0.2),
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(10.0),
               child: Icon(
                 item['icon'],
                 color: item['color'],
@@ -185,7 +186,7 @@ class _HomeScreenState extends State<HomeScreen> {
           item['label'],
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: FontWeight.w600,
             color: primaryTextColor,
           ),
