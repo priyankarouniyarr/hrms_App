@@ -37,7 +37,7 @@ class _OnboardScreenState extends State<OnboardScreen> {
   }
 
   void _startAutoSlide() {
-    _timer = Timer.periodic(Duration(seconds: 3), (Timer timer) {
+    _timer = Timer.periodic(const Duration(seconds: 3), (Timer timer) {
       if (_currentPage < _pages.length - 1) {
         _currentPage++;
       } else {
@@ -45,7 +45,7 @@ class _OnboardScreenState extends State<OnboardScreen> {
       }
       _pageController.animateToPage(
         _currentPage,
-        duration: Duration(milliseconds: 500),
+        duration: const Duration(milliseconds: 500),
         curve: Curves.easeInOut,
       );
     });
@@ -71,7 +71,7 @@ class _OnboardScreenState extends State<OnboardScreen> {
           children: [
             // Background image
             Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage('assets/images/doctor.jpg'),
                   fit: BoxFit.cover,
@@ -87,7 +87,7 @@ class _OnboardScreenState extends State<OnboardScreen> {
                 height: MediaQuery.of(context).size.height * 0.3,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.9),
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(60),
                     topRight: Radius.circular(60),
                   ),
@@ -112,16 +112,16 @@ class _OnboardScreenState extends State<OnboardScreen> {
                               children: [
                                 Text(
                                   _pages[index]['title']!,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
-                                SizedBox(height: 8),
+                                const SizedBox(height: 8),
                                 Text(
                                   _pages[index]['description']!,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 16,
                                   ),
                                   textAlign: TextAlign.center,
@@ -131,18 +131,18 @@ class _OnboardScreenState extends State<OnboardScreen> {
                           },
                         ),
                       ),
-                      SizedBox(height: 15),
+                      const SizedBox(height: 15),
                       // SmoothPageIndicator
                       SmoothPageIndicator(
                         controller: _pageController,
                         count: _pages.length,
-                        effect: ExpandingDotsEffect(
+                        effect: const ExpandingDotsEffect(
                           dotHeight: 12,
                           dotWidth: 12,
                           activeDotColor: primarySwatch, // Customize as needed
                         ),
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
                       GestureDetector(
                         onTap: () {
@@ -154,12 +154,12 @@ class _OnboardScreenState extends State<OnboardScreen> {
                         },
                         child: Container(
                           width: double.infinity,
-                          padding: EdgeInsets.symmetric(vertical: 16.0),
+                          padding: const EdgeInsets.symmetric(vertical: 16.0),
                           decoration: BoxDecoration(
                             color: primarySwatch[900],
                             borderRadius: BorderRadius.circular(10.0),
                           ),
-                          child: Center(
+                          child: const Center(
                             child: Text(
                               'Get Started',
                               style: TextStyle(
@@ -171,7 +171,7 @@ class _OnboardScreenState extends State<OnboardScreen> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                     ],
                   ),
                 ),

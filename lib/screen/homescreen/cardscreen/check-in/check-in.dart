@@ -1,118 +1,54 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:hrms_app/constants/colors.dart';
-import 'package:hrms_app/providers/check_in_provider.dart';
+import 'package:hrms_app/screen/homescreen/cardscreen/check-in/subcategories/punchpost.dart';
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
 
 class CheckInScreen extends StatelessWidget {
-  Future<void> _getLiveLocation(BuildContext context) async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please enable location services')),
-      );
-      return;
-    }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Location permission denied')),
-        );
-        return;
-      }
-    }
-
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    print('Live Location: ${position.latitude}, ${position.longitude}');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-          content: Text(
-              'Live Location: ${position.latitude}, ${position.longitude}')),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Consumer<CheckInProvider>(
-      builder: (context, checkInProvider, child) {
-        // Show success popup if there's a success message
-        if (checkInProvider.successMessage != null) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: Text("Success"),
-                  content: Text(checkInProvider.successMessage!),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Text("OK"),
-                    ),
-                  ],
-                );
-              },
-            );
-          });
-        }
-
-        return Scaffold(
-          backgroundColor: cardBackgroundColor,
-          appBar: CustomAppBarProfile(title: "Check In"),
-          body: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            print("Punch Post tapped");
-                            checkInProvider.punchPost();
-                          },
-                          child: IconTextContainer(
-                            icon: Icons.fingerprint,
-                            text: 'Punch Post',
-                            iconColor: Colors.blue,
-                            containerColor: Colors.blue[50]!,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 16),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            print("Shared Live Location tapped");
-                          },
-                          child: IconTextContainer(
-                            icon: Icons.my_location_outlined,
-                            text: 'Shared Live Location',
-                            iconColor: Colors.green,
-                            containerColor: Colors.green[50]!,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+    return Scaffold(
+      appBar: CustomAppBarProfile(title: "Check In Details"),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Equal spacing
+          children: [
+            Expanded(
+              child: GestureDetector(
+                onTap: () async {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => PunchInScreen()),
+                  );
+                },
+                child: IconTextContainer(
+                  icon: Icons.fingerprint,
+                  text: 'Punch Post',
+                  iconColor: Colors.blue,
+                  containerColor: Colors.blue[50]!,
                 ),
-              ],
+              ),
             ),
-          ),
-        );
-      },
+            SizedBox(width: 10), // Space between buttons
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ShareLiveLocationScreen()),
+                  );
+                },
+                child: IconTextContainer(
+                  icon: Icons.location_on,
+                  text: 'Share Live Location',
+                  iconColor: Colors.green,
+                  containerColor: Colors.green[50]!,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -134,32 +70,37 @@ class IconTextContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 200,
+      height: 120,
       decoration: BoxDecoration(
         color: containerColor,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
-            spreadRadius: 2,
+          BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: iconColor, size: 40),
+          SizedBox(height: 8),
+          Text(
+            text,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           ),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: iconColor, size: 40),
-            SizedBox(height: 8),
-            Text(
-              text,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-          ],
-        ),
-      ),
+    );
+  }
+}
+
+// Dummy Share Live Location Screen
+class ShareLiveLocationScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Live Location")),
+      body: Center(child: Text("Live Location Screen Coming Soon!")),
     );
   }
 }

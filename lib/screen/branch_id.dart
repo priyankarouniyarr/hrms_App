@@ -16,7 +16,6 @@ class _SelectBranchScreenState extends State<SelectBranchScreen> {
   @override
   void initState() {
     super.initState();
-
     Future.microtask(() => Provider.of<BranchProvider>(context, listen: false)
         .fetchUserBranches());
   }
@@ -64,6 +63,16 @@ class _SelectBranchScreenState extends State<SelectBranchScreen> {
                               onChanged: (value) {
                                 setState(() {
                                   selectedBranch = value;
+                                  // Find the branch that matches the selected branch name
+                                  final branch = branchProvider.branches
+                                      .firstWhere((branch) =>
+                                          branch.branchName == value);
+
+                                  // Call the setSelectedBranch method to save the branch ID
+                                  Provider.of<BranchProvider>(context,
+                                          listen: false)
+                                      .setSelectedBranch(
+                                          branch.branchId.toString());
                                 });
                               },
                             ),

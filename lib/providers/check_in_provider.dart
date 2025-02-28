@@ -8,55 +8,83 @@ class CheckInProvider with ChangeNotifier {
   bool _loading = false;
   String _errorMessage = '';
   String? _successMessage;
+  String? _latitude;
+  String? _longitude;
+  String? _branchId;
 
   final SecureStorageService _secureStorageService = SecureStorageService();
 
   bool get loading => _loading;
   String get errorMessage => _errorMessage;
   String? get successMessage => _successMessage;
+  String? get latitude => _latitude;
+  String? get longitude => _longitude;
+  String? get branchId => _branchId;
 
   Future<void> punchPost() async {
     _setLoading(true);
     try {
-      // Fetch token from secure storage
       String? token = await _secureStorageService.readData('auth_token');
-      print(token);
       if (token == null) {
         _setErrorMessage("No token found. Please log in again.");
         return;
       }
 
       // Fetch selected branch ID from secure storage
-      String? branchId =
-          await _secureStorageService.readData('workingBranchId');
-      print("branch_id :$branchId");
-      if (branchId == null) {
+      _branchId = await _secureStorageService.readData('workingBranchId');
+      print("Branch ID: $_branchId");
+      if (_branchId == null) {
         _setErrorMessage("No branch selected. Please select a branch.");
         return;
+      }
+
+      // Check if location is enabled
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        _setErrorMessage("Location services are disabled. Please enable them.");
+        return;
+      }
+
+      // Request location permission if not granted
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied ||
+            permission == LocationPermission.deniedForever) {
+          _setErrorMessage("Location permission denied.");
+          return;
+        }
       }
 
       // Fetch current location
       Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
 
-      // Send API request
+      _latitude = position.latitude.toString();
+      _longitude = position.longitude.toString();
+      print("Latitude: $_latitude, Longitude: $_longitude");
+
+      // Send API request with branch ID
       final response = await http.post(
         Uri.parse('http://45.117.153.90:5004/api/Employee/PunchPost'),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
-          "workingBranchId": branchId,
+          "workingBranchId": _branchId!,
         },
         body: json.encode({
-          "latitude": position.latitude.toString(),
-          "longitude": position.longitude.toString(),
+          "latitude": _latitude,
+          "longitude": _longitude,
         }),
       );
+      print(response.body);
 
       if (response.statusCode == 200) {
-        _setSuccessMessage("Check-in successful!");
+        _setSuccessMessage("Check-in successful for Branch ID: $_branchId!");
       } else {
-        _setErrorMessage("Failed to submit check-in: ${response.statusCode}");
+        _setErrorMessage(
+            "Failed to submit check-in: ${response.statusCode}\n ${response.body}");
       }
     } catch (e) {
       _setErrorMessage("Error: $e");
@@ -68,15 +96,23 @@ class CheckInProvider with ChangeNotifier {
   void _setLoading(bool value) {
     _loading = value;
     notifyListeners();
+    print("Loading: $_loading");
   }
 
   void _setErrorMessage(String message) {
     _errorMessage = message;
     notifyListeners();
+    print("Error: $_errorMessage");
   }
 
   void _setSuccessMessage(String message) {
     _successMessage = message;
+    notifyListeners();
+    print("Success: $_successMessage");
+  }
+
+  void clearSuccessMessage() {
+    _successMessage = null;
     notifyListeners();
   }
 }

@@ -10,15 +10,12 @@ class HospitalCodeScreen extends StatefulWidget {
 }
 
 class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
-  // Create a controller for each OTP field
   final List<TextEditingController> controllers =
       List.generate(6, (_) => TextEditingController());
   final List<FocusNode> focusNodes = List.generate(6, (_) => FocusNode());
-  // Track readonly state
 
   String enteredCode = ''; // Store entered OTP code
 
-  // Function to validate and submit the entered OTP
   void _validateAndSubmit() async {
     if (enteredCode.length == 6) {
       final provider =

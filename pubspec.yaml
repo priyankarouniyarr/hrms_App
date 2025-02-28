@@ -30,8 +30,9 @@ dependencies:
   fluttertoast: ^8.2.12
   provider: ^6.1.2
   flutter_secure_storage: ^9.2.4
-  flutter_otp_text_field: ^1.4.0+2
+
   geolocator: ^13.0.2
+  geocoding: ^3.0.0
   
 
   

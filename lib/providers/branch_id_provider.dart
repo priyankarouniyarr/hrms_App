@@ -16,8 +16,10 @@ class BranchProvider with ChangeNotifier {
   String get errorMessage => _errorMessage;
   List<BranchModel> get branches => _branches;
   String? get selectedBranchId => _selectedBranchId;
+
   Future<void> setSelectedBranch(String branchId) async {
     _selectedBranchId = branchId;
+    print("selectedbranchId: $_selectedBranchId");
     await _secureStorageService.writeData('workingBranchId', branchId);
     notifyListeners();
   }
@@ -25,6 +27,7 @@ class BranchProvider with ChangeNotifier {
   Future<void> loadSelectedBranch() async {
     String? storedBranchId =
         await _secureStorageService.readData('workingBranchId');
+    print("Loaded branch ID: $storedBranchId");
     if (storedBranchId != null) {
       _selectedBranchId = storedBranchId;
     }
