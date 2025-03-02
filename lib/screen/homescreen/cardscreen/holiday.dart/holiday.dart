@@ -1,8 +1,10 @@
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/models/holidays_model.dart';
-import 'package:hrms_app/storage/holidays_provider.dart';
+import 'package:hrms_app/providers/holidays_provider.dart';
+import 'package:hrms_app/screen/homescreen/cardscreen/holiday.dart/hoildays_details_screen.dart';
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
 
 class HolidayScreen extends StatelessWidget {
@@ -28,19 +30,27 @@ class HolidayScreen extends StatelessWidget {
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
-            return SingleChildScrollView(
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildHolidayList(context, 'Past Holidays',
-                      Provider.of<HolidayProvider>(context).pastHolidays),
-
-                  _buildHolidayList(context, 'Upcoming Holidays',
-                      Provider.of<HolidayProvider>(context).upcomingHolidays),
-
-                  // All Holidays List
-                  _buildHolidayList(context, 'All Holidays',
-                      Provider.of<HolidayProvider>(context).allHolidays),
+                  _buildHolidayCard(
+                      context,
+                      'Past Holidays',
+                      Provider.of<HolidayProvider>(context).pastHolidays,
+                      accentColor),
+                  _buildHolidayCard(
+                    context,
+                    'Upcoming Holidays',
+                    Provider.of<HolidayProvider>(context).upcomingHolidays,
+                    const Color.fromARGB(255, 5, 239, 126),
+                  ),
+                  _buildHolidayCard(
+                    context,
+                    'All Holidays',
+                    Provider.of<HolidayProvider>(context).allHolidays,
+                    Colors.blueAccent,
+                  ),
                 ],
               ),
             );
@@ -50,39 +60,48 @@ class HolidayScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHolidayList(
-      BuildContext context, String title, List<Holidays> holidays) {
-    print("Building Holiday List for $title: ${holidays.length} items");
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          SizedBox(height: 10),
-          holidays.isEmpty
-              ? Text('No holidays available')
-              : ListView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: holidays.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(holidays[index].title ?? 'No Title'),
-                      ),
-                      subtitle: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                            '${holidays[index].fromDate.toLocal()} to ${holidays[index].toDate.toLocal()}'),
-                      ),
-                    );
-                  },
+  /// Creates a Card for each Holiday Category
+  Widget _buildHolidayCard(BuildContext context, String title,
+      List<Holidays> holidays, Color color) {
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              HolidayDetailsScreen(title: title, holidays: holidays),
+        ),
+      ),
+      child: Card(
+        color: color,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 4,
+        margin: EdgeInsets.only(bottom: 16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: cardBackgroundColor,
                 ),
-        ],
+              ),
+              CircleAvatar(
+                backgroundColor: cardBackgroundColor,
+                child: Text(
+                  holidays.length.toString(),
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
-import 'package:hrms_app/storage/branch_id_storage.dart';
+import 'package:hrms_app/storage/securestorage.dart';
 
 class CheckInProvider with ChangeNotifier {
   bool _loading = false;
