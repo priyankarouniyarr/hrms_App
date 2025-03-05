@@ -21,94 +21,100 @@ class NoticeDetailScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 6, horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 4, 109, 238),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    categoryValues.reverse[notice.category] ?? 'Unknown',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.right,
-                  ),
-                ),
-                // Row to display Title and Categories
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: Offset(0, 4),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        notice.title.trim(),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                          letterSpacing: 0.4,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 8,
                       ),
-                    ],
-                  ),
-                  padding: EdgeInsets.all(16),
-                  child:
-
-                      // Title Text
-                      Flexible(
-                    child: Text(
-                      notice.title,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                      textAlign: TextAlign.justify,
-                      maxLines: 14,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-
-                  // Category Text
+                    SizedBox(width: 10),
+                    Container(
+                      padding:
+                          EdgeInsets.symmetric(vertical: 5, horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.blueAccent,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 4,
+                            offset: Offset(2, 2),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        categoryValues.reverse[notice.category] ?? 'Unknown',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-
-                SizedBox(height: 20),
-
-                // Published Date
+                SizedBox(height: 15),
                 if (notice.publishedTime != null)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 24),
-                    child: Text(
-                      'Published on: ${DateFormat('yyyy-MM-dd HH:mm:ss').format(notice.publishedTime!)}',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey[600],
+                  Row(
+                    mainAxisAlignment:
+                        MainAxisAlignment.spaceBetween, // Align date & time
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.calendar_today,
+                              size: 18, color: Colors.blue), // Date Icon
+                          SizedBox(width: 6),
+                          Text(
+                            DateFormat('yyyy-MM-dd')
+                                .format(notice.publishedTime!), // Only date
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey[900],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ),
-
-                // Content of the Notice in a Card-like Style
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: Offset(0, 4),
+                      Row(
+                        children: [
+                          Icon(Icons.access_time,
+                              size: 18, color: Colors.blue), // Time Icon
+                          SizedBox(width: 6),
+                          Text(
+                            DateFormat('HH:mm:ss')
+                                .format(notice.publishedTime!), // Only time
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey[900],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                  padding: EdgeInsets.all(16),
-                  child: Text(
-                    notice.content,
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.black87,
-                      height: 1.6,
-                    ),
-                    textAlign: TextAlign.justify,
+                SizedBox(height: 15),
+                Divider(color: Colors.grey[300], thickness: 1),
+                SizedBox(height: 15),
+                Text(
+                  notice.content,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.black87,
+                    height: 1.6,
                   ),
+                  textAlign: TextAlign.justify,
                 ),
               ],
             ),

@@ -1,7 +1,7 @@
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
-import 'package:hrms_app/models/notices_models.dart';
 import 'package:hrms_app/providers/notices_provider.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/notices/noticesdetails_screen.dart';
 import '../../../profile/subcategories/appbar_profilescreen categories/customprofile_appbar.dart';
@@ -9,48 +9,47 @@ import '../../../profile/subcategories/appbar_profilescreen categories/custompro
 class NoticesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // Fetch notices data from the NoticesProvider
     return Scaffold(
       backgroundColor: cardBackgroundColor,
-      appBar: CustomAppBarProfile(title: "All Notices"),
+      appBar: const CustomAppBarProfile(title: "All Notices"),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: FutureBuilder(
           future: Provider.of<NoticesProvider>(context, listen: false)
               .fetchNotice(),
           builder: (context, snapshot) {
-            // Check if data is being loaded
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             }
-
-            // Check for errors
             if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
             }
 
-            // Get the list of notices from the provider
             final notices = Provider.of<NoticesProvider>(context).notices;
-
-            // Show a message if no notices are found
             if (notices.isEmpty) {
-              return Center(child: Text('No notices available.'));
+              return const Center(
+                child: Text(
+                  'No notices available.',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                ),
+              );
             }
 
-            // Display the notices dynamically from the provider
+            // Reverse the notices list so the latest one appears first
+            final reversedNotices = notices.reversed.toList();
+
             return ListView.builder(
-              itemCount: notices.length,
+              itemCount: reversedNotices.length,
               itemBuilder: (context, index) {
-                final notice = notices[index];
+                final notice = reversedNotices[index];
                 return Card(
-                  elevation: 4,
-                  margin: EdgeInsets.symmetric(vertical: 8.0),
+                  elevation: 8, // Added higher elevation for depth
+                  margin: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(16), // Rounded corners
                   ),
                   child: InkWell(
                     onTap: () {
-                      // Navigate to the NoticeDetailScreen with the selected notice
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -60,53 +59,90 @@ class NoticesScreen extends StatelessWidget {
                       );
                     },
                     child: Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(18.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            // Format the date as needed
-                            notice.publishedTime != null
-                                ? notice.publishedTime!.toString()
-                                : "No date available",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey[900],
+                          // Date & Time Row with Icons
+                          if (notice.publishedTime != null)
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(Icons.calendar_today,
+                                        size: 20, color: Colors.blue[600]),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      DateFormat('yyyy-MM-dd')
+                                          .format(notice.publishedTime!),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey[800],
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Icon(Icons.access_time,
+                                        size: 20, color: Colors.blue[600]),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      DateFormat('HH:mm:ss')
+                                          .format(notice.publishedTime!),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey[800],
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                          ),
-                          SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                notice.title,
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              Text(
-                                // Display a placeholder for time or published time
-                                notice.publishedTime != null
-                                    ? notice.publishedTime!
-                                        .toLocal()
-                                        .toString()
-                                        .split(' ')[1]
-                                    : 'N/A',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey[900],
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 12),
+
+                          // Notice Title
                           Text(
-                            notice
-                                .excerpt, // Display the excerpt (short description)
+                            notice.title.length > 100
+                                ? '${notice.title.substring(0, notice.title.length ~/ 3)}....'
+                                : notice.title,
+                            style: const TextStyle(
+                              fontSize: 18, // Larger font size
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                              letterSpacing: 0.4,
+                            ),
+                            textAlign: TextAlign.justify,
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Notice Content Preview
+                          Text(
+                            notice.content.length > 100
+                                ? '${notice.content.substring(0, notice.content.length ~/ 15)}...' // Show part of content
+                                : notice.content,
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 16, // Slightly larger font size
                               color: Colors.grey[600],
+                              height: 1.3,
+                              letterSpacing: 0.2,
+                            ),
+                            textAlign: TextAlign.justify,
+                          ),
+                          const SizedBox(height: 16),
+
+                          const Align(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              "Read More →",
+                              style: TextStyle(
+                                fontSize: 16, // Larger size for better emphasis
+                                color: Colors.blueAccent,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ],

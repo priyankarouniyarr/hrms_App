@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'subcategories/emergency_conatct.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/custom_appbar.dart';
+import 'package:hrms_app/providers/profile_provider.dart';
 import 'package:hrms_app/screen/profile/profilemenuitem.dart';
 import 'package:hrms_app/screen/profile/subcategories/documents.dart';
-import 'package:hrms_app/screen/profile/subcategories/emergency_conatct.dart';
 import 'package:hrms_app/screen/profile/subcategories/insurance.details.dart';
 import 'package:hrms_app/screen/profile/subcategories/employement_contracts.dart';
 import 'package:hrms_app/screen/profile/subcategories/personal_information%20.dart';
@@ -18,7 +20,27 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   @override
+  void initState() {
+    super.initState();
+    Future.microtask(() async {
+      await Provider.of<EmployeeProvider>(context, listen: false)
+          .fetchEmployeeDetails();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final employeeProvider = Provider.of<EmployeeProvider>(context);
+
+    if (employeeProvider.isLoading) {
+      return Scaffold(
+        appBar: CustomAppBar(title: "My Profile"),
+        body: Center(
+            child:
+                CircularProgressIndicator()), // Show a loading indicator while fetching data
+      );
+    }
+
     return Scaffold(
       backgroundColor: cardBackgroundColor,
       appBar: CustomAppBar(title: "My Profile"),
@@ -27,24 +49,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             const CircleAvatar(
               radius: 40,
-              backgroundColor: Color.fromARGB(255, 205, 201, 201),
-              child: Icon(Icons.person, size: 50, color: Colors.white),
+              backgroundColor: Color.fromARGB(255, 201, 213, 250),
+              child: Icon(Icons.person, size: 50, color: Colors.blue),
             ),
             const SizedBox(height: 10),
-            const Text(
-              "Priyanka", //user
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Text(
+              employeeProvider.fullname,
+              style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
-            Text("work@mail.com", //email
-                style: TextStyle(
-                    fontSize: 16, color: primaryTextColor.withOpacity(0.7))),
-            Text("02134343", //phone number
-                style: TextStyle(
-                    fontSize: 16, color: primaryTextColor.withOpacity(0.7))),
-            const SizedBox(height: 20),
-
+            Text(
+              employeeProvider.devnagariName,
+              style: TextStyle(
+                  fontSize: 25,
+                  color: primaryTextColor.withOpacity(0.7),
+                  fontWeight: FontWeight.bold),
+            ),
             // Profile Menu List
+            SizedBox(
+              height: 20,
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Card(
@@ -143,9 +167,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             ),
-
             const SizedBox(height: 10),
-
             // Logout Button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

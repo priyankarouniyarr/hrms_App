@@ -27,9 +27,9 @@ class NoticesProvider with ChangeNotifier {
 
     if (response.statusCode == 200) {
       final List<dynamic> noticedata = json.decode(response.body);
-      //print("Decoded holiday data: $holidayData");
+
       _notices = noticedata.map((data) => Notices.fromJson(data)).toList();
-      //print("pastholidays:$_pastHolidays");
+
       notifyListeners();
     } else {
       throw Exception('Failed to load notices ');
@@ -48,7 +48,7 @@ class NoticesProvider with ChangeNotifier {
       Uri.parse('http://45.117.153.90:5004/api/Notice/GetNoticeById/1'),
       headers: {'Authorization': 'Bearer $token', "workingBranchId": branchId!},
     );
-    //print("Response body for upcoming holidays: ${response.body}");
+
     if (response.statusCode == 200) {
       final List<dynamic> holidayData = json.decode(response.body);
 

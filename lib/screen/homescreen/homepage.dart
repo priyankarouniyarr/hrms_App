@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
+import 'package:hrms_app/screen/app_main_screen.dart';
+import 'package:hrms_app/providers/auth_provider.dart';
 import 'package:hrms_app/screen/homescreen/Shifting.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/works/works.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/notices/notices.dart';
@@ -29,6 +32,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    String username = authProvider.username ?? "User";
+    // Default if null
+    print(username);
     return Scaffold(
       backgroundColor: primarySwatch[900],
       appBar: AppBar(
@@ -67,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Hey, Priyanka 👋",
+                      "Hey, $username 👋",
                       style: TextStyle(
                         color: secondaryTextColor,
                         fontSize: 25,

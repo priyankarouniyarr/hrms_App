@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
+import 'package:hrms_app/screen/app_main_screen.dart';
 import 'package:hrms_app/screen/homescreen/homepage.dart';
 import 'package:hrms_app/providers/branch_id_provider.dart';
 import 'package:hrms_app/screen/leaves/dropdown_custom.dart';
@@ -95,7 +96,7 @@ class _SelectFiscalYearScreenState extends State<SelectFiscalYearScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => HomeScreen()),
+                                  builder: (context) => AppMainScreen()),
                             );
                           }
                         : null,

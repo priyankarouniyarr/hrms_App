@@ -2,13 +2,22 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hrms_app/screen/branch_id.dart';
+import 'package:hrms_app/storage/token_storage.dart';
 import 'package:hrms_app/models/loginscreen_models.dart';
-import 'package:hrms_app/storage/token_storage.dart'; // Import the TokenStorage
 
 class AuthProvider with ChangeNotifier {
   bool _loading = false;
   String _errorMessage = '';
   String? _token;
+  String? _username; // Store username
+  String _formatToPascalCase(String text) {
+    return text
+        .split(' ') // Split words by spaces
+        .map((word) => word.isNotEmpty
+            ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}'
+            : '')
+        .join(' '); // Join words back
+  }
 
   final TokenStorage _tokenStorage = TokenStorage();
 
@@ -16,7 +25,8 @@ class AuthProvider with ChangeNotifier {
   String get errorMessage => _errorMessage;
   String? get token => _token;
 
-  // Login function with access and refresh token handling
+  String? get username => _username;
+
   Future<void> login(
       String username, String password, BuildContext context) async {
     _setLoading(true);
@@ -45,7 +55,7 @@ class AuthProvider with ChangeNotifier {
         final responseData = json.decode(response.body);
         final token = responseData['token'];
         final refreshToken = responseData['refreshToken'];
-
+        _username = _formatToPascalCase(username);
         print('Token: $token');
         print('RefreshToken: $refreshToken');
 

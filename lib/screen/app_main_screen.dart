@@ -25,7 +25,7 @@ class _AppMainScreenState extends State<AppMainScreen> {
     setState(() {
       _selectedIndex = index; // Update the selected index
     });
-    print("Selected Index: $_selectedIndex"); // Debug print
+    //print("Selected Index: $_selectedIndex"); // Debug print
   }
 
   @override
