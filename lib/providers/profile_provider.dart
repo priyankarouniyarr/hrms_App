@@ -10,6 +10,10 @@ class EmployeeProvider with ChangeNotifier {
   final SecureStorageService secureStorageService = SecureStorageService();
   List<Employee> _employees = [];
   bool isLoading = false;
+  String? _branch;
+  String? _department;
+  String? _designation;
+  String? _joiningDate;
   String? _fullname;
   String? _email;
   String? _phone;
@@ -22,46 +26,54 @@ class EmployeeProvider with ChangeNotifier {
   String? errorMessage;
   EmployeeTemporaryAddress? _temporaryAddress;
   EmployeeEmergencyContact? _emergencyContact;
+  EmployeeCurrentShift? _currentShift;
+  List<EmployeeDocument> _document = [];
+  String formatToPascalCase(String text) {
+    return text
+        .replaceAll(RegExp(r'[_\s]+'), ' ')
+        .trim()
+        .split(' ')
+        .map((word) => word.isNotEmpty
+            ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}'
+            : '')
+        .join(' ');
+  }
+
+  List<EmployeeInsuranceDetail> _insuranceDetail = [];
+  String get email => _email ?? '';
+  String get phone => _phone ?? '';
+  String get gender => _gender ?? '';
+  String get branch => _branch ?? '';
+  String get department => _department ?? '';
+  String get desgination => _designation ?? '';
+  String get dateOfJoining => _joiningDate ?? '';
+  String get dateofBirth => _dateofBirth ?? '';
+  String get maritalStatus => _maritalStatus ?? '';
+  String get bloodGroup => _bloodGroup ?? '';
+  String get fullname => _fullname ?? '';
+  String get devnagariName => _devnagariName ?? '';
   EmployeeEmergencyContact get emergenecycontact =>
       _emergencyContact ??
       EmployeeEmergencyContact(
         contactPerson: '',
         phoneNumber: '',
         relation: '',
+        employeeId: '',
       );
 
-  EmployeeInsuranceDetail get insuranceDetail =>
-      _insuranceDetail ??
-      EmployeeInsuranceDetail(
-          type: '',
-          isIncomeTaxExceptionApplicable: '',
-          policyNumber: '',
-          startdate: '',
-          enddate: '',
-          amount: '',
-          employeeName: '');
+  List<EmployeeDocument> get documents => _document;
+  EmployeeCurrentShift get currentShift =>
+      _currentShift ??
+      EmployeeCurrentShift(
+        primaryShiftName: '',
+        primaryShiftStart: '',
+        primaryShiftEnd: '',
+        extendedShiftName: '',
+        extendedShiftStart: '',
+        extendedShiftEnd: '',
+      );
+  List<EmployeeInsuranceDetail> get insurance => _insuranceDetail;
 
-  String formatToPascalCase(String text) {
-    return text
-        .replaceAll(RegExp(r'[_\s]+'),
-            ' ') // Replace underscores & multiple spaces with a single space
-        .trim()
-        .split(' ') // Split by space
-        .map((word) => word.isNotEmpty
-            ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}'
-            : '')
-        .join(' '); // Join words back
-  }
-
-  EmployeeInsuranceDetail? _insuranceDetail;
-  String get email => _email ?? '';
-  String get phone => _phone ?? '';
-  String get gender => _gender ?? '';
-  String get dateofBirth => _dateofBirth ?? '';
-  String get maritalStatus => _maritalStatus ?? '';
-  String get bloodGroup => _bloodGroup ?? '';
-  String get fullname => _fullname ?? '';
-  String get devnagariName => _devnagariName ?? '';
   EmployeePermanentAddress get permanentAddress =>
       _permanentAddress ??
       EmployeePermanentAddress(
@@ -76,7 +88,7 @@ class EmployeeProvider with ChangeNotifier {
   Future<void> fetchEmployeeDetails() async {
     try {
       isLoading = true;
-      notifyListeners(); // Notify listeners when loading starts
+      notifyListeners();
 
       // Retrieve token and branchId from secure storage
       String? token = await secureStorageService.readData('auth_token');
@@ -85,7 +97,7 @@ class EmployeeProvider with ChangeNotifier {
       if (token == null || branchId == null) {
         errorMessage = 'Token or BranchId is missing';
         isLoading = false;
-        notifyListeners(); // Notify listeners when an error occurs
+        notifyListeners();
         return;
       }
 
@@ -102,148 +114,144 @@ class EmployeeProvider with ChangeNotifier {
         },
       );
 
-      final data = json.decode(response.body);
-      //print(data); // Inspect the structure of the response
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
 
-      if (data.containsKey('employeeFullName') &&
-          data['employeeFullName'] != null) {
-        _fullname = data['employeeFullName'];
-        // print(_fullname);
-      } else {
-        _fullname = 'null';
-      }
+        // Document fetching
+        List<dynamic> jsonResponse = data['employeeDocuments'] ?? 'null';
+        _document =
+            jsonResponse.map((e) => EmployeeDocument.fromJson(e)).toList();
+        List<dynamic> jsonResponse1 =
+            data['employeeInsuranceDetails'] ?? 'null';
+        _insuranceDetail = jsonResponse1
+            .map((e) => EmployeeInsuranceDetail.fromJson(e))
+            .toList();
 
-      if (data.containsKey('devnagariName') && data['devnagariName'] != null) {
-        _devnagariName = data['devnagariName'];
-      } else {
-        _devnagariName = 'null';
-      }
-      if (data.containsKey('homeEmail') && data['homeEmail'] != null) {
-        _email = data['homeEmail'];
-      } else {
-        _email = 'null';
-      }
-      if (data.containsKey('homePhone') && data['homePhone'] != null) {
-        _phone = data['homePhone'];
-        // print(_phone);
-      } else {
-        _phone = 'null';
-        //print("hello");
-      }
-      if (data.containsKey('gender') && data['gender'] != null) {
-        _gender = data['gender'];
-      } else {
-        _gender = 'null';
-      }
-      if (data.containsKey('maritalStatus') && data['maritalStatus'] != null) {
-        _maritalStatus = data['maritalStatus'];
-      } else {
-        _maritalStatus = 'null';
-      }
-      if (data.containsKey('bloodGroup') && data['bloodGroup'] != null) {
-        _bloodGroup = data['bloodGroup'];
-      } else {
-        _bloodGroup = 'null';
-      }
-      if (data.containsKey('birthDate') && data['birthDate'] != null) {
-        DateTime birthDate = DateTime.parse(data['birthDate']);
-        _dateofBirth = DateFormat('yyyy-MM-dd').format(birthDate);
-      } else {
-        _dateofBirth = 'null';
-      }
+        _fullname = data['employeeFullName'] ?? 'null';
+        _designation = data['designationTitle'] ?? 'null';
+        _branch = data['workBranchTitle'] ?? 'null';
+        _joiningDate = data['joiningDateNp'] ?? 'null';
+        _department = data['departmentTitle'] ?? 'null';
+        _devnagariName = data['devnagariName'] ?? 'null';
+        _email = data['homeEmail'] ?? 'null';
+        _phone = data['homePhone'] ?? 'null';
+        _gender = data['gender'] ?? 'null';
+        _maritalStatus = data['maritalStatus'] ?? 'null';
+        _bloodGroup = data['bloodGroup'] ?? 'null';
 
-      // Handling Permanent Address
-      if (data.containsKey('permanentAddress') &&
-          data['permanentAddress'] != null) {
-        var permanentAddressData = data['permanentAddress'];
-        _permanentAddress =
-            EmployeePermanentAddress.fromJson(permanentAddressData);
-      } else {
-        _permanentAddress = EmployeePermanentAddress(
-            addressLine1: 'null',
-            city: 'null',
-            ward: 'null',
-            municipalName: 'null');
-      }
-
-      // Handling Temporary Address
-      if (data.containsKey('temporaryAddress') &&
-          data['temporaryAddress'] != null) {
-        var temporaryAddressData = data['temporaryAddress'];
-        _temporaryAddress =
-            EmployeeTemporaryAddress.fromJson(temporaryAddressData);
-      } else {
-        _temporaryAddress = EmployeeTemporaryAddress(
-            addressLine1: 'null',
-            city: 'null',
-            ward: 'null',
-            municipalName: 'null');
-      }
-
-      //emergency contact
-      if (data.containsKey('employeeEmergencyContacts') &&
-          data['employeeEmergencyContacts'] != null) {
-        var employeeEmergencyContacts = data['employeeEmergencyContacts'];
-
-        // Iterate through all emergency contacts in the list
-        if (employeeEmergencyContacts.isNotEmpty) {
-          _emergencyContact = EmployeeEmergencyContact(
-            contactPerson: formatToPascalCase(
-                employeeEmergencyContacts[0]['contactPerson'] ?? 'null'),
-            phoneNumber: employeeEmergencyContacts[0]['phoneNumber'] ?? 'null',
-            relation: formatToPascalCase(
-                employeeEmergencyContacts[0]['relation'] ?? 'null'),
-          );
+        // Birthdate formatting
+        if (data.containsKey('birthDate') && data['birthDate'] != null) {
+          DateTime birthDate = DateTime.parse(data['birthDate']);
+          _dateofBirth = DateFormat('yyyy-MM-dd').format(birthDate);
         } else {
-          // If the list is empty, assign default values
+          _dateofBirth = 'null';
+        }
+
+        // Permanent Address
+        if (data.containsKey('permanentAddress') &&
+            data['permanentAddress'] != null) {
+          var permanentAddressData = data['permanentAddress'];
+          _permanentAddress =
+              EmployeePermanentAddress.fromJson(permanentAddressData);
+        } else {
+          _permanentAddress = EmployeePermanentAddress(
+              addressLine1: 'null',
+              city: 'null',
+              ward: 'null',
+              municipalName: 'null');
+        }
+
+        // Temporary Address
+        if (data.containsKey('temporaryAddress') &&
+            data['temporaryAddress'] != null) {
+          var temporaryAddressData = data['temporaryAddress'];
+          _temporaryAddress =
+              EmployeeTemporaryAddress.fromJson(temporaryAddressData);
+        } else {
+          _temporaryAddress = EmployeeTemporaryAddress(
+              addressLine1: 'null',
+              city: 'null',
+              ward: 'null',
+              municipalName: 'null');
+        }
+
+        // Emergency Contact
+        if (data.containsKey('employeeEmergencyContacts') &&
+            data['employeeEmergencyContacts'] != null) {
+          var employeeEmergencyContacts = data['employeeEmergencyContacts'];
+
+          // Iterate through all emergency contacts in the list
+          if (employeeEmergencyContacts.isNotEmpty) {
+            _emergencyContact = EmployeeEmergencyContact(
+              contactPerson: formatToPascalCase(
+                  employeeEmergencyContacts[0]['contactPerson']),
+              phoneNumber: employeeEmergencyContacts[0]['phoneNumber'],
+              relation:
+                  formatToPascalCase(employeeEmergencyContacts[0]['relation']),
+            );
+          } else {
+            // If the list is empty, assign default values
+            _emergencyContact = EmployeeEmergencyContact(
+              contactPerson: '',
+              phoneNumber: '',
+              relation: '',
+            );
+          }
+        } else {
           _emergencyContact = EmployeeEmergencyContact(
             contactPerson: 'null',
             phoneNumber: 'null',
             relation: 'null',
           );
         }
-      } else {
-        // If the key doesn't exist or the data is null, assign default values
-        _emergencyContact = EmployeeEmergencyContact(
-          contactPerson: 'null',
-          phoneNumber: 'null',
-          relation: 'null',
-        );
-      }
 
-      if (data.containsKey('employeeInsuranceDetails') &&
-          data['employeeInsuranceDetails'] != null &&
-          data['employeeInsuranceDetails'].isNotEmpty) {
-        var insuranceData = data['employeeInsuranceDetails'];
+        // Current Shift Details
+        if (data.containsKey('employeeCurrentShift') &&
+            data['employeeCurrentShift'] != null) {
+          var shiftData = data['employeeCurrentShift'];
 
-        if (insuranceData.isNotEmpty) {
-          var firstItem = insuranceData[0];
+          if (shiftData is Map<String, dynamic>) {
+            var primaryShiftName = shiftData['primaryShiftName'];
+            var primaryShiftStart = shiftData['primaryShiftStart'];
+            var primaryShiftEnd = shiftData['primaryShiftEnd'];
 
-          _insuranceDetail = EmployeeInsuranceDetail.fromJson(firstItem);
-          //print(insuranceDetail!.policyNumber);
+            var extendedShiftName = shiftData['extendedShiftName'];
+            var extendedShiftStart = shiftData['extendedShiftStart'];
+            var extendedShiftEnd = shiftData['extendedShiftEnd'];
+
+            _currentShift = EmployeeCurrentShift(
+              primaryShiftName: primaryShiftName,
+              primaryShiftStart: primaryShiftStart,
+              primaryShiftEnd: primaryShiftEnd,
+              extendedShiftName: extendedShiftName,
+              extendedShiftStart: extendedShiftStart,
+              extendedShiftEnd: extendedShiftEnd,
+            );
+          } else {
+            _currentShift = EmployeeCurrentShift(
+              primaryShiftName: 'null',
+              primaryShiftStart: 'null',
+              primaryShiftEnd: 'null',
+              extendedShiftName: 'null',
+              extendedShiftStart: 'null',
+              extendedShiftEnd: 'null',
+            );
+          }
         } else {
-          _insuranceDetail = EmployeeInsuranceDetail(
-            type: 'N/A',
-            enddate: 'N/A',
-            startdate: 'N/A',
-            policyNumber: 'N/A',
-            employeeName: 'N/A',
-            amount: 'N/A',
-            isIncomeTaxExceptionApplicable: 'N/A',
+          _currentShift = EmployeeCurrentShift(
+            primaryShiftName: 'null',
+            primaryShiftStart: 'null',
+            primaryShiftEnd: 'null',
+            extendedShiftName: 'null',
+            extendedShiftStart: 'null',
+            extendedShiftEnd: 'null',
           );
         }
-      } else {
-        _insuranceDetail = EmployeeInsuranceDetail(
-          type: 'N/A',
-          enddate: 'N/A',
-          startdate: 'N/A',
-          policyNumber: 'N/A',
-          employeeName: 'N/A',
-          amount: 'N/A',
-          isIncomeTaxExceptionApplicable: 'N/A',
-        );
 
+        // Notify listeners after all updates
         notifyListeners();
+      } else {
+        errorMessage = 'Failed to load employee details';
       }
     } catch (e) {
       errorMessage = 'Error: $e';

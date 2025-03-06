@@ -169,7 +169,7 @@ class EmployeeEducation {
 class EmployeeEmergencyContact {
   final String relation;
   final int? id;
-  final int? employeeId;
+  final String? employeeId;
 
   final String contactPerson;
   final String phoneNumber;
@@ -182,7 +182,7 @@ class EmployeeEmergencyContact {
   });
   factory EmployeeEmergencyContact.fromJson(Map<String, dynamic> json) {
     return EmployeeEmergencyContact(
-      relation: json['relation'] ?? 'Unknown',
+      relation: json['relation'] ?? '',
       id: json['id'],
       employeeId: json['employeeId'],
       contactPerson: json['contactPerson'] ?? '',
@@ -255,6 +255,7 @@ class EmployeeTemporaryAddress {
 }
 
 class EmployeeInsuranceDetail {
+  final String? employeeCode;
   final String type;
   final String enddate;
   final String startdate;
@@ -262,8 +263,11 @@ class EmployeeInsuranceDetail {
   final String employeeName;
   final String amount;
   final String isIncomeTaxExceptionApplicable;
+  final String company;
 
   EmployeeInsuranceDetail({
+    this.employeeCode,
+    required this.company,
     required this.type,
     required this.enddate,
     required this.startdate,
@@ -275,6 +279,7 @@ class EmployeeInsuranceDetail {
 
   factory EmployeeInsuranceDetail.fromJson(Map<String, dynamic> json) {
     return EmployeeInsuranceDetail(
+      company: json['company']?.toString() ?? '',
       type: json['type']?.toString() ?? '',
       startdate: json['insuredFromDate']?.toString() ?? '',
       enddate: json['insuredToDate']?.toString() ?? '',
@@ -288,35 +293,186 @@ class EmployeeInsuranceDetail {
 }
 
 class EmployeeDocument {
-  final String documentType;
-  final String attachmentPath;
+  final int? id;
+  final int? documentNumberSequence;
+  final String documentNumber;
+  final int? employeeId;
+  final int? documentTypeId;
+  final String? attachmentPath;
+  final String? issueDate;
+  final String? issueDateNp;
+  final String? issuePlace;
+  final String? expiryDateNp;
+  final String? expiryDate;
+  final String? notificationType;
+  final int? days;
+  final String employeeName;
+  final String? employeeCode;
+  final String? documentType;
 
   EmployeeDocument({
-    required this.documentType,
-    required this.attachmentPath,
+    this.id,
+    this.documentNumberSequence,
+    required this.documentNumber,
+    this.employeeId,
+    this.documentTypeId,
+    this.attachmentPath,
+    this.issueDate,
+    this.issueDateNp,
+    this.issuePlace,
+    this.expiryDateNp,
+    this.expiryDate,
+    this.notificationType,
+    this.days,
+    required this.employeeName,
+    this.employeeCode,
+    this.documentType,
   });
 
+  // Convert JSON to Model
   factory EmployeeDocument.fromJson(Map<String, dynamic> json) {
     return EmployeeDocument(
-      documentType: json['documentType'] ?? '',
+      id: json['id'] ?? 0,
+      documentNumberSequence: json['documentNumberSequence'] ?? 0,
+      documentNumber: json['documentNumber'] ?? '',
+      employeeId: json['employeeId'] ?? 0,
+      documentTypeId: json['documentTypeId'] ?? 0,
       attachmentPath: json['attachmentPath'] ?? '',
+      issueDate: json['issueDate'] ?? '',
+      issueDateNp: json['issueDateNp'] ?? '',
+      issuePlace: json['issuePlace'] ?? '',
+      expiryDateNp: json['expiryDateNp'],
+      expiryDate: json['expiryDate'],
+      notificationType: json['notificationType'],
+      days: json['days'] ?? 0,
+      employeeName: json['employeeName'] ?? '',
+      employeeCode: json['employeeCode'] ?? '',
+      documentType: json['documentType'] ?? '',
     );
+  }
+
+  // Convert Model to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'documentNumberSequence': documentNumberSequence,
+      'documentNumber': documentNumber,
+      'employeeId': employeeId,
+      'documentTypeId': documentTypeId,
+      'attachmentPath': attachmentPath,
+      'issueDate': issueDate,
+      'issueDateNp': issueDateNp,
+      'issuePlace': issuePlace,
+      'expiryDateNp': expiryDateNp,
+      'expiryDate': expiryDate,
+      'notificationType': notificationType,
+      'days': days,
+      'employeeName': employeeName,
+      'employeeCode': employeeCode,
+      'documentType': documentType,
+    };
+  }
+
+  // Convert a list of JSON objects to a list of EmployeeDocument objects
+  static List<EmployeeDocument> fromJsonList(List<dynamic> jsonList) {
+    return jsonList.map((json) => EmployeeDocument.fromJson(json)).toList();
   }
 }
 
 class EmployeeCurrentShift {
-  final String primaryShiftName;
-  final String primaryShiftTime;
+  String? currentDate;
+  String? currentDateNp;
+  bool? hasMultiShift;
+  int? primaryShiftTypeId;
+  int? extendedShiftTypeId;
+  String? primaryShiftName;
+  String? primaryShiftTime;
+  String? primaryShiftStart;
+  String? primaryShiftEnd;
+  String? breakEndTime;
+  String? breakStartTime;
+  String? extendedShiftName;
+  String? extendedShiftTime;
+  String? extendedShiftStart;
+  String? extendedShiftEnd;
+  int? employeeId;
+  bool? isContinuousShift;
+  bool? hasBreak;
+  bool? isFlexibleBreak;
+  String? primaryBreakDuration;
 
   EmployeeCurrentShift({
-    required this.primaryShiftName,
-    required this.primaryShiftTime,
+    this.currentDate,
+    this.currentDateNp,
+    this.hasMultiShift,
+    this.primaryShiftTypeId,
+    this.extendedShiftTypeId,
+    this.primaryShiftName,
+    this.primaryShiftTime,
+    this.primaryShiftStart,
+    this.primaryShiftEnd,
+    this.breakEndTime,
+    this.breakStartTime,
+    this.extendedShiftName,
+    this.extendedShiftTime,
+    this.extendedShiftStart,
+    this.extendedShiftEnd,
+    this.employeeId,
+    this.isContinuousShift,
+    this.hasBreak,
+    this.isFlexibleBreak,
+    this.primaryBreakDuration,
   });
 
+  // Factory method to create an instance from a JSON object
   factory EmployeeCurrentShift.fromJson(Map<String, dynamic> json) {
     return EmployeeCurrentShift(
-      primaryShiftName: json['primaryShiftName'] ?? '',
-      primaryShiftTime: json['primaryShiftTime'] ?? '',
+      currentDate: json['currentDate'],
+      currentDateNp: json['currentDateNp'],
+      hasMultiShift: json['hasMultiShift'],
+      primaryShiftTypeId: json['primaryShiftTypeId'],
+      extendedShiftTypeId: json['extendedShiftTypeId'],
+      primaryShiftName: json['primaryShiftName'],
+      primaryShiftTime: json['primaryShiftTime'],
+      primaryShiftStart: json['primaryShiftStart'],
+      primaryShiftEnd: json['primaryShiftEnd'],
+      breakEndTime: json['breakEndTime'],
+      breakStartTime: json['breakStartTime'],
+      extendedShiftName: json['extendedShiftName'],
+      extendedShiftTime: json['extendedShiftTime'],
+      extendedShiftStart: json['extendedShiftStart'],
+      extendedShiftEnd: json['extendedShiftEnd'],
+      employeeId: json['employeeId'],
+      isContinuousShift: json['isContinuousShift'],
+      hasBreak: json['hasBreak'],
+      isFlexibleBreak: json['isFlexibleBreak'],
+      primaryBreakDuration: json['primaryBreakDuration'],
     );
+  }
+
+  // Method to convert an instance to a JSON object
+  Map<String, dynamic> toJson() {
+    return {
+      'currentDate': currentDate,
+      'currentDateNp': currentDateNp,
+      'hasMultiShift': hasMultiShift,
+      'primaryShiftTypeId': primaryShiftTypeId,
+      'extendedShiftTypeId': extendedShiftTypeId,
+      'primaryShiftName': primaryShiftName,
+      'primaryShiftTime': primaryShiftTime,
+      'primaryShiftStart': primaryShiftStart,
+      'primaryShiftEnd': primaryShiftEnd,
+      'breakEndTime': breakEndTime,
+      'breakStartTime': breakStartTime,
+      'extendedShiftName': extendedShiftName,
+      'extendedShiftTime': extendedShiftTime,
+      'extendedShiftStart': extendedShiftStart,
+      'extendedShiftEnd': extendedShiftEnd,
+      'employeeId': employeeId,
+      'isContinuousShift': isContinuousShift,
+      'hasBreak': hasBreak,
+      'isFlexibleBreak': isFlexibleBreak,
+      'primaryBreakDuration': primaryBreakDuration,
+    };
   }
 }

@@ -27,56 +27,44 @@ class _EmergencyContactState extends State<EmergencyContact> {
 
     return Scaffold(
       backgroundColor: cardBackgroundColor,
-      appBar: CustomAppBarProfile(
-          title: "EmergencyContact"), // Customize color as needed
-
+      appBar: CustomAppBarProfile(title: "Emergency Contact"),
       body: employeeProvider.isLoading
-          ? Center(child: CircularProgressIndicator()) // Simple loading spinner
+          ? Center(child: CircularProgressIndicator())
           : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Container(
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Contact Person
-                    _buildInfoRow(
-                      title: "Contact Person",
-                      content: employeeProvider
-                              .emergenecycontact.contactPerson.isNotEmpty
-                          ? employeeProvider.emergenecycontact.contactPerson
-                          : "null",
-                    ),
-
-                    // Phone Number
-                    _buildInfoRow(
-                      title: "Phone Number",
-                      content: employeeProvider
-                              .emergenecycontact.phoneNumber.isNotEmpty
-                          ? employeeProvider.emergenecycontact.phoneNumber
-                          : "null",
-                    ),
-
-                    // Relation
-                    _buildInfoRow(
-                      title: "Relation",
-                      content:
-                          employeeProvider.emergenecycontact.relation.isNotEmpty
-                              ? employeeProvider.emergenecycontact.relation
-                              : "null",
-                    ),
-                  ],
-                ),
+              padding: EdgeInsets.all(16),
+              child: Column(
+                //mainAxisAlignment: MainAxisAlignment.spa,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildInfoRow(
+                    title: "Contact Person",
+                    content: employeeProvider
+                            .emergenecycontact.contactPerson.isNotEmpty
+                        ? employeeProvider.emergenecycontact.contactPerson
+                        : "N/A",
+                  ),
+                  Divider(), // A divider for separation
+                  _buildInfoRow(
+                    title: "Phone Number",
+                    content: employeeProvider
+                            .emergenecycontact.phoneNumber.isNotEmpty
+                        ? employeeProvider.emergenecycontact.phoneNumber
+                        : "N/A",
+                  ),
+                  Divider(),
+                  _buildInfoRow(
+                    title: "Relation",
+                    content:
+                        employeeProvider.emergenecycontact.relation.isNotEmpty
+                            ? employeeProvider.emergenecycontact.relation
+                            : "N/A",
+                  ),
+                ],
               ),
             ),
     );
   }
 
-  // Helper Widget to build each info row within the single card
   Widget _buildInfoRow({required String title, required String content}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -90,10 +78,13 @@ class _EmergencyContactState extends State<EmergencyContact> {
               color: Colors.blueAccent,
             ),
           ),
-          SizedBox(width: 10), // Space between title and content
-          Text(
-            content,
-            style: TextStyle(fontSize: 16, color: Colors.black87),
+          SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              content,
+              style: TextStyle(fontSize: 16, color: Colors.black87),
+              overflow: TextOverflow.ellipsis, // Prevents overflow issues
+            ),
           ),
         ],
       ),

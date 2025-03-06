@@ -10,6 +10,7 @@ import 'package:hrms_app/providers/check_in_provider.dart';
 import 'package:hrms_app/providers/branch_id_provider.dart';
 import 'package:hrms_app/providers/fiscal_year_provider.dart';
 import 'package:hrms_app/providers/hosptial_code_provider.dart';
+import 'package:hrms_app/providers/employee_contract_provider.dart';
 import 'package:hrms_app/providers/attendance_providers/attendance_provider.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/attendance/attendancehistory.dart';
 import 'package:hrms_app/providers/attendance_providers/attendance_history_provider.dart';
@@ -29,6 +30,7 @@ void main() {
         ChangeNotifierProvider(
             create: (context) => AttendanceDetailsProvider()),
         ChangeNotifierProvider(create: (context) => EmployeeProvider()),
+        ChangeNotifierProvider(create: (context) => EmployeeContractProvider()),
       ],
       child: MyApp(),
     ),
