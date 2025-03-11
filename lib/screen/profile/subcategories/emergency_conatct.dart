@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
-import 'package:hrms_app/providers/profile_provider.dart';
+import 'package:hrms_app/models/profiles.models.dart';
+import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
 
 class EmergencyContact extends StatefulWidget {
@@ -28,66 +29,96 @@ class _EmergencyContactState extends State<EmergencyContact> {
     return Scaffold(
       backgroundColor: cardBackgroundColor,
       appBar: CustomAppBarProfile(title: "Emergency Contact"),
-      body: employeeProvider.isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: EdgeInsets.all(16),
-              child: Column(
-                //mainAxisAlignment: MainAxisAlignment.spa,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildInfoRow(
-                    title: "Contact Person",
-                    content: employeeProvider
-                            .emergenecycontact.contactPerson.isNotEmpty
-                        ? employeeProvider.emergenecycontact.contactPerson
-                        : "N/A",
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: employeeProvider.isLoading
+            ? Center(child: CircularProgressIndicator())
+            : employeeProvider.emergenecycontact.isEmpty
+                ? Center(child: Text("No emergency Contact Found"))
+                : ListView.builder(
+                    itemCount: employeeProvider.emergenecycontact.length,
+                    itemBuilder: (context, index) {
+                      EmployeeEmergencyContact emergencyContact =
+                          employeeProvider.emergenecycontact[index];
+                      return Card(
+                        color: cardBackgroundColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 3,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: 16),
+                              _buildInfoRow("Contact Person",
+                                  emergencyContact.contactPerson),
+                              _buildInfoRow(
+                                  "Phone Number", emergencyContact.phoneNumber),
+                              _buildInfoRow(
+                                  "Relation", emergencyContact.relation),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                  Divider(), // A divider for separation
-                  _buildInfoRow(
-                    title: "Phone Number",
-                    content: employeeProvider
-                            .emergenecycontact.phoneNumber.isNotEmpty
-                        ? employeeProvider.emergenecycontact.phoneNumber
-                        : "N/A",
-                  ),
-                  Divider(),
-                  _buildInfoRow(
-                    title: "Relation",
-                    content:
-                        employeeProvider.emergenecycontact.relation.isNotEmpty
-                            ? employeeProvider.emergenecycontact.relation
-                            : "N/A",
-                  ),
-                ],
-              ),
-            ),
+      ),
     );
   }
+  // Function to format date
 
-  Widget _buildInfoRow({required String title, required String content}) {
+  Widget _buildInfoRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.only(bottom: 10.0),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "$title:",
+            "$label ",
             style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.blueAccent,
-            ),
+                fontSize: 16,
+                color: textColor.withOpacity(0.7),
+                fontWeight: FontWeight.bold),
           ),
-          SizedBox(width: 10),
-          Expanded(
+          Flexible(
             child: Text(
-              content,
-              style: TextStyle(fontSize: 16, color: Colors.black87),
-              overflow: TextOverflow.ellipsis, // Prevents overflow issues
+              value,
+              style: TextStyle(fontSize: 16),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2, // Ensures long texts don't break layout
             ),
           ),
         ],
       ),
     );
   }
+}
+
+Widget _buildInfoRow({required String title, required String content}) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8.0),
+    child: Row(
+      children: [
+        Text(
+          "$title:",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.blueAccent,
+          ),
+        ),
+        SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            content,
+            style: TextStyle(fontSize: 16, color: Colors.black87),
+            overflow: TextOverflow.ellipsis, // Prevents overflow issues
+          ),
+        ),
+      ],
+    ),
+  );
 }

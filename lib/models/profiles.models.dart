@@ -167,27 +167,48 @@ class EmployeeEducation {
 }
 
 class EmployeeEmergencyContact {
-  final String relation;
-  final int? id;
-  final String? employeeId;
-
+  final int id;
+  final int employeeId;
   final String contactPerson;
   final String phoneNumber;
+  final String relation;
+  final String? employeeName;
+  final String? employeeCode;
+
   EmployeeEmergencyContact({
-    required this.relation,
-    this.id, // Optional
-    this.employeeId, // Optional
+    required this.id,
+    required this.employeeId,
     required this.contactPerson,
     required this.phoneNumber,
+    required this.relation,
+    this.employeeName,
+    this.employeeCode,
   });
+
+  // Factory method to create an instance from JSON
   factory EmployeeEmergencyContact.fromJson(Map<String, dynamic> json) {
     return EmployeeEmergencyContact(
-      relation: json['relation'] ?? '',
       id: json['id'],
       employeeId: json['employeeId'],
-      contactPerson: json['contactPerson'] ?? '',
-      phoneNumber: json['phoneNumber'] ?? '',
+      contactPerson: json['contactPerson'],
+      phoneNumber: json['phoneNumber'],
+      relation: json['relation'],
+      employeeName: json['employeeName'],
+      employeeCode: json['employeeCode'],
     );
+  }
+
+  // Method to convert the object into a JSON format
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'employeeId': employeeId,
+      'contactPerson': contactPerson,
+      'phoneNumber': phoneNumber,
+      'relation': relation,
+      'employeeName': employeeName,
+      'employeeCode': employeeCode,
+    };
   }
 }
 

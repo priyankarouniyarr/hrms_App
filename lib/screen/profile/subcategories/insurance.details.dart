@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/custom_appbar.dart';
 import 'package:hrms_app/models/profiles.models.dart';
-import 'package:hrms_app/providers/profile_provider.dart';
+import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
 
 class InsuranceDetails extends StatefulWidget {

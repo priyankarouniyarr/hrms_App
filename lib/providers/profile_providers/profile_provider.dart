@@ -25,7 +25,7 @@ class EmployeeProvider with ChangeNotifier {
   String? _devnagariName;
   String? errorMessage;
   EmployeeTemporaryAddress? _temporaryAddress;
-  EmployeeEmergencyContact? _emergencyContact;
+  String? _imagepath;
   EmployeeCurrentShift? _currentShift;
   List<EmployeeDocument> _document = [];
   String formatToPascalCase(String text) {
@@ -39,6 +39,7 @@ class EmployeeProvider with ChangeNotifier {
         .join(' ');
   }
 
+  List<EmployeeEmergencyContact> _emergencyContact = [];
   List<EmployeeInsuranceDetail> _insuranceDetail = [];
   String get email => _email ?? '';
   String get phone => _phone ?? '';
@@ -52,25 +53,21 @@ class EmployeeProvider with ChangeNotifier {
   String get bloodGroup => _bloodGroup ?? '';
   String get fullname => _fullname ?? '';
   String get devnagariName => _devnagariName ?? '';
-  EmployeeEmergencyContact get emergenecycontact =>
-      _emergencyContact ??
-      EmployeeEmergencyContact(
-        contactPerson: '',
-        phoneNumber: '',
-        relation: '',
-        employeeId: '',
-      );
-
+  List<EmployeeEmergencyContact> get emergenecycontact => _emergencyContact;
+  String get imagepath => _imagepath ?? '';
   List<EmployeeDocument> get documents => _document;
   EmployeeCurrentShift get currentShift =>
       _currentShift ??
       EmployeeCurrentShift(
+        currentDateNp: '',
         primaryShiftName: '',
         primaryShiftStart: '',
         primaryShiftEnd: '',
         extendedShiftName: '',
         extendedShiftStart: '',
         extendedShiftEnd: '',
+        breakEndTime: '',
+        breakStartTime: '',
       );
   List<EmployeeInsuranceDetail> get insurance => _insuranceDetail;
 
@@ -126,7 +123,12 @@ class EmployeeProvider with ChangeNotifier {
         _insuranceDetail = jsonResponse1
             .map((e) => EmployeeInsuranceDetail.fromJson(e))
             .toList();
-
+        List<dynamic> jsonResponse2 =
+            data['employeeEmergencyContacts'] ?? 'null';
+        _emergencyContact = jsonResponse2
+            .map((e) => EmployeeEmergencyContact.fromJson(e))
+            .toList();
+        _imagepath = data['imagePath'] ?? 'null';
         _fullname = data['employeeFullName'] ?? 'null';
         _designation = data['designationTitle'] ?? 'null';
         _branch = data['workBranchTitle'] ?? 'null';
@@ -134,7 +136,7 @@ class EmployeeProvider with ChangeNotifier {
         _department = data['departmentTitle'] ?? 'null';
         _devnagariName = data['devnagariName'] ?? 'null';
         _email = data['homeEmail'] ?? 'null';
-        _phone = data['homePhone'] ?? 'null';
+        _phone = data['mobileNumber'] ?? 'null';
         _gender = data['gender'] ?? 'null';
         _maritalStatus = data['maritalStatus'] ?? 'null';
         _bloodGroup = data['bloodGroup'] ?? 'null';
@@ -175,80 +177,26 @@ class EmployeeProvider with ChangeNotifier {
               municipalName: 'null');
         }
 
-        // Emergency Contact
-        if (data.containsKey('employeeEmergencyContacts') &&
-            data['employeeEmergencyContacts'] != null) {
-          var employeeEmergencyContacts = data['employeeEmergencyContacts'];
-
-          // Iterate through all emergency contacts in the list
-          if (employeeEmergencyContacts.isNotEmpty) {
-            _emergencyContact = EmployeeEmergencyContact(
-              contactPerson: formatToPascalCase(
-                  employeeEmergencyContacts[0]['contactPerson']),
-              phoneNumber: employeeEmergencyContacts[0]['phoneNumber'],
-              relation:
-                  formatToPascalCase(employeeEmergencyContacts[0]['relation']),
-            );
-          } else {
-            // If the list is empty, assign default values
-            _emergencyContact = EmployeeEmergencyContact(
-              contactPerson: '',
-              phoneNumber: '',
-              relation: '',
-            );
-          }
-        } else {
-          _emergencyContact = EmployeeEmergencyContact(
-            contactPerson: 'null',
-            phoneNumber: 'null',
-            relation: 'null',
-          );
-        }
-
         // Current Shift Details
-        if (data.containsKey('employeeCurrentShift') &&
-            data['employeeCurrentShift'] != null) {
-          var shiftData = data['employeeCurrentShift'];
-
-          if (shiftData is Map<String, dynamic>) {
-            var primaryShiftName = shiftData['primaryShiftName'];
-            var primaryShiftStart = shiftData['primaryShiftStart'];
-            var primaryShiftEnd = shiftData['primaryShiftEnd'];
-
-            var extendedShiftName = shiftData['extendedShiftName'];
-            var extendedShiftStart = shiftData['extendedShiftStart'];
-            var extendedShiftEnd = shiftData['extendedShiftEnd'];
-
-            _currentShift = EmployeeCurrentShift(
-              primaryShiftName: primaryShiftName,
-              primaryShiftStart: primaryShiftStart,
-              primaryShiftEnd: primaryShiftEnd,
-              extendedShiftName: extendedShiftName,
-              extendedShiftStart: extendedShiftStart,
-              extendedShiftEnd: extendedShiftEnd,
-            );
-          } else {
-            _currentShift = EmployeeCurrentShift(
-              primaryShiftName: 'null',
-              primaryShiftStart: 'null',
-              primaryShiftEnd: 'null',
-              extendedShiftName: 'null',
-              extendedShiftStart: 'null',
-              extendedShiftEnd: 'null',
-            );
-          }
+        if (data['employeeCurrentShift'] is Map<String, dynamic>) {
+          _currentShift =
+              EmployeeCurrentShift.fromJson(data['employeeCurrentShift']);
         } else {
           _currentShift = EmployeeCurrentShift(
-            primaryShiftName: 'null',
-            primaryShiftStart: 'null',
-            primaryShiftEnd: 'null',
-            extendedShiftName: 'null',
-            extendedShiftStart: 'null',
-            extendedShiftEnd: 'null',
+            primaryShiftName: '',
+            primaryShiftStart: '',
+            primaryShiftEnd: '',
+            extendedShiftName: '',
+            extendedShiftStart: '',
+            extendedShiftEnd: '',
+            breakStartTime: '',
+            breakEndTime: '',
+            currentDateNp: '',
+            hasMultiShift: false,
+            hasBreak: false,
           );
         }
 
-        // Notify listeners after all updates
         notifyListeners();
       } else {
         errorMessage = 'Failed to load employee details';

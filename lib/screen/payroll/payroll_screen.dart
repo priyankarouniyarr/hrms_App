@@ -1,14 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/custom_appbar.dart';
+import 'dart:async'; // Import for scheduleMicrotask
+import 'package:hrms_app/providers/payroll_provider.dart';
 
-class PayrollScreen extends StatelessWidget {
+class PayrollScreen extends StatefulWidget {
+  @override
+  _PayrollScreenState createState() => _PayrollScreenState();
+}
+
+class _PayrollScreenState extends State<PayrollScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      final provider =
+          Provider.of<LoanAndAdvanceProvider>(context, listen: false);
+      provider.fetchLoanAndAdvances();
+      provider.fetchMyTaxes(); // Fetch taxes as well
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<LoanAndAdvanceProvider>(context);
+
     return Scaffold(
         backgroundColor: cardBackgroundColor,
-        appBar: CustomAppBar(
+        appBar: const CustomAppBar(
           title: 'Payroll',
         ),
         body: SingleChildScrollView(
@@ -16,6 +37,7 @@ class PayrollScreen extends StatelessWidget {
           padding: EdgeInsets.all(16.0),
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            // Basic salary and other details
             Card(
                 color: backgroundColor,
                 child: Column(
@@ -57,8 +79,8 @@ class PayrollScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -71,7 +93,7 @@ class PayrollScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Padding(
+                    const Padding(
                       padding: EdgeInsets.all(8.0),
                       child: DottedLine(
                         direction: Axis.horizontal,
@@ -83,7 +105,7 @@ class PayrollScreen extends StatelessWidget {
                         dashGapColor: Colors.transparent,
                       ),
                     ),
-                    Padding(
+                    const Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -113,9 +135,11 @@ class PayrollScreen extends StatelessWidget {
                     ),
                   ],
                 )),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
+
+            // Taxes section
             Text("Taxes",
                 style: TextStyle(
                     fontSize: 20,
@@ -124,80 +148,98 @@ class PayrollScreen extends StatelessWidget {
             const SizedBox(
               height: 10,
             ),
-            const Card(
-                color: backgroundColor,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Center(
-                        child: Text('Sharwan,2081',
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: primarySwatch)),
+            if (provider.isLoading)
+              const Center(child: CircularProgressIndicator())
+            else if (provider.errorMessage.isNotEmpty)
+              Center(child: Text(provider.errorMessage))
+            else if (provider.salaryDeductions.isEmpty)
+              const Center(child: Text('No tax data available.'))
+            else
+              ...provider.salaryDeductions.map((tax) {
+                return Card(
+                  color: backgroundColor,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 10,
                       ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('SST',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w500)),
-                          Text('Rs 0',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w500)),
-                        ],
+                      Center(
+                        child: Text(
+                          "(${tax.month} ${tax.year})",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.blue,
+                          ),
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('IncomeTax',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w500)),
-                          Text(' Rs 0',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w500)),
-                        ],
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('SST ',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w500)),
+                            Text('Rs ${tax.sst}',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w500)),
+                          ],
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: DottedLine(
-                        direction: Axis.horizontal,
-                        lineLength: double.infinity,
-                        lineThickness: 1.0,
-                        dashLength: 4.0,
-                        dashColor: Colors.black,
-                        dashGapLength: 4.0,
-                        dashGapColor: Colors.transparent,
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Income Tax',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w500)),
+                            Text('Rs ${tax.incomeTax}',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w500)),
+                          ],
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Total Deduction',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold)),
-                          Text(' Rs 0',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold)),
-                        ],
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: DottedLine(
+                          direction: Axis.horizontal,
+                          lineLength: double.infinity,
+                          lineThickness: 1.0,
+                          dashLength: 4.0,
+                          dashColor: Colors.black,
+                          dashGapLength: 4.0,
+                          dashGapColor: Colors.transparent,
+                        ),
                       ),
-                    ),
-                  ],
-                )),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Total Deduction',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold)),
+                            Text('Rs ${tax.totalDeduction}',
+                                style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: accentColor)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+
             const SizedBox(
               height: 20,
             ),
+
+            // Loan and Advances section
             Text("Loan And Advances",
                 style: TextStyle(
                     fontSize: 20,
@@ -206,109 +248,107 @@ class PayrollScreen extends StatelessWidget {
             const SizedBox(
               height: 10,
             ),
-            const Card(
-                color: backgroundColor,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Particular',
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
-                          Text('Amount',
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
-                        ],
+
+            // Loan and Advances Card
+            if (provider.isLoading)
+              const Center(child: CircularProgressIndicator())
+            else if (provider.errorMessage.isNotEmpty)
+              Center(child: Text(provider.errorMessage))
+            else if (provider.loanAndAdvanceModel == null)
+              const Center(
+                  child: Text(
+                      'No loan and advance data available.')) // Handle empty data case
+            else
+              Card(
+                  color: backgroundColor,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Particular',
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold)),
+                            Text('Amount',
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Advance',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w500)),
-                          Text('Rs 0',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w500)),
-                        ],
+                      for (var item
+                          in provider.loanAndAdvanceModel!.loanAndAdvanceData)
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                item.title,
+                                style: const TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w500),
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    'Rs ${item.amount}',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: item.nature == '-'
+                                          ? Colors.red
+                                          : Colors.black,
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text(
+                                    '${item.nature}',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: item.nature == '-'
+                                          ? Colors.red
+                                          : Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: DottedLine(
+                          direction: Axis.horizontal,
+                          lineLength: double.infinity,
+                          lineThickness: 1.0,
+                          dashLength: 4.0,
+                          dashColor: Colors.black,
+                          dashGapLength: 4.0,
+                          dashGapColor: Colors.transparent,
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Basishak 2081',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w500)),
-                          Text(' Rs 0',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w500)),
-                        ],
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Balance',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold)),
+                            Text(
+                                'Rs ${provider.loanAndAdvanceModel!.balanceAmount}',
+                                style: const TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Jestha 2081',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w500)),
-                          Text(' Rs 0',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w500)),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Ashad 2081',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w500)),
-                          Text(' Rs 0',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w500)),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: DottedLine(
-                        direction: Axis.horizontal,
-                        lineLength: double.infinity,
-                        lineThickness: 1.0,
-                        dashLength: 4.0,
-                        dashColor: Colors.black,
-                        dashGapLength: 4.0,
-                        dashGapColor: Colors.transparent,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('  Balance',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold)),
-                          Text(' Rs 70000',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold)),
-                        ],
-                      ),
-                    ),
-                  ],
-                )),
+                    ],
+                  )),
           ]),
         )));
   }

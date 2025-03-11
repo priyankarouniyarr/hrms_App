@@ -61,7 +61,7 @@ class CheckInProvider with ChangeNotifier {
 
       // Fetch current location
       Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
+          desiredAccuracy: LocationAccuracy.low);
 
       _latitude = position.latitude.toString();
       _longitude = position.longitude.toString();

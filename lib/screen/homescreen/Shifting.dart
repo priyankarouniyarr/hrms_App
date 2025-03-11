@@ -1,10 +1,7 @@
-import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:nepali_utils/nepali_utils.dart';
 import 'package:hrms_app/constants/colors.dart';
-import 'package:hrms_app/models/attendance_details_models.dart';
-import 'package:hrms_app/providers/attendance_providers/attendance_history_provider.dart';
+import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
 
 class ShiftScreen extends StatefulWidget {
   @override
@@ -12,45 +9,50 @@ class ShiftScreen extends StatefulWidget {
 }
 
 class _ShiftScreenState extends State<ShiftScreen> {
-  final PageController _pageController = PageController(viewportFraction: 0.9);
+  final PageController _pageController = PageController();
   int _currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    // Initialize provider when the screen is created
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<AttendanceDetailsProvider>(context, listen: false)
-          .initialize();
+      Provider.of<EmployeeProvider>(context, listen: false)
+          .fetchEmployeeDetails();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<AttendanceDetailsProvider>(context);
+    final provider = Provider.of<EmployeeProvider>(context);
 
     if (provider.isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator());
     }
 
-    final attendanceDetails = provider.attendanceDetails;
-
-    if (attendanceDetails == null ||
-        attendanceDetails.attendanceDetails.isEmpty) {
-      return Center(child: Text("No shift data available"));
+    final currentshifts = provider.currentShift;
+    if (currentshifts == null) {
+      return const Center(child: Text("No shift data available"));
     }
 
-    final todayDate = DateFormat("yyyy-MM-dd").format(DateTime.now());
-
-    final todayShifts = attendanceDetails.attendanceDetails.where((shift) {
-      final shiftDate = DateFormat("yyyy-MM-dd").format(shift.attendanceDate);
-
-      return shiftDate == todayDate;
-    }).toList();
-
-    if (todayShifts.isEmpty) {
-      return Center(child: Text("No shifts for today"));
-    }
+    final shiftData = [
+      {
+        'shift': currentshifts.primaryShiftName,
+        'shifttime': currentshifts.primaryShiftStart,
+        'shiftend': currentshifts.primaryShiftEnd,
+      },
+      if (currentshifts.hasBreak == true)
+        {
+          'shift': 'Break',
+          'shifttime': currentshifts.breakStartTime,
+          'shiftend': currentshifts.breakEndTime,
+        },
+      if (currentshifts.hasMultiShift == true)
+        {
+          'shift': 'Extended Shift',
+          'shifttime': currentshifts.extendedShiftStart,
+          'shiftend': currentshifts.extendedShiftEnd,
+        },
+    ];
 
     return Column(
       children: [
@@ -58,17 +60,19 @@ class _ShiftScreenState extends State<ShiftScreen> {
           height: MediaQuery.of(context).size.height / 5,
           child: PageView.builder(
             controller: _pageController,
-            itemCount: todayShifts.length,
+            itemCount: shiftData.length,
             onPageChanged: (index) {
               setState(() {
                 _currentIndex = index;
               });
             },
             itemBuilder: (context, index) {
-              final shift = todayShifts[index];
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: ShiftCard(shift: shift),
+              final currentShift = shiftData[index];
+              return ShiftCard(
+                dateNp: currentshifts.currentDateNp,
+                shift: currentShift['shift']!,
+                shifttime: currentShift['shifttime']!,
+                shiftend: currentShift['shiftend']!,
               );
             },
           ),
@@ -77,18 +81,18 @@ class _ShiftScreenState extends State<ShiftScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(
-            todayShifts.length,
+            shiftData.length,
             (index) {
               return GestureDetector(
                 onTap: () {
                   _pageController.animateToPage(index,
-                      duration: Duration(milliseconds: 300),
+                      duration: const Duration(milliseconds: 300),
                       curve: Curves.easeInOut);
                 },
                 child: Container(
                   width: 10,
                   height: 10,
-                  margin: EdgeInsets.symmetric(horizontal: 5),
+                  margin: const EdgeInsets.symmetric(horizontal: 5),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: _currentIndex == index
@@ -106,12 +110,23 @@ class _ShiftScreenState extends State<ShiftScreen> {
 }
 
 class ShiftCard extends StatelessWidget {
-  final AttendanceDetail shift;
+  final String shift;
+  final String? dateNp;
+  final String? shifttime;
+  final String? shiftend;
 
-  const ShiftCard({required this.shift});
+  const ShiftCard({
+    required this.shift,
+    this.dateNp,
+    this.shifttime,
+    this.shiftend,
+  });
 
   @override
   Widget build(BuildContext context) {
+    DateTime shiftStartTime = DateTime.parse(shifttime!);
+    DateTime shiftEndTime = DateTime.parse(shiftend!);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -124,17 +139,18 @@ class ShiftCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(NepaliDateFormat("yyyy-MM-dd").format(NepaliDateTime.now()),
+              Text(dateNp!,
                   style: TextStyle(
                       color: cardBackgroundColor,
                       fontSize: 18,
                       fontWeight: FontWeight.bold)),
               Container(
-                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
                 decoration: BoxDecoration(
                     color: cardBackgroundColor,
                     borderRadius: BorderRadius.circular(8)),
-                child: Text(shift.shiftTitle,
+                child: Text(shift,
                     style: TextStyle(
                         color: primarySwatch[900],
                         fontSize: 16,
@@ -142,7 +158,7 @@ class ShiftCard extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 15),
           Container(
             padding: EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -151,9 +167,9 @@ class ShiftCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildTimeColumn("Shift Start", shift.shiftStartTime),
+                _buildTimeColumn("Shift Start", shiftStartTime),
                 Container(width: 3, height: 40, color: cardBackgroundColor),
-                _buildTimeColumn("Shift End", shift.shiftEndTime),
+                _buildTimeColumn("Shift End", shiftEndTime),
               ],
             ),
           ),
@@ -166,14 +182,13 @@ class ShiftCard extends StatelessWidget {
     return Column(
       children: [
         Text(label,
-            style: TextStyle(
+            style: const TextStyle(
                 color: cardBackgroundColor,
                 fontSize: 18,
                 fontWeight: FontWeight.w600)),
-        SizedBox(height: 5),
+        const SizedBox(height: 5),
         Text("${time.hour}:${time.minute.toString().padLeft(2, '0')}",
-            //ensures that minutes are always displayed with two digits
-            style: TextStyle(
+            style: const TextStyle(
                 color: cardBackgroundColor,
                 fontSize: 18,
                 fontWeight: FontWeight.bold)),

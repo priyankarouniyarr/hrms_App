@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
-import 'package:hrms_app/screen/app_main_screen.dart';
 import 'package:hrms_app/providers/auth_provider.dart';
 import 'package:hrms_app/screen/homescreen/Shifting.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/works/works.dart';
@@ -34,8 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
     String username = authProvider.username ?? "User";
-    // Default if null
-    print(username);
+
     return Scaffold(
       backgroundColor: primarySwatch[900],
       appBar: AppBar(
@@ -55,7 +53,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   size: 28,
                 ),
                 onPressed: () {
-                  print("Notification button clicked!");
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => NoticesScreen()),
+                  );
                 },
                 splashRadius: 24,
               ),
@@ -65,6 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
+          physics: const NeverScrollableScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -95,10 +97,13 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               SizedBox(height: 10),
               // Shifting screen
-              ShiftScreen(),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ShiftScreen(),
+              ),
               SizedBox(height: 20),
               Container(
-                height: MediaQuery.of(context).size.height,
+                height: MediaQuery.of(context).size.height / 2,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
@@ -109,8 +114,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: EdgeInsets.all(16),
                 child: GridView.builder(
                   shrinkWrap: true,
-                  // Set physics to NeverScrollableScrollPhysics to avoid scrolling conflicts
-                  physics: NeverScrollableScrollPhysics(),
+                  //Set physics to NeverScrollableScrollPhysics to avoid scrolling conflicts
+                  physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
                     crossAxisSpacing: 10,

@@ -3,11 +3,13 @@ import 'package:provider/provider.dart';
 import 'subcategories/emergency_conatct.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/custom_appbar.dart';
-import 'package:hrms_app/providers/profile_provider.dart';
+import 'package:hrms_app/screen/login%20screen.dart';
 import 'package:hrms_app/screen/profile/profilemenuitem.dart';
 import 'package:hrms_app/screen/profile/subcategories/documents.dart';
+import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
 import 'package:hrms_app/screen/profile/subcategories/insurance.details.dart';
 import 'package:hrms_app/screen/profile/subcategories/employement_contracts.dart';
+import 'package:hrms_app/providers/auth_provider.dart'; // Import the AuthProvider
 import 'package:hrms_app/screen/profile/subcategories/personal_information%20.dart';
 import 'package:hrms_app/screen/profile/subcategories/work%20and%20shift%20information.dart';
 
@@ -31,13 +33,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final employeeProvider = Provider.of<EmployeeProvider>(context);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     if (employeeProvider.isLoading) {
       return Scaffold(
         appBar: CustomAppBar(title: "My Profile"),
-        body: Center(
-            child:
-                CircularProgressIndicator()), // Show a loading indicator while fetching data
+        body: Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -47,11 +48,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const CircleAvatar(
+            CircleAvatar(
               radius: 40,
-              backgroundColor: Color.fromARGB(255, 201, 213, 250),
-              child: Icon(Icons.person, size: 50, color: Colors.blue),
+              backgroundColor: Color.fromARGB(255, 226, 232, 251),
+              child: employeeProvider.imagepath?.isNotEmpty == true
+                  ? ClipOval(
+                      child: Image.network(
+                        "http://45.117.153.90:5001/uploads/users/${employeeProvider.imagepath}",
+                        fit: BoxFit.cover,
+                        width: 80,
+                        height: 80,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Icon(Icons.person,
+                              size: 40,
+                              color: const Color.fromARGB(255, 8, 96, 168));
+                        },
+                      ),
+                    )
+                  : Icon(Icons.person, size: 40),
             ),
+
             const SizedBox(height: 10),
             Text(
               employeeProvider.fullname,
@@ -175,8 +191,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 color: backgroundColor,
                 elevation: 3,
                 child: InkWell(
-                  onTap: () {
-                    print("Logout Pressed");
+                  onTap: () async {
+                    await authProvider.logout();
+
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LoginScreen(),
+                      ),
+                    );
                   },
                   child: const Padding(
                     padding: EdgeInsets.symmetric(vertical: 12),

@@ -2,111 +2,94 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hrms_app/storage/securestorage.dart';
-import 'package:hrms_app/models/attendance_details_models.dart';
+import 'package:hrms_app/models/attendance%20_models/attendance_details_models.dart';
 
-class AttendanceDetailsProvider extends ChangeNotifier {
+class AttendanceDetailsProvider with ChangeNotifier {
+  bool _isLoading = false;
+  String _errorMessage = '';
   final SecureStorageService _secureStorageService = SecureStorageService();
 
-  // State variables
+  AttendanceReport? _attendanceReport;
   String? _branchId;
   String? _token;
-  bool _isLoading = true;
-  AttendanceDetailsModel? _attendanceDetails;
+  List<String> _shiftTypes = []; // Default shift types
+  List<AttendanceSummary> _summaryAttendance = [];
+  List<AttendanceDetails> _detsilsAttendance = [];
 
   bool get isLoading => _isLoading;
-  AttendanceDetailsModel? get attendanceDetails => _attendanceDetails;
+  String get errorMessage => _errorMessage;
+  AttendanceReport? get attendanceReport => _attendanceReport;
+  List<String> get shiftTypes => _shiftTypes;
+  List<AttendanceSummary> get summaryAttendance => _summaryAttendance;
+  List<AttendanceDetails> get detailsAttendance =>
+      _detsilsAttendance; // Details attendance
 
-  // Add a getter for shift types
-  // Add a getter for shift types
-  List<String> get shiftTypes {
-    if (_attendanceDetails == null ||
-        _attendanceDetails!.filter == null ||
-        _attendanceDetails!.attendanceSummary!.isEmpty) {
-      print("No attendance summary found or it's empty");
-      return [];
-    }
+  Future<void> fetchAttendanceSummary(Filter filter) async {
+    _isLoading = true;
+    notifyListeners();
 
-    // Extract unique shift types from attendanceSummary
-    print("Attendance Summary: ${_attendanceDetails!.attendanceSummary}");
-    return _attendanceDetails!.attendanceSummary!
-        .map((summary) => summary.category)
-        .toSet()
-        .toList(); // Return unique shift types
-  }
-
-  Future<void> _loadSecureData() async {
     _branchId = await _secureStorageService.readData('workingBranchId');
     _token = await _secureStorageService.readData('auth_token');
 
-    if (_branchId != null && _token != null) {
-      await fetchAttendanceData(
-        fromDate: DateTime.now().subtract(Duration(days: 30)),
-        toDate: DateTime.now(),
-        shiftType: '',
-      );
-    } else {
-      print("Error: Branch ID or token is null.");
-    }
-
-    notifyListeners();
-  }
-
-  Future<void> fetchAttendanceData({
-    required DateTime fromDate,
-    required DateTime toDate,
-    required String shiftType,
-  }) async {
-    if (_branchId == null || _token == null) {
-      print("Error: Branch ID or token is null");
+    if (_token == null || _branchId == null) {
+      _errorMessage = 'No token or branchId found';
+      _isLoading = false;
+      notifyListeners();
       return;
     }
 
-    final url = Uri.parse(
-        'http://45.117.153.90:5004/api/EmployeeAttendance/GetMyAttendanceSummary');
-
     try {
       final response = await http.post(
-        url,
+        Uri.parse(
+            'http://45.117.153.90:5004/api/EmployeeAttendance/GetMyAttendanceSummary'),
         headers: {
           'Authorization': 'Bearer $_token',
-          'BranchId': _branchId ?? '',
           'Content-Type': 'application/json',
+          'workingBranchId': _branchId!,
         },
-        body: json.encode({
-          "FromDate": fromDate.toIso8601String(),
-          "ToDate": toDate.toIso8601String(),
-          "ShiftType": shiftType,
-        }),
+        body: json.encode(filter.toJson()),
       );
 
       if (response.statusCode == 200) {
-        if (response.body.isNotEmpty) {
-          _attendanceDetails =
-              AttendanceDetailsModel.fromJson(json.decode(response.body));
-          print("Attendance data fetched successfully");
-        } else {
-          print("Error: Empty response body.");
-        }
-      } else {
-        print(
-            'Failed to load attendance data. Status code: ${response.statusCode}');
-      }
-    } catch (e) {
-      print("Error during API call: $e");
-    }
-  }
+        final responseData = json.decode(response.body);
+        _attendanceReport = AttendanceReport.fromJson(responseData);
 
-  void initialize() async {
-    try {
-      _isLoading = true;
-      notifyListeners();
-      await _loadSecureData();
-      _isLoading = false;
-      notifyListeners();
-    } catch (e) {
-      _isLoading = false;
-      notifyListeners();
-      print('Error: $e');
+        final List<dynamic> summaryData =
+            responseData['attendanceSummary'] ?? [];
+
+        final List<dynamic> detailsData =
+            responseData['attendanceDetails'] ?? [];
+
+        _summaryAttendance = summaryData
+            .map((attendanceData) => AttendanceSummary.fromJson(attendanceData))
+            .toList();
+
+        _detsilsAttendance = detailsData
+            .map((attendanceData) => AttendanceDetails.fromJson(attendanceData))
+            .toList();
+
+        if (_attendanceReport != null) {
+          String shiftTypeFromAPI = _attendanceReport!.filter.shiftType;
+
+          _shiftTypes = ["Primary", "Extended"];
+
+          // Add the dynamic shift type from API, if it's not already in the list
+          if (shiftTypeFromAPI.isNotEmpty &&
+              !_shiftTypes.contains(shiftTypeFromAPI)) {
+            _shiftTypes.add(shiftTypeFromAPI);
+          }
+        }
+
+        notifyListeners();
+      } else {
+        _errorMessage =
+            'Failed to load attendance summary: ${response.statusCode}';
+      }
+    } catch (error) {
+      _errorMessage = 'Error: $error';
     }
+
+    _isLoading = false;
+    notifyListeners();
   }
 }

@@ -11,10 +11,37 @@ class AttendanceScreen extends StatefulWidget {
 }
 
 class _AttendanceScreenState extends State<AttendanceScreen> {
+  void initState() {
+    super.initState();
+    Future.microtask(() async {
+      await Provider.of<AttendanceProvider>(context, listen: false)
+          .fetchAttendanceData();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final attendanceProvider = Provider.of<AttendanceProvider>(context);
-    final attendance = attendanceProvider.attendance;
+
+    if (attendanceProvider.isLoading) {
+      return const Scaffold(
+        backgroundColor: cardBackgroundColor,
+        appBar: CustomAppBarProfile(title: "View Attendance"),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    // Show error message if there was an issue fetching the data
+    if (attendanceProvider.errorMessage.isNotEmpty) {
+      return Scaffold(
+        backgroundColor: cardBackgroundColor,
+        appBar: const CustomAppBarProfile(title: "View Attendance"),
+        body: Center(child: Text(attendanceProvider.errorMessage)),
+      );
+    }
+
+    final primaryShiftAttendance = attendanceProvider.primaryShiftAttendance;
+    final extendedShiftAttendance = attendanceProvider.extendedShiftAttendance;
 
     return Scaffold(
       backgroundColor: cardBackgroundColor,
@@ -22,57 +49,47 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: attendance == null
-              ? Center(child: CircularProgressIndicator())
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Primary Shift', style: _titleStyle),
-                    SizedBox(height: 10),
-                    _buildTwoColumnLayout([
-                      _buildCategoryTile(
-                          'Working Days', attendance.workingDaysPrimary),
-                      _buildCategoryTile('Present', attendance.presentPrimary),
-                      _buildCategoryTile('Week End', attendance.weekendPrimary),
-                      _buildCategoryTile('Leave', attendance.leavePrimary),
-                      _buildCategoryTile('Absent', attendance.absentPrimary),
-                    ]),
-                    SizedBox(height: 20),
-                    Text('Extended Shift', style: _titleStyle),
-                    SizedBox(height: 10),
-                    _buildTwoColumnLayout([
-                      _buildCategoryTile(
-                          'Working Days', attendance.workingDaysExtended),
-                      _buildCategoryTile('Present', attendance.presentExtended),
-                      _buildCategoryTile(
-                          'Week End', attendance.weekendExtended),
-                      _buildCategoryTile('Leave', attendance.leaveExtended),
-                      _buildCategoryTile('Absent', attendance.absentExtended),
-                    ]),
-                    SizedBox(height: 30),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => AttendanceDetailsScreen()),
-                        );
-                      },
-                      child: Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.symmetric(vertical: 12.0),
-                        decoration: BoxDecoration(
-                          color: primarySwatch[900],
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        child: Center(
-                          child:
-                              Text('Attendance History', style: _buttonStyle),
-                        ),
-                      ),
-                    ),
-                  ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Primary Shift', style: _titleStyle),
+              SizedBox(height: 10),
+              _buildTwoColumnLayout(
+                  primaryShiftAttendance.map((attendanceData) {
+                return _buildCategoryTile(
+                    attendanceData.category, attendanceData.qty);
+              }).toList()),
+              SizedBox(height: 20),
+              Text('Extended Shift', style: _titleStyle),
+              SizedBox(height: 10),
+              _buildTwoColumnLayout(
+                  extendedShiftAttendance.map((attendanceData) {
+                return _buildCategoryTile(
+                    attendanceData.category, attendanceData.qty);
+              }).toList()),
+              SizedBox(height: 30),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => AttendanceDetailsScreen()),
+                  );
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(vertical: 12.0),
+                  decoration: BoxDecoration(
+                    color: primarySwatch[900],
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  child: Center(
+                    child: Text('Attendance History', style: _buttonStyle),
+                  ),
                 ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -83,7 +100,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold);
 
   Widget _buildTwoColumnLayout(List<Widget?> tiles) {
-    // Remove null tiles
     List<Widget?> filteredTiles = tiles.where((tile) => tile != null).toList();
 
     return Column(
@@ -95,12 +111,11 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(child: filteredTiles[i]!),
-                SizedBox(width: 10), // Space between the tiles
+                SizedBox(width: 10),
                 if (i + 1 < filteredTiles.length)
                   Expanded(child: filteredTiles[i + 1]!)
                 else
-                  Expanded(
-                      child: SizedBox()), // In case of an odd number of tiles
+                  Expanded(child: SizedBox()),
               ],
             ),
           ),
@@ -108,9 +123,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     );
   }
 
-  Widget? _buildCategoryTile(String category, int? value) {
-    if (value == null || value == 0) return null;
-
+  Widget _buildCategoryTile(String category, int qty) {
     return Container(
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -124,7 +137,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           Text(category,
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
           SizedBox(height: 5),
-          Text('$value',
+          Text('$qty',
               style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
