@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 
@@ -11,8 +13,12 @@ class CheckInProvider with ChangeNotifier {
   String? _latitude;
   String? _longitude;
   String? _branchId;
-  String? _userId; // Declare userId
 
+  String? _address;
+  String? _checkInTime; // Stores check-in time
+  String? _checkOutTime; // Stores check-out time
+  bool _isCheckedIn = false; // Flag to track if check-in is done
+  String? get aDDress => _address;
   final SecureStorageService _secureStorageService = SecureStorageService();
 
   bool get loading => _loading;
@@ -21,53 +27,75 @@ class CheckInProvider with ChangeNotifier {
   String? get latitude => _latitude;
   String? get longitude => _longitude;
   String? get branchId => _branchId;
-
+  String? get checkInTime => _checkInTime;
+  String? get checkOutTime => _checkOutTime;
+  bool get isCheckedIn => _isCheckedIn; // Getter for check-in status
+  void clearData() => _clearData();
   Future<void> punchPost() async {
     _setLoading(true);
     try {
-      // Fetch auth token
       String? token = await _secureStorageService.readData('auth_token');
       if (token == null) {
         _setErrorMessage("No token found. Please log in again.");
         return;
       }
 
-      // Fetch selected branch ID from secure storage
       _branchId = await _secureStorageService.readData('workingBranchId');
-      print("Branch ID: $_branchId");
       if (_branchId == null) {
         _setErrorMessage("No branch selected. Please select a branch.");
         return;
       }
 
-      // Check if location is enabled
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        _setErrorMessage("Location services are disabled. Please enable them.");
+        await Geolocator.openLocationSettings();
         return;
       }
+      print(serviceEnabled);
 
-      // Request location permission if not granted
       LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
+      if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied ||
-            permission == LocationPermission.deniedForever) {
+        if (permission == LocationPermission.denied) {
           _setErrorMessage("Location permission denied.");
           return;
         }
       }
+      if (permission == LocationPermission.deniedForever) {
+        _setErrorMessage("Location permission denied forever.");
+        return;
+      }
 
-      // Fetch current location
       Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.low);
+          desiredAccuracy: LocationAccuracy.high);
 
       _latitude = position.latitude.toString();
       _longitude = position.longitude.toString();
-      print("Latitude: $_latitude, Longitude: $_longitude");
+      List<Placemark> address =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
+      if (address.isNotEmpty) {
+        _address =
+            '${address[0].name},${address[0].locality},${address[0].administrativeArea}';
+      }
+      print(_address);
+      print(position);
 
-      // Send API request with userId and branchId
+      // Store Check-in or Check-out time
+      String currentTime = DateFormat('hh:mm a').format(DateTime.now());
+
+      if (!_isCheckedIn) {
+        // Check-in logic
+        if (_checkInTime != null || _checkOutTime != null) {
+          _clearData();
+        }
+        _checkInTime = currentTime;
+        _isCheckedIn = true;
+      } else {
+        //check-out
+        _checkOutTime = currentTime;
+        _isCheckedIn = false;
+      }
+
       final response = await http.post(
         Uri.parse('http://45.117.153.90:5004/api/Employee/PunchPost'),
         headers: {
@@ -76,18 +104,18 @@ class CheckInProvider with ChangeNotifier {
           "workingBranchId": _branchId!,
         },
         body: json.encode({
-          "user_id": _userId, // Add user_id here
           "latitude": _latitude,
           "longitude": _longitude,
         }),
       );
-      print(response.body);
 
       if (response.statusCode == 200) {
-        _setSuccessMessage("Check-in successful for Branch ID: $_branchId!");
+        _setSuccessMessage(_isCheckedIn
+            ? "Check-in successful at $_checkInTime"
+            : "Check-out successful at $_checkOutTime");
       } else {
         _setErrorMessage(
-            "Failed to submit check-in: ${response.statusCode}\n ${response.body}");
+            "Failed to submit: ${response.statusCode}\n ${response.body}");
       }
     } catch (e) {
       _setErrorMessage("Error: $e");
@@ -96,22 +124,27 @@ class CheckInProvider with ChangeNotifier {
     }
   }
 
+  // Method to clear check-in data
+  void _clearData() {
+    _checkInTime = null;
+    _checkOutTime = null;
+
+    notifyListeners();
+  }
+
   void _setLoading(bool value) {
     _loading = value;
     notifyListeners();
-    print("Loading: $_loading");
   }
 
   void _setErrorMessage(String message) {
     _errorMessage = message;
     notifyListeners();
-    print("Error: $_errorMessage");
   }
 
   void _setSuccessMessage(String message) {
     _successMessage = message;
     notifyListeners();
-    print("Success: $_successMessage");
   }
 
   void clearSuccessMessage() {

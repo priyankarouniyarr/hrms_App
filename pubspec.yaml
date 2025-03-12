@@ -33,7 +33,8 @@ dependencies:
   nepali_utils: 
   geolocator: ^13.0.2
   geocoding: ^3.0.0
-  shimmer: ^2.0.0
+  
+  google_maps_flutter: ^2.10.1
   
   
 
