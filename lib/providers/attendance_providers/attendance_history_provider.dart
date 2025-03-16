@@ -12,7 +12,7 @@ class AttendanceDetailsProvider with ChangeNotifier {
   AttendanceReport? _attendanceReport;
   String? _branchId;
   String? _token;
-  List<String> _shiftTypes = []; // Default shift types
+  List<String> _shiftTypes = ["Primary", "Extended"];
   List<AttendanceSummary> _summaryAttendance = [];
   List<AttendanceDetails> _detsilsAttendance = [];
 
@@ -70,14 +70,6 @@ class AttendanceDetailsProvider with ChangeNotifier {
 
         if (_attendanceReport != null) {
           String shiftTypeFromAPI = _attendanceReport!.filter.shiftType;
-
-          _shiftTypes = ["Primary", "Extended"];
-
-          // Add the dynamic shift type from API, if it's not already in the list
-          if (shiftTypeFromAPI.isNotEmpty &&
-              !_shiftTypes.contains(shiftTypeFromAPI)) {
-            _shiftTypes.add(shiftTypeFromAPI);
-          }
         }
 
         notifyListeners();

@@ -15,7 +15,7 @@ class CheckInProvider with ChangeNotifier {
   String? _branchId;
 
   String? _address;
-  String? _checkInTime; // Stores check-in time
+  String? _checkInTime;
   String? _checkOutTime; // Stores check-out time
   bool _isCheckedIn = false; // Flag to track if check-in is done
   String? get aDDress => _address;
@@ -31,6 +31,14 @@ class CheckInProvider with ChangeNotifier {
   String? get checkOutTime => _checkOutTime;
   bool get isCheckedIn => _isCheckedIn; // Getter for check-in status
   void clearData() => _clearData();
+  Future<void> loadCheckInData() async {
+    _checkInTime = await _secureStorageService.readData('lastCheckInTime');
+    print(_checkInTime);
+    _checkOutTime = await _secureStorageService.readData('lastCheckOutTime');
+    print(_checkOutTime);
+    notifyListeners();
+  }
+
   Future<void> punchPost() async {
     _setLoading(true);
     try {
@@ -84,15 +92,13 @@ class CheckInProvider with ChangeNotifier {
       String currentTime = DateFormat('hh:mm a').format(DateTime.now());
 
       if (!_isCheckedIn) {
-        // Check-in logic
-        if (_checkInTime != null || _checkOutTime != null) {
-          _clearData();
-        }
         _checkInTime = currentTime;
+        await _secureStorageService.writeData('lastCheckInTime', _checkInTime!);
         _isCheckedIn = true;
       } else {
-        //check-out
         _checkOutTime = currentTime;
+        await _secureStorageService.writeData(
+            'lastCheckOutTime', _checkOutTime!);
         _isCheckedIn = false;
       }
 

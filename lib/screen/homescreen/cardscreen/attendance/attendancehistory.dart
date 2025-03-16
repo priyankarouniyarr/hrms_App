@@ -28,17 +28,6 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    final filter = Filter(
-      fromDate:
-          DateTime.now().subtract(Duration(days: 30)), // Example: last 30 days
-      toDate: DateTime.now().subtract(Duration(days: 1)),
-      shiftType: '',
-    );
-
-    Future.microtask(() async {
-      await Provider.of<AttendanceDetailsProvider>(context, listen: false)
-          .fetchAttendanceSummary(filter);
-    });
   }
 
   @override

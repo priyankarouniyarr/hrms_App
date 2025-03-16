@@ -1,12 +1,31 @@
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/custom_appbar.dart';
 import 'package:hrms_app/screen/leaves/leavehistorypage.dart';
+import 'package:hrms_app/models/leaves/leave_history_models.dart';
 import 'package:hrms_app/screen/leaves/leaves_requestscreen.dart';
+import 'package:hrms_app/providers/leaves_provider/leavehistory_provider.dart';
 
-class LeavesScreen extends StatelessWidget {
+class LeavesScreen extends StatefulWidget {
+  @override
+  _LeavesScreenState createState() => _LeavesScreenState();
+}
+
+class _LeavesScreenState extends State<LeavesScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Fetch leave data when the screen loads
+    Future.microtask(() => Provider.of<LeaveProvider>(context, listen: false)
+        .fetchEmployeeLeaveHistory());
+  }
+
   @override
   Widget build(BuildContext context) {
+    final leaveProvider = Provider.of<LeaveProvider>(context);
+
     return Scaffold(
       backgroundColor: cardBackgroundColor,
       appBar: CustomAppBar(title: "Leaves"),
@@ -20,9 +39,9 @@ class LeavesScreen extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                 child: Table(
                   columnWidths: {
-                    0: FlexColumnWidth(3), //  Title column
+                    0: FlexColumnWidth(3), // Title column
                     1: FlexColumnWidth(2), // Available column
-                    2: FlexColumnWidth(2), //  Total column
+                    2: FlexColumnWidth(2), // Total column
                   },
                   children: [
                     TableRow(
@@ -36,12 +55,12 @@ class LeavesScreen extends StatelessWidget {
                         _buildTableHeader('Total'),
                       ],
                     ),
-                    _buildTableRow('Home Leave', '0', '0'),
-                    _buildTableRow('Sick Leave', '0', '0'),
-                    _buildTableRow('Leave Without Pay', '0', '0'),
-                    _buildTableRow('Satta Bida', '0', '0'),
-                    _buildTableRow('Paternity Leave', '0', '0'),
-                    _buildTableRow('Maternity Leave\n Long Sentence', '0', '0'),
+                    ...leaveProvider.leaves.map((leave) {
+                      return _buildTableRow(
+                          leave.leaveType,
+                          '${leave.balance.toInt()}',
+                          '${leave.allocated.toInt()}');
+                    }).toList(),
                   ],
                 ),
               ),
@@ -52,11 +71,12 @@ class LeavesScreen extends StatelessWidget {
                   alignment: Alignment.centerRight,
                   child: GestureDetector(
                     onTap: () {
-                      // Add logic to apply leave
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => LeavesRequestscreen()));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LeavesRequestscreen(),
+                        ),
+                      );
                     },
                     child: Container(
                       padding:
@@ -89,9 +109,132 @@ class LeavesScreen extends StatelessWidget {
               SizedBox(height: 8),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
-                child: Center(child: Text('No leave requests found.')),
+                child: leaveProvider.leaveNotApprovals.isEmpty
+                    ? Center(child: Text('No approved leave requests found.'))
+                    : Column(
+                        children: leaveProvider.leaveNotApprovals.map((leave) {
+                          return Card(
+                            color: Colors.white,
+                            elevation: 4.0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              side: const BorderSide(
+                                  color: primarySwatch, width: 1),
+                            ),
+                            margin: const EdgeInsets.symmetric(vertical: 15.0),
+                            child: Padding(
+                              padding: EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Leave Type
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        leave.leaveTypeName,
+                                        style: TextStyle(
+                                          fontSize: 16.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        leave.status.toString(),
+                                        style: TextStyle(
+                                          fontSize: 14.0,
+                                          fontWeight: FontWeight.bold,
+                                          color: accentColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8.0),
+
+                                  // Dates
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Leave From",
+                                        style: TextStyle(fontSize: 14.0),
+                                      ),
+                                      Text(
+                                        DateFormat('yyyy-MM-dd').format(
+                                          DateTime.parse(
+                                              leave.fromDate.toString()),
+                                        ),
+                                        style: TextStyle(fontSize: 14.0),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8.0),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Leave To",
+                                        style: TextStyle(fontSize: 14.0),
+                                      ),
+                                      Text(
+                                        DateFormat('yyyy-MM-dd').format(
+                                              DateTime.parse(
+                                                  leave.toDate.toString()),
+                                            ) ??
+                                            '-',
+                                        style: TextStyle(fontSize: 14.0),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8.0),
+
+                                  // Total Leave Days
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "No of Days",
+                                        style: TextStyle(fontSize: 14.0),
+                                      ),
+                                      Text(
+                                        ('${leave.totalLeaveDays.toInt()}'),
+                                        style: TextStyle(fontSize: 14.0),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8.0),
+
+                                  // Request Date
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Request Date",
+                                        style: TextStyle(fontSize: 14.0),
+                                      ),
+                                      Text(
+                                        DateFormat('yyyy-MM-dd').format(
+                                              DateTime.parse(leave
+                                                  .applicationDate
+                                                  .toString()),
+                                            ) ??
+                                            '-',
+                                        style: TextStyle(fontSize: 14.0),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
               ),
-              SizedBox(height: 16),
+              SizedBox(height: 8),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
@@ -99,10 +242,158 @@ class LeavesScreen extends StatelessWidget {
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ),
-              SizedBox(height: 8),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
-                child: Center(child: Text('No leave requests found.')),
+                child: leaveProvider.leaveApprovals.isEmpty
+                    ? Center(child: Text('No approved leave requests found.'))
+                    : Column(
+                        children: leaveProvider.leaveApprovals.map((leave) {
+                          return Card(
+                            color: Colors.white,
+                            elevation: 4.0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              side: const BorderSide(
+                                  color: primarySwatch, width: 1),
+                            ),
+                            margin: const EdgeInsets.symmetric(vertical: 15.0),
+                            child: Padding(
+                              padding: EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Leave Type
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        ' ${leave.leaveTypeName}',
+                                        style: TextStyle(
+                                          fontSize: 16.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        ' ${leave.status}',
+                                        style: TextStyle(
+                                          fontSize: 14.0,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.green,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+                                  SizedBox(height: 8.0),
+
+                                  // Dates
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Leave From",
+                                        style: TextStyle(fontSize: 14.0),
+                                      ),
+                                      Text(
+                                        '   ${DateFormat('yyyy-MM-dd').format(DateTime.parse(leave.fromDate))} ',
+                                        style: TextStyle(
+                                          fontSize: 14.0,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 8.0,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "To From",
+                                        style: TextStyle(fontSize: 14.0),
+                                      ),
+                                      Text(
+                                        '${DateFormat('yyyy-MM-dd').format(DateTime.parse(leave.toDate)) ?? '-'}',
+                                        style: TextStyle(
+                                          fontSize: 14.0,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8.0),
+
+                                  // Total Leave Days
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "No of Days",
+                                        style: TextStyle(fontSize: 14.0),
+                                      ),
+                                      Text(
+                                        ' ${leave.totalLeaveDays.toInt()}',
+                                        style: TextStyle(
+                                          fontSize: 14.0,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8.0),
+
+                                  // Request Date
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Request Date",
+                                        style: TextStyle(fontSize: 14.0),
+                                      ),
+                                      Text(
+                                        '  ${DateFormat('yyyy-MM-dd').format(DateTime.parse(leave.applicationDate)) ?? '-'}',
+                                        style: TextStyle(
+                                          fontSize: 14.0,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8.0),
+
+                                  // Approval Date
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Approval Date",
+                                        style: TextStyle(fontSize: 14.0),
+                                      ),
+                                      Text(
+                                        leave.leaveApprovedOn is DateTime
+                                            ? DateFormat('yyyy-MM-dd').format(
+                                                leave.leaveApprovedOn
+                                                    as DateTime)
+                                            : (leave.leaveApprovedOn != null
+                                                ? DateFormat('yyyy-MM-dd')
+                                                    .format(DateTime.parse(
+                                                        leave.leaveApprovedOn))
+                                                : '-'),
+                                        style: TextStyle(
+                                          fontSize: 14.0,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
               ),
               SizedBox(height: 15),
               Padding(
@@ -110,9 +401,11 @@ class LeavesScreen extends StatelessWidget {
                 child: GestureDetector(
                   onTap: () {
                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => LeaveStatementScreen()));
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LeaveStatementScreen(),
+                      ),
+                    );
                   },
                   child: Container(
                     width: double.infinity,
@@ -158,7 +451,6 @@ class LeavesScreen extends StatelessWidget {
     );
   }
 
-  // Function to build table header cell
   Widget _buildTableHeader(String text) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
@@ -173,7 +465,6 @@ class LeavesScreen extends StatelessWidget {
     );
   }
 
-  // Function to build table data cell
   Widget _buildTableCell(String text) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),

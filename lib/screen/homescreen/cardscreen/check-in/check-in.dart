@@ -16,7 +16,6 @@ class _CheckInScreenState extends State<CheckInScreen> {
   late GoogleMapController mapController;
 
   @override
-  @override
   Widget build(BuildContext context) {
     final checkInProvider = Provider.of<CheckInProvider>(context);
 
@@ -24,7 +23,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
         (checkInProvider.latitude != null && checkInProvider.longitude != null)
             ? LatLng(double.parse(checkInProvider.latitude!),
                 double.parse(checkInProvider.longitude!))
-            : null;
+            : LatLng(0.0, 0.0);
 
     return Scaffold(
       backgroundColor: cardBackgroundColor,
@@ -41,6 +40,15 @@ class _CheckInScreenState extends State<CheckInScreen> {
                       onTap: () async {
                         await checkInProvider.punchPost();
                         _showDialog(checkInProvider);
+                        mapController.animateCamera(
+                          CameraUpdate.newCameraPosition(
+                            CameraPosition(
+                              target:
+                                  userLocation, // Target position (marker location)
+                              zoom: 15.0, // Adjust zoom level
+                            ),
+                          ),
+                        );
                       },
                       child: _buildCheckInButton(checkInProvider),
                     ),
@@ -49,6 +57,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
                   Expanded(
                     child: GestureDetector(
                       onTap: () async {
+                        //  await checkInProvider.punchPost();
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -91,8 +100,8 @@ class _CheckInScreenState extends State<CheckInScreen> {
                   Center(
                     child: Text(
                       checkInProvider.isCheckedIn
-                          ? ' Last Check-in at: ${checkInProvider.checkInTime}'
-                          : ' Last Check-out at: ${checkInProvider.checkOutTime}',
+                          ? ' Last Check-in at: ${checkInProvider.checkInTime ?? '- -'}'
+                          : ' Last Check-out at: ${checkInProvider.checkOutTime ?? '--'}',
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
                     ),
@@ -107,7 +116,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
                   borderRadius: BorderRadius.circular(12),
                   child: GoogleMap(
                     initialCameraPosition: CameraPosition(
-                      target: userLocation!,
+                      target: userLocation,
                       zoom: 15,
                     ),
                     markers: {

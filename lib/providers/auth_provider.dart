@@ -9,17 +9,16 @@ class AuthProvider with ChangeNotifier {
   bool _loading = false;
   String _errorMessage = '';
   String? _token;
-  String? _username; // Store username
+  String? _username;
+  int? _expirationTime; // Store expiration time
 
   final TokenStorage _tokenStorage = TokenStorage();
 
   bool get loading => _loading;
   String get errorMessage => _errorMessage;
   String? get token => _token;
+  String? get username => _username;
 
-  String? get username => _username; // Getter for username
-
-  // Login function with access and refresh token handling
   Future<void> login(
       String username, String password, BuildContext context) async {
     _setLoading(true);
@@ -42,18 +41,15 @@ class AuthProvider with ChangeNotifier {
         body: json.encode(loginModel.toJson()),
       );
 
-      print('Status Code: ${response.statusCode}');
-
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         final token = responseData['token'];
         final refreshToken = responseData['refreshToken'];
-        _username = username; // Store username in provider
+        _expirationTime =
+            responseData['expirationTime']; // Store expiration time
 
-        print('Token: $token');
-        print('RefreshToken: $refreshToken');
+        _username = username;
 
-        // Store tokens securely using TokenStorage
         await _tokenStorage.storeToken(token);
         await _tokenStorage.storeRefreshToken(refreshToken);
 
@@ -72,6 +68,14 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  // Check if the token is expired
+  bool isTokenExpired() {
+    if (_expirationTime == null) return true;
+
+    final currentTime = DateTime.now().millisecondsSinceEpoch / 1000;
+    return currentTime > _expirationTime!;
+  }
+
   // Load access token securely
   Future<void> loadToken() async {
     _token = await _tokenStorage.getToken();
@@ -88,32 +92,27 @@ class AuthProvider with ChangeNotifier {
 
   // Refresh the access token using the refresh token
   Future<void> refreshAccessToken() async {
-    String? refreshToken = await _tokenStorage.getRefreshToken();
+    if (isTokenExpired()) {
+      String? refreshToken = await _tokenStorage.getRefreshToken();
 
-    if (refreshToken != null) {
-      final response = await http.post(
-        Uri.parse('http://45.117.153.90:5004/Account/RefreshToken/'),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: json.encode({
-          "refreshToken": refreshToken,
-        }),
-      );
+      if (refreshToken != null) {
+        final response = await http.post(
+          Uri.parse('http://45.117.153.90:5004/Account/RefreshToken/'),
+          headers: {"Content-Type": "application/json"},
+          body: json.encode({"refreshToken": refreshToken}),
+        );
 
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        final newToken = responseData['token'];
+        if (response.statusCode == 200) {
+          final responseData = json.decode(response.body);
+          final newToken = responseData['token'];
 
-        // Store new access token
-        await _tokenStorage.storeToken(newToken);
-        _token = newToken;
-        notifyListeners();
-      } else {
-        _setErrorMessage("Failed to refresh token");
+          await _tokenStorage.storeToken(newToken);
+          _token = newToken;
+          notifyListeners();
+        } else {
+          _setErrorMessage("Failed to refresh token");
+        }
       }
-    } else {
-      _setErrorMessage("No refresh token available");
     }
   }
 

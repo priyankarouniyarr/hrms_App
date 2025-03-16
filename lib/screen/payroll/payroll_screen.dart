@@ -155,85 +155,96 @@ class _PayrollScreenState extends State<PayrollScreen> {
             else if (provider.salaryDeductions.isEmpty)
               const Center(child: Text('No tax data available.'))
             else
-              ...provider.salaryDeductions.map((tax) {
-                return Card(
-                  color: backgroundColor,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Center(
-                        child: Text(
-                          "(${tax.month} ${tax.year})",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.blue,
+              Card(
+                color: backgroundColor,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 10),
+                    Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          IconButton(
+                            onPressed: provider.prevTax,
+                            icon: const Icon(Icons.arrow_left,
+                                color: primarySwatch),
                           ),
-                        ),
+                          Text(
+                            "${provider.currentTax?.month} ${provider.currentTax?.year}",
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: primarySwatch,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: provider.nextTax,
+                            icon: const Icon(Icons.arrow_right,
+                                color: primarySwatch),
+                          ),
+                        ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('SST ',
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.w500)),
-                            Text('Rs ${tax.sst}',
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.w500)),
-                          ],
-                        ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('SST',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.w500)),
+                          Text('Rs ${provider.currentTax?.sst}',
+                              style: const TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.w500)),
+                        ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Income Tax',
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.w500)),
-                            Text('Rs ${tax.incomeTax}',
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.w500)),
-                          ],
-                        ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Income Tax',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.w500)),
+                          Text('Rs ${provider.currentTax?.incomeTax}',
+                              style: const TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.w500)),
+                        ],
                       ),
-                      const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: DottedLine(
-                          direction: Axis.horizontal,
-                          lineLength: double.infinity,
-                          lineThickness: 1.0,
-                          dashLength: 4.0,
-                          dashColor: Colors.black,
-                          dashGapLength: 4.0,
-                          dashGapColor: Colors.transparent,
-                        ),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: DottedLine(
+                        direction: Axis.horizontal,
+                        lineLength: double.infinity,
+                        lineThickness: 1.0,
+                        dashLength: 4.0,
+                        dashColor: Colors.black,
+                        dashGapLength: 4.0,
+                        dashGapColor: Colors.transparent,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text('Total Deduction',
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold)),
-                            Text('Rs ${tax.totalDeduction}',
-                                style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: accentColor)),
-                          ],
-                        ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Total Deduction',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold)),
+                          Text('Rs ${provider.currentTax?.totalDeduction}',
+                              style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: accentColor)),
+                        ],
                       ),
-                    ],
-                  ),
-                );
-              }).toList(),
+                    ),
+                  ],
+                ),
+              ),
 
             const SizedBox(
               height: 20,

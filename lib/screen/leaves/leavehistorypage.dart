@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/leaves/dropdown_custom.dart';
+import 'package:hrms_app/providers/leaves_provider/leaves_history%20_contract%20and%20fiscalyear_period.dart';
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
 
 class LeaveStatementScreen extends StatefulWidget {
@@ -11,9 +13,20 @@ class LeaveStatementScreen extends StatefulWidget {
 class _LeaveStatementScreenState extends State<LeaveStatementScreen> {
   String? selectedPeriod;
   String? selectedFiscalYear;
+  @override
+  void initState() {
+    super.initState();
+    // Fetch data when the screen is loaded
+    final leaveProvider =
+        Provider.of<LeaveContractandFiscalYearProvider>(context, listen: false);
+    leaveProvider.fetchEmployeeLeaveHistory();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final leaveProvider =
+        Provider.of<LeaveContractandFiscalYearProvider>(context);
+
     return Scaffold(
       backgroundColor: cardBackgroundColor,
       appBar: const CustomAppBarProfile(title: "Leave Statement"),
@@ -30,7 +43,9 @@ class _LeaveStatementScreenState extends State<LeaveStatementScreen> {
             const SizedBox(height: 8),
             CustomDropdown(
                 value: selectedPeriod,
-                items: ['2024', '2023', '2022'],
+                items: leaveProvider.leaveContractYear
+                    .map((item) => item.text)
+                    .toList(),
                 hintText: 'Select a period',
                 onChanged: (value) {
                   setState(() {
@@ -48,7 +63,9 @@ class _LeaveStatementScreenState extends State<LeaveStatementScreen> {
             const SizedBox(height: 8),
             CustomDropdown(
                 value: selectedFiscalYear,
-                items: ['2024-25', '2023-24', '2022-23'],
+                items: leaveProvider.leaveFiscalYear
+                    .map((item) => item.text)
+                    .toList(),
                 hintText: 'Select a fiscal year',
                 onChanged: (value) {
                   setState(() {

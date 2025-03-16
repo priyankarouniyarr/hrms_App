@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../storage/securestorage.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/app_main_screen.dart';
@@ -13,7 +14,7 @@ class SelectFiscalYearScreen extends StatefulWidget {
 }
 
 class _SelectFiscalYearScreenState extends State<SelectFiscalYearScreen> {
-  String? selectedFiscalYear;
+  int? selectedFiscalYear;
 
   @override
   void initState() {
@@ -59,8 +60,12 @@ class _SelectFiscalYearScreenState extends State<SelectFiscalYearScreen> {
                 return Center(child: Text("No fiscal years available"));
               }
 
-              List<String> fiscalYearNames = fiscalYearProvider.fiscalYears
-                  .map((fiscalYear) => fiscalYear.financialYearCode)
+              List<Map<String, dynamic>> fiscalYearNames = fiscalYearProvider
+                  .fiscalYears
+                  .map((fiscalYear) => {
+                        'label': fiscalYear.financialYearCode,
+                        'value': fiscalYear.financialYearId
+                      })
                   .toList();
 
               return Column(
@@ -77,15 +82,17 @@ class _SelectFiscalYearScreenState extends State<SelectFiscalYearScreen> {
                     style: TextStyle(fontSize: 16, color: secondaryColor),
                   ),
                   const SizedBox(height: 20),
-                  CustomDropdown(
+                  CustomDropdown2(
                     value: selectedFiscalYear,
                     items: fiscalYearNames,
                     hintText: "Select Fiscal Year",
                     onChanged: (value) {
-                      if (value != selectedFiscalYear) {
+                      if (value != null) {
                         setState(() {
                           selectedFiscalYear = value;
                         });
+                        SecureStorageService().writeData(
+                            "selected_fiscal_year", value.toString());
                       }
                     },
                   ),

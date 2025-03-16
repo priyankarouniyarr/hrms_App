@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
@@ -102,6 +104,13 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
                   return SizedBox(
                     width: 56,
                     child: TextField(
+                      keyboardType:
+                          TextInputType.number, // Restrict keyboard to numbers
+                      inputFormatters: [
+                        FilteringTextInputFormatter
+                            .digitsOnly, // Allow only digits
+                      ],
+
                       controller: controllers[index],
                       focusNode: focusNodes[index],
                       cursorColor: primarySwatch[900],

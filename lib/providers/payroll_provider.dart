@@ -8,12 +8,16 @@ import 'package:hrms_app/screen/homescreen/salary_deduction_models.dart';
 class LoanAndAdvanceProvider with ChangeNotifier {
   LoanAndAdvanceModel? _loanAndAdvanceModel;
   List<SalaryDeduction> _salaryDeductions = [];
+  int _currentTaxIndex = 0; // Track the current index
   bool _isLoading = false;
   String _errorMessage = '';
   final SecureStorageService _secureStorageService = SecureStorageService();
 
   LoanAndAdvanceModel? get loanAndAdvanceModel => _loanAndAdvanceModel;
   List<SalaryDeduction> get salaryDeductions => _salaryDeductions;
+
+  SalaryDeduction? get currentTax =>
+      _salaryDeductions.isNotEmpty ? _salaryDeductions[_currentTaxIndex] : null;
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
 
@@ -78,7 +82,7 @@ class LoanAndAdvanceProvider with ChangeNotifier {
         url,
         headers: {
           'Authorization': 'Bearer $token',
-          'workingBranchId': '$branchId',
+          'workingBranchId': branchId!,
         },
       );
 
@@ -95,5 +99,20 @@ class LoanAndAdvanceProvider with ChangeNotifier {
 
     _isLoading = false;
     notifyListeners();
+  }
+
+  void nextTax() {
+    if (_currentTaxIndex < _salaryDeductions.length - 1) {
+      _currentTaxIndex++;
+      notifyListeners();
+    }
+  }
+
+  // Move to the previous tax record
+  void prevTax() {
+    if (_currentTaxIndex > 0) {
+      _currentTaxIndex--;
+      notifyListeners();
+    }
   }
 }
