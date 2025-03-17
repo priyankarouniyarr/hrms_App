@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'subcategories/emergency_conatct.dart';
 import 'package:hrms_app/constants/colors.dart';
+import 'package:hrms_app/screen/hospitalcode.dart';
+import 'package:hrms_app/models/hospital_code.dart';
 import 'package:hrms_app/screen/custom_appbar.dart';
 import 'package:hrms_app/screen/login%20screen.dart';
 import 'package:hrms_app/screen/profile/profilemenuitem.dart';
@@ -197,7 +199,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => LoginScreen(),
+                        builder: (context) => HospitalCodeScreen(),
                       ),
                     );
                   },

@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hrms_app/storage/securestorage.dart';
-import 'package:hrms_app/models/profiles.models.dart';
+import 'package:hrms_app/models/profile_models/profiles.models.dart';
 import 'package:hrms_app/screen/profile/subcategories/emergency_conatct.dart';
 
 class EmployeeProvider with ChangeNotifier {

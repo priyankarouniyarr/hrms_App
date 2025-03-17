@@ -3,19 +3,20 @@ import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hrms_app/screen/onboardscreen.dart';
 import 'package:hrms_app/screen/app_main_screen.dart';
-import 'package:hrms_app/providers/payroll_provider.dart';
 import 'package:hrms_app/providers/notices_provider.dart';
 import 'package:hrms_app/providers/holidays_provider.dart';
 import 'package:hrms_app/providers/check_in_provider.dart';
 import 'package:hrms_app/providers/branch_id_provider.dart';
 import 'package:hrms_app/providers/fiscal_year_provider.dart';
 import 'package:hrms_app/providers/hosptial_code_provider.dart';
+import 'package:hrms_app/providers/payroll/payroll_provider.dart';
 import 'package:hrms_app/models/leaves/leave_history_models.dart';
 import 'package:hrms_app/providers/employee_contract_provider.dart';
 import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
 import 'package:hrms_app/providers/auth_provider.dart'; // Import AuthProvider
 import 'package:hrms_app/providers/leaves_provider/leavehistory_provider.dart';
 import 'package:hrms_app/providers/attendance_providers/attendance_provider.dart';
+import 'package:hrms_app/providers/payroll/payroll_monthly_salarayy_provider.dart';
 import 'package:hrms_app/providers/attendance_providers/attendance_history_provider.dart';
 import 'package:hrms_app/providers/leaves_provider/leaves_history%20_contract%20and%20fiscalyear_period.dart';
 
@@ -90,6 +91,7 @@ void main() async {
           ChangeNotifierProvider(create: (context) => LeaveProvider()),
           ChangeNotifierProvider(
               create: (context) => LeaveContractandFiscalYearProvider()),
+          ChangeNotifierProvider(create: (context) => SalaryProvider()),
         ],
         child: //MyApp(isLoggedIn: isLoggedIn),
             MyApp() // Pass the login status to MyApp

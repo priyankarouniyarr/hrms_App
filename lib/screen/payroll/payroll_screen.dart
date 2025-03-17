@@ -4,7 +4,8 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/custom_appbar.dart';
 import 'dart:async'; // Import for scheduleMicrotask
-import 'package:hrms_app/providers/payroll_provider.dart';
+import 'package:hrms_app/providers/payroll/payroll_provider.dart';
+import 'package:hrms_app/providers/payroll/payroll_monthly_salarayy_provider.dart';
 
 class PayrollScreen extends StatefulWidget {
   @override
@@ -27,6 +28,8 @@ class _PayrollScreenState extends State<PayrollScreen> {
   Widget build(BuildContext context) {
     final provider = Provider.of<LoanAndAdvanceProvider>(context);
 
+    // If data is not loaded yet, show a loading indicator
+
     return Scaffold(
         backgroundColor: cardBackgroundColor,
         appBar: const CustomAppBar(
@@ -38,6 +41,7 @@ class _PayrollScreenState extends State<PayrollScreen> {
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             // Basic salary and other details
+
             Card(
                 color: backgroundColor,
                 child: Column(
@@ -140,11 +144,13 @@ class _PayrollScreenState extends State<PayrollScreen> {
             ),
 
             // Taxes section
-            Text("Taxes",
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black.withOpacity(0.8))),
+            Text(
+              "Taxes",
+              style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black.withOpacity(0.8)),
+            ),
             const SizedBox(
               height: 10,
             ),
@@ -166,9 +172,15 @@ class _PayrollScreenState extends State<PayrollScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           IconButton(
-                            onPressed: provider.prevTax,
-                            icon: const Icon(Icons.arrow_left,
-                                color: primarySwatch),
+                            onPressed: provider.currentTaxIndex > 0
+                                ? provider.prevTax
+                                : null,
+                            icon: Icon(
+                              Icons.arrow_left,
+                              color: provider.currentTaxIndex > 0
+                                  ? primarySwatch
+                                  : Colors.grey,
+                            ),
                           ),
                           Text(
                             "${provider.currentTax?.month} ${provider.currentTax?.year}",
@@ -179,9 +191,17 @@ class _PayrollScreenState extends State<PayrollScreen> {
                             ),
                           ),
                           IconButton(
-                            onPressed: provider.nextTax,
-                            icon: const Icon(Icons.arrow_right,
-                                color: primarySwatch),
+                            onPressed: provider.currentTaxIndex <
+                                    provider.salaryDeductions.length - 1
+                                ? provider.nextTax
+                                : null,
+                            icon: Icon(
+                              Icons.arrow_right,
+                              color: provider.currentTaxIndex <
+                                      provider.salaryDeductions.length - 1
+                                  ? primarySwatch
+                                  : Colors.grey,
+                            ),
                           ),
                         ],
                       ),
@@ -245,7 +265,6 @@ class _PayrollScreenState extends State<PayrollScreen> {
                   ],
                 ),
               ),
-
             const SizedBox(
               height: 20,
             ),

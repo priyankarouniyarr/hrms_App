@@ -36,9 +36,6 @@ class LeaveProvider extends ChangeNotifier {
       _token = await _secureStorageService.readData('auth_token');
       _fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
-      print(_branchId);
-      print(_token);
-      print(_fiscalYear);
 
       if (_token == null || _branchId == null || _fiscalYear == null) {
         _errorMessage = 'Missing required credentials';
@@ -65,7 +62,7 @@ class LeaveProvider extends ChangeNotifier {
       final response2 = await http.get(Uri.parse(url1), headers: headers);
       final response3 = await http.get(Uri.parse(url2), headers: headers);
 
-      print(response.statusCode);
+      //print(response.statusCode);
 
       if (response.statusCode == 200 &&
           response2.statusCode == 200 &&

@@ -2,16 +2,18 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hrms_app/storage/securestorage.dart';
-import 'package:hrms_app/models/loan_and_advance_data.dart';
-import 'package:hrms_app/screen/homescreen/salary_deduction_models.dart';
+import 'package:hrms_app/models/payrolls_models/loan_and_advance_data.dart';
+import 'package:hrms_app/models/payrolls_models/salary_deduction_models.dart';
 
 class LoanAndAdvanceProvider with ChangeNotifier {
   LoanAndAdvanceModel? _loanAndAdvanceModel;
   List<SalaryDeduction> _salaryDeductions = [];
   int _currentTaxIndex = 0; // Track the current index
+
   bool _isLoading = false;
   String _errorMessage = '';
   final SecureStorageService _secureStorageService = SecureStorageService();
+  int get currentTaxIndex => _currentTaxIndex;
 
   LoanAndAdvanceModel? get loanAndAdvanceModel => _loanAndAdvanceModel;
   List<SalaryDeduction> get salaryDeductions => _salaryDeductions;

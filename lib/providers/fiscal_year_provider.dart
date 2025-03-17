@@ -21,7 +21,7 @@ class FiscalYearProvider with ChangeNotifier {
 
     try {
       String? token = await _secureStorageService.readData('auth_token');
-      print("Token: $token");
+      // print("Token: $token");
 
       if (token == null) {
         _setErrorMessage("No token found. Please log in again.");
@@ -37,8 +37,8 @@ class FiscalYearProvider with ChangeNotifier {
         },
       );
 
-      print('Fiscal Year Fetch Status Code: ${response.statusCode}');
-      print('Raw Response Body: ${response.body}');
+      // print('Fiscal Year Fetch Status Code: ${response.statusCode}');
+      // print('Raw Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         List<dynamic> jsonData = json.decode(response.body);

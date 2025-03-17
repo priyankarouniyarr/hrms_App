@@ -15,11 +15,11 @@ class HospitalCodeProvider with ChangeNotifier {
   Future<void> fetchBaseUrl(String code) async {
     _isLoading = true;
     notifyListeners();
-    print("hello");
+
     try {
       final response = await http
           .get(Uri.parse('http://45.117.153.90:5005/api/CodeUrl/$code'));
-      print(response.body);
+      // print(response.body);
 
       if (response.statusCode == 200) {
         final decodedResponse = json.decode(response.body);

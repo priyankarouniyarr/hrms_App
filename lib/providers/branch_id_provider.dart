@@ -19,7 +19,7 @@ class BranchProvider with ChangeNotifier {
 
   Future<void> setSelectedBranch(String branchId) async {
     _selectedBranchId = branchId;
-    print("selectedbranchId: $_selectedBranchId");
+    //print("selectedbranchId: $_selectedBranchId");
     await _secureStorageService.writeData('workingBranchId', branchId);
     notifyListeners();
   }
@@ -27,7 +27,7 @@ class BranchProvider with ChangeNotifier {
   Future<void> loadSelectedBranch() async {
     String? storedBranchId =
         await _secureStorageService.readData('workingBranchId');
-    print("Loaded branch ID: $storedBranchId");
+    //print("Loaded branch ID: $storedBranchId");
     if (storedBranchId != null) {
       _selectedBranchId = storedBranchId;
     }
@@ -51,7 +51,7 @@ class BranchProvider with ChangeNotifier {
           "Authorization": "Bearer $token",
         },
       );
-      print(response.body);
+      // print(response.body);
 
       if (response.statusCode == 200) {
         List<dynamic> jsonData = json.decode(response.body);

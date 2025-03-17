@@ -1,9 +1,12 @@
 import 'package:intl/intl.dart';
 import 'customtextfieldform.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/leaves/dropdown_custom.dart';
+import 'package:hrms_app/models/leaves/leave_history_models.dart';
+import 'package:hrms_app/providers/leaves_provider/leavehistory_provider.dart';
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
 
 class LeavesRequestscreen extends StatefulWidget {
@@ -19,9 +22,28 @@ class _LeavesRequestscreenState extends State<LeavesRequestscreen> {
   DateTime? _startDate;
   String? _selectedleaveType;
   String? _selectedhalfday;
+  @override
+  void initState() {
+    super.initState();
+    // Fetch leave data when the screen loads
+    Future.microtask(() => Provider.of<LeaveProvider>(context, listen: false)
+        .fetchEmployeeLeaveHistory());
+  }
 
   @override
   Widget build(BuildContext context) {
+    final leaveProvider = Provider.of<LeaveProvider>(context);
+    // Filter and calculate available leaves
+    final homeLeaves = leaveProvider.leaves
+        .where((leave) => leave.leaveType == "Home Leave")
+        .map((leave) => leave.balance.toInt())
+        .toList();
+
+    final sickLeaves = leaveProvider.leaves
+        .where((leave) => leave.leaveType == "Sick Leave")
+        .map((leave) => leave.balance.toInt())
+        .toList();
+
     return Scaffold(
       backgroundColor: cardBackgroundColor,
       appBar: CustomAppBarProfile(title: "Leave Request"),
@@ -36,15 +58,14 @@ class _LeavesRequestscreenState extends State<LeavesRequestscreen> {
                 children: [
                   Expanded(
                     child: LeavesContainer(
-                      title: "Home Leaves Available",
-                      count: 0,
-                    ),
+                        title: "Home Leaves Available",
+                        count: homeLeaves.isNotEmpty ? homeLeaves.first : 0),
                   ),
                   SizedBox(width: 16),
                   Expanded(
                     child: LeavesContainer(
                       title: "Sick Leaves Available",
-                      count: 0,
+                      count: sickLeaves.isNotEmpty ? sickLeaves.first : 0,
                     ),
                   ),
                 ],
@@ -487,6 +508,10 @@ class _LeavesRequestscreenState extends State<LeavesRequestscreen> {
       ),
     );
   }
+}
+
+extension on List<Leave> {
+  get balance => null;
 }
 
 // LeavesContainer widget
