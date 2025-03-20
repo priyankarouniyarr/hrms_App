@@ -30,7 +30,9 @@ class CheckInProvider with ChangeNotifier {
   String? get checkInTime => _checkInTime;
   String? get checkOutTime => _checkOutTime;
   bool get isCheckedIn => _isCheckedIn; // Getter for check-in status
+
   void clearData() => _clearData();
+
   Future<void> loadCheckInData() async {
     _checkInTime = await _secureStorageService.readData('lastCheckInTime');
     print(_checkInTime);
@@ -59,7 +61,6 @@ class CheckInProvider with ChangeNotifier {
         await Geolocator.openLocationSettings();
         return;
       }
-      print(serviceEnabled);
 
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
@@ -83,19 +84,22 @@ class CheckInProvider with ChangeNotifier {
           await placemarkFromCoordinates(position.latitude, position.longitude);
       if (address.isNotEmpty) {
         _address =
-            '${address[0].name},${address[0].locality},${address[0].administrativeArea}';
+            '${address[0].name}, ${address[0].locality}, ${address[0].administrativeArea}';
       }
-      print(_address);
-      print(position);
 
       // Store Check-in or Check-out time
       String currentTime = DateFormat('hh:mm a').format(DateTime.now());
 
       if (!_isCheckedIn) {
+        // Clear previous check-out time when checking in again
+        _checkOutTime = null; // Clear previous check-out time
+        await _secureStorageService.writeData('lastCheckOutTime', '');
+
         _checkInTime = currentTime;
         await _secureStorageService.writeData('lastCheckInTime', _checkInTime!);
         _isCheckedIn = true;
       } else {
+        // When checking out, display the check-out time
         _checkOutTime = currentTime;
         await _secureStorageService.writeData(
             'lastCheckOutTime', _checkOutTime!);
@@ -134,7 +138,7 @@ class CheckInProvider with ChangeNotifier {
   void _clearData() {
     _checkInTime = null;
     _checkOutTime = null;
-
+    _isCheckedIn = false; // Ensure to reset the check-in flag
     notifyListeners();
   }
 

@@ -23,7 +23,6 @@ class _WorkScreenState extends State<WorkScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Segmented Tab Control using ToggleButtons
             Container(
               height: 60,
               decoration: BoxDecoration(
@@ -48,7 +47,7 @@ class _WorkScreenState extends State<WorkScreen> {
                     const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 children: const [
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 30),
+                    padding: EdgeInsets.symmetric(horizontal: 50),
                     child: Text('My Ticket', style: TextStyle(fontSize: 18)),
                   ),
                   Padding(
@@ -60,7 +59,6 @@ class _WorkScreenState extends State<WorkScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            // Tab content
             Expanded(
               child: _selectedIndex == 0
                   ? const Myticketsumarry()

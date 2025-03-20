@@ -40,11 +40,11 @@ class _CheckInScreenState extends State<CheckInScreen> {
                       onTap: () async {
                         await checkInProvider.punchPost();
                         _showDialog(checkInProvider);
+
                         mapController.animateCamera(
                           CameraUpdate.newCameraPosition(
                             CameraPosition(
-                              target:
-                                  userLocation, // Target position (marker location)
+                              target: userLocation,
                               zoom: 15.0, // Adjust zoom level
                             ),
                           ),

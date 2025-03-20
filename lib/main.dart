@@ -18,6 +18,8 @@ import 'package:hrms_app/providers/leaves_provider/leavehistory_provider.dart';
 import 'package:hrms_app/providers/attendance_providers/attendance_provider.dart';
 import 'package:hrms_app/providers/payroll/payroll_monthly_salarayy_provider.dart';
 import 'package:hrms_app/providers/attendance_providers/attendance_history_provider.dart';
+import 'package:hrms_app/providers/works_Summary_provider/assign_by_me_ticket_provider.dart';
+import 'package:hrms_app/providers/works_Summary_provider/my_ticket_get_summary_provider.dart';
 import 'package:hrms_app/providers/leaves_provider/leaves_history%20_contract%20and%20fiscalyear_period.dart';
 
 void main() async {
@@ -29,7 +31,6 @@ void main() async {
     // Request to enable location services
     bool serviceEnabled = await Geolocator.openLocationSettings();
     if (!serviceEnabled) {
-      // Handle the case where the user did not enable location services
       return;
     }
   }
@@ -92,6 +93,10 @@ void main() async {
           ChangeNotifierProvider(
               create: (context) => LeaveContractandFiscalYearProvider()),
           ChangeNotifierProvider(create: (context) => SalaryProvider()),
+          ChangeNotifierProvider(
+              create: (context) => MyTicketGetSummaryProvider()),
+          ChangeNotifierProvider(
+              create: (context) => AssignByMeTicketProvider()),
         ],
         child: //MyApp(isLoggedIn: isLoggedIn),
             MyApp() // Pass the login status to MyApp

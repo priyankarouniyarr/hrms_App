@@ -30,9 +30,6 @@ class _ShiftScreenState extends State<ShiftScreen> {
     }
 
     final currentshifts = provider.currentShift;
-    if (currentshifts == null) {
-      return const Center(child: Text("No shift data available"));
-    }
 
     final shiftData = [
       {

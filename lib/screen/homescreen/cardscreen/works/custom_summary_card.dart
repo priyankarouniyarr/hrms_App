@@ -17,8 +17,8 @@ class SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: screenWidth * 0.4,
-      padding: const EdgeInsets.all(12),
+      width: screenWidth * 0.45,
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
@@ -33,7 +33,7 @@ class SummaryCard extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   color: Colors.black)),
           const SizedBox(height: 4),
-          Text(count,
+          Text(count.toString(),
               style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

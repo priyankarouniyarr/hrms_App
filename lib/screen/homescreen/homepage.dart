@@ -4,6 +4,7 @@ import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/providers/auth_provider.dart';
 import 'package:hrms_app/screen/homescreen/Shifting.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/works/works.dart';
+import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/notices/notices.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/check-in/check-in.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/new%20ticket/ticket.dart';
@@ -32,6 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
+    final provider = Provider.of<EmployeeProvider>(context);
     String username = authProvider.username ?? "User";
 
     return Scaffold(
@@ -66,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          physics: const NeverScrollableScrollPhysics(),
+          //physics: const NeverScrollableScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -99,11 +101,13 @@ class _HomeScreenState extends State<HomeScreen> {
               // Shifting screen
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: ShiftScreen(),
+                child: provider.currentShift == null
+                    ? SizedBox.shrink()
+                    : ShiftScreen(),
               ),
               SizedBox(height: 20),
               Container(
-                height: MediaQuery.of(context).size.height / 2,
+                height: MediaQuery.of(context).size.height / 2.5,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
@@ -115,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: GridView.builder(
                   shrinkWrap: true,
                   //Set physics to NeverScrollableScrollPhysics to avoid scrolling conflicts
-                  physics: const NeverScrollableScrollPhysics(),
+                  //  physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
                     crossAxisSpacing: 10,

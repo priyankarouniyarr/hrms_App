@@ -1,4 +1,5 @@
 class GetMyCurrentMonthSalary {
+  //for current month
   final int month;
   final int year;
   final int nextMonth;
@@ -38,6 +39,7 @@ class GetMyCurrentMonthSalary {
   }
 }
 
+//for monthlySalaryData
 class SalaryData {
   final String payHead;
   final double amount;
@@ -58,6 +60,7 @@ class SalaryData {
   }
 }
 
+//post request
 class GetMyMonthSalaryRequest {
   final int month;
   final int year;

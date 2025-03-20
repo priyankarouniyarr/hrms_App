@@ -1,9 +1,11 @@
+import 'dart:async';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:dotted_line/dotted_line.dart';
+import 'package:nepali_utils/nepali_utils.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/custom_appbar.dart';
-import 'dart:async'; // Import for scheduleMicrotask
 import 'package:hrms_app/providers/payroll/payroll_provider.dart';
 import 'package:hrms_app/providers/payroll/payroll_monthly_salarayy_provider.dart';
 
@@ -13,22 +15,60 @@ class PayrollScreen extends StatefulWidget {
 }
 
 class _PayrollScreenState extends State<PayrollScreen> {
-  @override
+  int currentMonth = NepaliDateTime.now().month; // Nepali month
+  int currentYear = NepaliDateTime.now().year;
   void initState() {
     super.initState();
+
     Future.microtask(() {
-      final provider =
-          Provider.of<LoanAndAdvanceProvider>(context, listen: false);
-      provider.fetchLoanAndAdvances();
-      provider.fetchMyTaxes(); // Fetch taxes as well
+      print(currentMonth);
+      Provider.of<LoanAndAdvanceProvider>(context, listen: false)
+          .fetchLoanAndAdvances();
+      Provider.of<LoanAndAdvanceProvider>(context, listen: false)
+          .fetchMyTaxes();
+
+      Provider.of<SalaryProvider>(context, listen: false)
+          .fetchCurrentMonthSalary();
     });
+    //
+  }
+
+  void _fetchPreviousMonthSalary() {
+    setState(() {
+      if (currentMonth == 1) {
+        currentMonth = 12;
+        currentYear--;
+      } else {
+        currentMonth--;
+      }
+
+      print("Current Year: $currentYear,$currentMonth");
+    });
+
+    Provider.of<SalaryProvider>(context, listen: false)
+        .fetchMonthSalary(currentMonth, currentYear);
+  }
+
+  void _fetchNextMonthSalary() {
+    setState(() {
+      if (currentMonth == 12) {
+        currentMonth = 1;
+        currentYear++;
+      } else {
+        currentMonth++;
+      }
+
+      print("Current Year: $currentYear,$currentMonth");
+    });
+
+    Provider.of<SalaryProvider>(context, listen: false)
+        .fetchMonthSalary(currentMonth, currentYear);
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<LoanAndAdvanceProvider>(context);
-
-    // If data is not loaded yet, show a loading indicator
+    final salaryProvider = Provider.of<SalaryProvider>(context);
 
     return Scaffold(
         backgroundColor: cardBackgroundColor,
@@ -40,105 +80,157 @@ class _PayrollScreenState extends State<PayrollScreen> {
           padding: EdgeInsets.all(16.0),
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            // Basic salary and other details
-
-            Card(
-                color: backgroundColor,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          IconButton(
-                              onPressed: () {},
-                              icon: const Icon(Icons.arrow_left,
-                                  color: primarySwatch)),
-                          const Text('Sharwan,2081',
+            if (salaryProvider.isLoading)
+              const Center(child: CircularProgressIndicator())
+            else if (salaryProvider.errorMessage.isNotEmpty)
+              Center(child: Text(salaryProvider.errorMessage))
+            else if (salaryProvider.currentMonthSalary == null &&
+                salaryProvider.monthSalary == null)
+              const Center(
+                  child: Text(
+                'No salary data available.',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: accentColor),
+              ))
+            else
+              Card(
+                  color: backgroundColor,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            IconButton(
+                                onPressed: _fetchPreviousMonthSalary,
+                                icon: const Icon(Icons.arrow_left,
+                                    color: Color.fromRGBO(19, 96, 164, 1))),
+                            Text(
+                              "${NepaliDateFormat('MMMM').format(NepaliDateTime(currentYear, currentMonth))} $currentYear",
                               style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: primarySwatch)),
-                          IconButton(
-                            onPressed: () {},
-                            icon: Icon(Icons.arrow_right,
-                                color: primarySwatch[900]),
+                                  color: primarySwatch),
+                            ),
+                            IconButton(
+                              onPressed: _fetchNextMonthSalary,
+                              icon: Icon(Icons.arrow_right,
+                                  color: primarySwatch[900]),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (salaryProvider
+                                  .monthSalary?.monthlySalaryData.isEmpty ==
+                              true ||
+                          salaryProvider.currentMonthSalary?.monthlySalaryData
+                                  .isEmpty ==
+                              true)
+                        Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: Text(
+                              'No salary data available.',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: accentColor,
+                              ),
+                            ),
                           ),
-                        ],
-                      ),
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Basic Salary',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w500)),
-                          Text('Rs 20000',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w500)),
-                        ],
-                      ),
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Allowance',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w500)),
-                          Text(' Rs 0000',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w500)),
-                        ],
-                      ),
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: DottedLine(
-                        direction: Axis.horizontal,
-                        lineLength: double.infinity,
-                        lineThickness: 1.0,
-                        dashLength: 4.0,
-                        dashColor: Colors.black,
-                        dashGapLength: 4.0,
-                        dashGapColor: Colors.transparent,
-                      ),
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Gross Total',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold)),
-                          Text(' Rs 0000',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold)),
-                        ],
-                      ),
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Net Total',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold)),
-                          Text(' Rs 0000',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold)),
-                        ],
-                      ),
-                    ),
-                  ],
-                )),
+                        )
+                      else ...[
+                        // List of Salary Items
+                        ListView.builder(
+                          shrinkWrap: true, // Add this
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: salaryProvider
+                              .monthSalary?.monthlySalaryData.length,
+                          itemBuilder: (context, index) {
+                            final salaryData = salaryProvider
+                                .monthSalary?.monthlySalaryData[index];
+
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    salaryData!.payHead,
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                  Text(
+                                    'Rs ${salaryData.amount.toStringAsFixed(2)}',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: salaryData.additionOrDeduction ==
+                                              "Addition"
+                                          ? Colors.black
+                                          : Colors.red,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: DottedLine(
+                            direction: Axis.horizontal,
+                            lineLength: double.infinity,
+                            lineThickness: 1.0,
+                            dashLength: 4.0,
+                            dashColor: Colors.black,
+                            dashGapLength: 4.0,
+                            dashGapColor: Colors.transparent,
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('Gross Total',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold)),
+                              Text(
+                                  ' Rs ${salaryProvider.monthSalary?.netTotal}',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('Net Total',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold)),
+                              Text(
+                                  " Rs ${salaryProvider.monthSalary?.grossTotal}",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                        ),
+                      ]
+                    ],
+                  )),
             const SizedBox(
               height: 20,
             ),
