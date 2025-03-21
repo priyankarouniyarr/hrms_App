@@ -1,6 +1,11 @@
+import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/leaves/dropdown_custom.dart';
+import 'package:hrms_app/providers/new_tickets_providers/ne_tickets_providers.dart';
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
 
 class CreateTicketScreen extends StatefulWidget {
@@ -14,10 +19,42 @@ class _CreateTicketScreenState extends State<CreateTicketScreen> {
   String? _selectedassigntoType;
   String? _selectedServerityType;
   @override
+  void initState() {
+    super.initState();
+
+    Future.microtask(() {
+      Provider.of<NewTicketProvider>(context, listen: false)
+          .fetchTicketCategories();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<NewTicketProvider>(context);
+    File? selectedImage;
+    String base64Image = "";
+    String? selectedFileName;
+    Future<void> chooseImage(type) async {
+      var image;
+      if (type == "camera") {
+        image = await ImagePicker()
+            .pickImage(source: ImageSource.camera, imageQuality: 10);
+      } else {
+        image = await ImagePicker()
+            .pickImage(source: ImageSource.gallery, imageQuality: 25);
+      }
+      if (image != null) {
+        setState(() {
+          selectedImage = File(image.path);
+          base64Image = base64Encode(selectedImage!.readAsBytesSync());
+          selectedFileName = image.name;
+        });
+      }
+    }
+
     return Scaffold(
       backgroundColor: cardBackgroundColor,
-      appBar: CustomAppBarProfile(title: "Create Ticket"),
+      appBar: const CustomAppBarProfile(title: "Create Ticket"),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -27,67 +64,73 @@ class _CreateTicketScreenState extends State<CreateTicketScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   //categories
-                  Text(
+                  const Text(
                     "Categories",
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 10),
-                  CustomDropdown(
-                    value: _selectedCategoriesType,
-                    items: ['IT Support', 'Biomedical'],
-                    hintText: 'Select',
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedCategoriesType = value;
-                      });
-                    },
-                  ),
+                  const SizedBox(height: 10),
+                  provider.isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : provider.errorMessage.isNotEmpty
+                          ? Center(child: Text(provider.errorMessage))
+                          : CustomDropdown(
+                              value: _selectedCategoriesType,
+                              items: provider.categories
+                                  .map((category) => category.text)
+                                  .toList(),
+                              hintText: 'Select Category',
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedCategoriesType = value;
+                                });
+                              },
+                            ),
                   SizedBox(height: 10),
                   //ticket Subject
-                  Text(
+                  const Text(
                     "Ticket Subject",
                     style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: primaryTextColor),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   TextFormField(
                     decoration: InputDecoration(
                       hintText: 'Enter Subject',
                       hintStyle: TextStyle(color: primarySwatch[900]),
                       enabledBorder: OutlineInputBorder(
                         borderSide:
-                            BorderSide(color: primarySwatch, width: 1.0),
+                            const BorderSide(color: primarySwatch, width: 1.0),
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide:
-                            BorderSide(color: primarySwatch, width: 2.0),
+                            const BorderSide(color: primarySwatch, width: 2.0),
                         borderRadius: BorderRadius.circular(8.0),
                       ),
-                      contentPadding: EdgeInsets.symmetric(
+                      contentPadding: const EdgeInsets.symmetric(
                           vertical: 16.0, horizontal: 10.0),
                       filled: true,
                       fillColor: cardBackgroundColor,
                     ),
                     cursorColor: primarySwatch[900],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   //ticket message
-                  Text(
+                  const Text(
                     "Ticket Message",
                     style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: primaryTextColor),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   TextFormField(
                     maxLines: 5,
                     decoration: InputDecoration(
@@ -95,40 +138,87 @@ class _CreateTicketScreenState extends State<CreateTicketScreen> {
                       hintStyle: TextStyle(color: primarySwatch[900]),
                       enabledBorder: OutlineInputBorder(
                         borderSide:
-                            BorderSide(color: primarySwatch, width: 1.0),
+                            const BorderSide(color: primarySwatch, width: 1.0),
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide:
-                            BorderSide(color: primarySwatch, width: 2.0),
+                            const BorderSide(color: primarySwatch, width: 2.0),
                         borderRadius: BorderRadius.circular(8.0),
                       ),
-                      contentPadding: EdgeInsets.symmetric(
+                      contentPadding: const EdgeInsets.symmetric(
                           vertical: 16.0, horizontal: 10.0),
                       filled: true,
                       fillColor: cardBackgroundColor,
                     ),
                     cursorColor: primarySwatch[900],
                   ),
-                  SizedBox(height: 10),
-                  Text(
+                  const SizedBox(height: 10),
+                  const Text(
                     "Attach Files",
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          chooseImage("camera");
+                        },
+                        child: const Icon(Icons.camera_alt_outlined,
+                            color: primarySwatch, size: 30),
+                      ),
+                      const SizedBox(width: 10),
+                      GestureDetector(
+                        onTap: () {
+                          chooseImage("Gallery");
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: primarySwatch,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Text(
+                            "Select Files",
+                            style: TextStyle(
+                              color: Colors.white, // Text color
+                              fontSize: 16, // Text size
+                              fontWeight: FontWeight.bold, // Text weight
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  // Show selected image file name
+                  if (selectedFileName != null) ...[
+                    const SizedBox(height: 10),
+                    Text(
+                      "Selected File: $selectedFileName",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black87,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+
+                  const SizedBox(height: 10),
 
                   //serverity
-                  Text(
+                  const Text(
                     "Severity",
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   CustomDropdown(
                     value: _selectedServerityType,
                     items: ['Low', 'Medium', 'High'],
@@ -139,19 +229,19 @@ class _CreateTicketScreenState extends State<CreateTicketScreen> {
                     },
                     hintText: '',
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   //priority
-                  Text(
+                  const Text(
                     "Ticket Priority",
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   CustomDropdown(
                     value: _selectedpriorityType,
-                    items: [''],
+                    items: ['Low', 'Medium', 'High'],
                     onChanged: (value) {
                       setState(() {
                         _selectedpriorityType = value;
@@ -159,28 +249,30 @@ class _CreateTicketScreenState extends State<CreateTicketScreen> {
                     },
                     hintText: '',
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   //assign to
-                  Text(
+                  const Text(
                     "Assign To",
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
+
                   CustomDropdown(
                     value: _selectedassigntoType,
-                    items: [''],
+                    items:
+                        provider.userList.map((users) => users.text).toList(),
+                    hintText: '',
                     onChanged: (value) {
                       setState(() {
                         _selectedassigntoType = value;
                       });
                     },
-                    hintText: '',
                   ),
                   //button
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                   Row(
                     children: [
                       Expanded(
@@ -196,7 +288,7 @@ class _CreateTicketScreenState extends State<CreateTicketScreen> {
                             onPressed: () {
                               // Handle the login action
                             },
-                            child: Text(
+                            child: const Text(
                               "Create ",
                               style: TextStyle(
                                 fontSize: 16,
@@ -207,7 +299,7 @@ class _CreateTicketScreenState extends State<CreateTicketScreen> {
                           ),
                         ),
                       ),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: SizedBox(
                           height: 50,
@@ -220,7 +312,7 @@ class _CreateTicketScreenState extends State<CreateTicketScreen> {
                               ),
                             ),
                             onPressed: () {},
-                            child: Text(
+                            child: const Text(
                               "Cancel",
                               style: TextStyle(
                                 fontSize: 16,

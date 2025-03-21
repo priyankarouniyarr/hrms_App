@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/works/workflow_view.dart';
@@ -26,6 +27,101 @@ class _AssignedByMeState extends State<AssignedByMe> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     final provider = Provider.of<AssignByMeTicketProvider>(context);
+
+    //assign by me severity type
+    List<PieChartSectionData> pieChartAssignByMeServityType() {
+      final low = provider.assignByMeSummary!.severityLow;
+      final medium = provider.assignByMeSummary!.severityMedium;
+      final high = provider.assignByMeSummary!.severityHigh;
+      final total = low + medium + high;
+
+      // To avoid division by zero
+      String getPercentage(int value) {
+        if (total == 0) return '0%';
+        double percent = (value / total) * 100;
+        return '${percent.toStringAsFixed(0)}%';
+      }
+
+      final List<int> values = [low, medium, high];
+      final List<Color> colors = [primarySwatch, Colors.orange, Colors.red];
+      if (total == 0) {
+        return [
+          PieChartSectionData(
+            value: 50,
+            color: Color(0xFFCC8B6E).withOpacity(0.9),
+            title: '',
+            radius: 50,
+            titleStyle: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ];
+      }
+      return List.generate(3, (index) {
+        return PieChartSectionData(
+          value: values[index].toDouble(),
+          color: colors[index],
+          title: getPercentage(values[index]),
+          radius: 50,
+          titleStyle: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        );
+      });
+    }
+
+    //assign by me priority type
+    List<PieChartSectionData> pieChartAssignByMePirorityType() {
+      final low = provider.assignByMeSummary!.priorityLow;
+      final medium = provider.assignByMeSummary!.priorityMedium;
+      final high = provider.assignByMeSummary!.priorityHigh;
+      final total = low + medium + high;
+
+      String getPercentage(int value) {
+        if (total == 0) return '0%';
+        double percent = (value / total) * 100;
+        return '${percent.toStringAsFixed(0)}%';
+      }
+
+      final List<int> values = [low, medium, high];
+      final List<Color> colors = [primarySwatch, Colors.orange, Colors.red];
+
+      // If total is 0, show a default pie chart with grey and brown
+      if (total == 0) {
+        return [
+          PieChartSectionData(
+            value: 50,
+            color: Color(0xFFCC8B6E).withOpacity(0.9),
+            title: '',
+            radius: 50,
+            titleStyle: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ];
+      }
+
+      // If total is not zero, show actual data
+      return List.generate(3, (index) {
+        return PieChartSectionData(
+          value: values[index].toDouble(),
+          color: colors[index],
+          title: getPercentage(values[index]),
+          radius: 50,
+          titleStyle: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        );
+      });
+    }
 
     // Check if data is still loading
     if (provider.isLoading) {
@@ -64,10 +160,111 @@ class _AssignedByMeState extends State<AssignedByMe> {
             ),
 
             const SizedBox(height: 20),
-            Center(
-              child: Text(
-                "No data available",
-                style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
+            Card(
+              color: cardBackgroundColor,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(
+                        width: 200, // Adjust width as needed
+                        height: 200,
+                        child: PieChart(PieChartData(
+                          sections: pieChartAssignByMeServityType(),
+                          sectionsSpace: 0,
+                        )),
+                      ),
+                      Column(
+                        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Severity Type',
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: primarySwatch),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          _buildSeverityPriorityItem(
+                              'Low',
+                              provider.assignByMeSummary!.severityLow,
+                              primarySwatch),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          _buildSeverityPriorityItem(
+                              'Medium',
+                              provider.assignByMeSummary!.severityMedium,
+                              Colors.orange),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          _buildSeverityPriorityItem(
+                              'High',
+                              provider.assignByMeSummary!.severityHigh,
+                              Colors.red),
+                        ],
+                      ),
+                    ]),
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Card(
+              color: cardBackgroundColor,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(
+                        width: 200, // Adjust width as needed
+                        height: 200,
+                        child: PieChart(PieChartData(
+                          sections: pieChartAssignByMePirorityType(),
+                          sectionsSpace: 0,
+                        )),
+                      ),
+                      Column(
+                        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Priority Type',
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: primarySwatch),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          _buildSeverityPriorityItem(
+                              'Low',
+                              provider.assignByMeSummary!.priorityLow,
+                              primarySwatch),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          _buildSeverityPriorityItem(
+                              'Medium',
+                              provider.assignByMeSummary!.priorityMedium,
+                              Colors.orange),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          _buildSeverityPriorityItem(
+                              'High',
+                              provider.assignByMeSummary!.priorityHigh,
+                              Colors.red),
+                        ],
+                      ),
+                    ]),
               ),
             ),
 
@@ -141,6 +338,45 @@ class _AssignedByMeState extends State<AssignedByMe> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSeverityPriorityItem(String label, int value, Color color) {
+    return Padding(
+      padding:
+          const EdgeInsets.symmetric(vertical: 5.0), // Add vertical padding
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment
+            .spaceBetween, // Use space between to push items apart
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                radius: 8,
+                backgroundColor: color,
+                foregroundColor: color,
+              ),
+              SizedBox(width: 10),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(
+            width: 10,
+          ),
+          Text(
+            '$value',
+            style: TextStyle(
+                fontSize: 16, fontWeight: FontWeight.w700, color: color),
+          ),
+        ],
       ),
     );
   }

@@ -1,4 +1,3 @@
-import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
@@ -12,7 +11,7 @@ class HolidayScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: cardBackgroundColor,
-      appBar: CustomAppBarProfile(
+      appBar: const CustomAppBarProfile(
         title: "My Office",
       ),
       body: FutureBuilder(
@@ -26,7 +25,7 @@ class HolidayScreen extends StatelessWidget {
         ]),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
@@ -75,7 +74,7 @@ class HolidayScreen extends StatelessWidget {
         color: color,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         elevation: 4,
-        margin: EdgeInsets.only(bottom: 16),
+        margin: const EdgeInsets.only(bottom: 16),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
           child: Row(
@@ -83,7 +82,7 @@ class HolidayScreen extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: cardBackgroundColor,
@@ -93,7 +92,7 @@ class HolidayScreen extends StatelessWidget {
                 backgroundColor: cardBackgroundColor,
                 child: Text(
                   holidays.length.toString(),
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
                   ),

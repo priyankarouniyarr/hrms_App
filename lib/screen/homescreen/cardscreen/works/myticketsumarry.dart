@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/works/workflow_view.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/works/custom_summary_card.dart';
 import 'package:hrms_app/providers/works_Summary_provider/my_ticket_get_summary_provider.dart';
@@ -28,6 +28,98 @@ class _MyticketsumarryState extends State<Myticketsumarry> {
     double screenWidth = MediaQuery.of(context).size.width;
     final provider = Provider.of<MyTicketGetSummaryProvider>(context);
 
+    //myticket severity type
+
+    List<PieChartSectionData> pieChartServityType() {
+      final low = provider.myTicketSummary!.severityLow;
+      final medium = provider.myTicketSummary!.severityMedium;
+      final high = provider.myTicketSummary!.severityHigh;
+      final total = low + medium + high;
+
+      // To avoid division by zero
+      String getPercentage(int value) {
+        if (total == 0) return '0%';
+        double percent = (value / total) * 100;
+        return '${percent.toStringAsFixed(0)}%';
+      }
+
+      final List<int> values = [low, medium, high];
+      final List<Color> colors = [primarySwatch, Colors.orange, Colors.red];
+      if (total == 0) {
+        return [
+          PieChartSectionData(
+            value: 50,
+            color: Color(0xFFCC8B6E).withOpacity(0.9),
+            title: '',
+            radius: 50,
+            titleStyle: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ];
+      }
+      return List.generate(3, (index) {
+        return PieChartSectionData(
+          value: values[index].toDouble(),
+          color: colors[index],
+          title: getPercentage(values[index]),
+          radius: 50,
+          titleStyle: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        );
+      });
+    }
+
+    //priority Type myticket
+    List<PieChartSectionData> pieChartPirorityType() {
+      final low = provider.myTicketSummary!.priorityLow;
+      final medium = provider.myTicketSummary!.priorityMedium;
+      final high = provider.myTicketSummary!.priorityHigh;
+      final total = low + medium + high;
+
+      String getPercentage(int value) {
+        if (total == 0) return '0%';
+        double percent = (value / total) * 100;
+        return '${percent.toStringAsFixed(0)}%';
+      }
+
+      final List<int> values = [low, medium, high];
+      final List<Color> colors = [primarySwatch, Colors.orange, Colors.red];
+      if (total == 0) {
+        return [
+          PieChartSectionData(
+            value: 50,
+            color: Color(0xFFCC8B6E).withOpacity(0.9),
+            title: '',
+            radius: 50,
+            titleStyle: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ];
+      }
+      return List.generate(3, (index) {
+        return PieChartSectionData(
+          value: values[index].toDouble(),
+          color: colors[index],
+          title: getPercentage(values[index]),
+          radius: 50,
+          titleStyle: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        );
+      });
+    }
+
     // Check if data is still loading
     if (provider.isLoading) {
       return Center(child: CircularProgressIndicator());
@@ -36,18 +128,10 @@ class _MyticketsumarryState extends State<Myticketsumarry> {
     if (provider.errorMessage.isNotEmpty) {
       return Center(child: Text(provider.errorMessage));
     }
-    final List<ChartData> severityData = [
-      ChartData('Low', 1, Colors.blue),
-      ChartData('Medium', 12, Colors.orange),
-      ChartData('High', 18, Colors.red),
-    ];
 
-    final List<ChartData> priorityData = [
-      ChartData('Low', 1, Colors.blue),
-      ChartData('Medium', 11, Colors.orange),
-      ChartData('High', 17, Colors.red),
-    ];
-    // Check if ticket data is available
+    if (provider.myTicketSummary == null) {
+      return Center(child: Text("No ticket summary available"));
+    }
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -77,19 +161,110 @@ class _MyticketsumarryState extends State<Myticketsumarry> {
             ),
             const SizedBox(height: 16),
 
-            // Center(
-            //   child: Text(
-            //     "No data available",
-            //     style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
-            //   ),
-            // ),
-            ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                _buildChartCard('Severity Type', severityData),
-                const SizedBox(height: 20),
-                _buildChartCard('Priority Type', priorityData),
-              ],
+            Card(
+              color: cardBackgroundColor,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(
+                        width: 200, // Adjust width as needed
+                        height: 200,
+                        child: PieChart(PieChartData(
+                          sections: pieChartServityType(),
+                          sectionsSpace: 0,
+                        )),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Severity Type',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: primarySwatch),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          _buildSeverityPriorityItem(
+                              'Low',
+                              provider.myTicketSummary!.severityLow,
+                              primarySwatch),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          _buildSeverityPriorityItem(
+                              'Medium',
+                              provider.myTicketSummary!.severityMedium,
+                              Colors.orange),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          _buildSeverityPriorityItem(
+                              'High',
+                              provider.myTicketSummary!.severityHigh,
+                              Colors.red),
+                        ],
+                      ),
+                    ]),
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Card(
+              color: cardBackgroundColor,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(
+                        width: 200, // Adjust width as needed
+                        height: 200,
+                        child: PieChart(PieChartData(
+                          sections: pieChartPirorityType(),
+                          sectionsSpace: 0,
+                        )),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Priority Type',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: primarySwatch),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          _buildSeverityPriorityItem(
+                              'Low',
+                              provider.myTicketSummary!.priorityLow,
+                              primarySwatch),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          _buildSeverityPriorityItem(
+                              'Medium',
+                              provider.myTicketSummary!.priorityMedium,
+                              Colors.orange),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          _buildSeverityPriorityItem(
+                              'High',
+                              provider.myTicketSummary!.priorityHigh,
+                              Colors.red),
+                        ],
+                      ),
+                    ]),
+              ),
             ),
 
             const SizedBox(height: 16),
@@ -165,91 +340,37 @@ class _MyticketsumarryState extends State<Myticketsumarry> {
     );
   }
 
-  Widget _buildChartCard(String title, List<ChartData> data) {
-    int total = data.fold(0, (sum, item) => sum + item.value);
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black12, blurRadius: 10, offset: Offset(0, 5)),
-        ],
-      ),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 150,
-            height: 150,
-            child: SfCircularChart(
-              annotations: <CircularChartAnnotation>[
-                CircularChartAnnotation(
-                  widget: Container(),
-                ),
-              ],
-              series: <DoughnutSeries<ChartData, String>>[
-                DoughnutSeries<ChartData, String>(
-                  dataSource: data,
-                  xValueMapper: (ChartData data, _) => data.label,
-                  yValueMapper: (ChartData data, _) => data.value,
-                  pointColorMapper: (ChartData data, _) => data.color,
-                  dataLabelMapper: (ChartData data, _) {
-                    double percent = (data.value / total) * 100;
-                    return '${percent.toStringAsFixed(0)}%';
-                  },
-                  dataLabelSettings: DataLabelSettings(
-                    isVisible: true,
-                    labelPosition: ChartDataLabelPosition.outside,
-                    textStyle: const TextStyle(
-                        color: Colors.black, fontWeight: FontWeight.bold),
-                  ),
-                  radius: '90%',
-                  innerRadius: '70%',
-                ),
-              ],
+  Widget _buildSeverityPriorityItem(String label, int value, Color color) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            CircleAvatar(
+              radius: 8,
+              backgroundColor: color,
+              foregroundColor: color,
             ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title,
-                    style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue)),
-                const SizedBox(height: 12),
-                ...data.map((d) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 12,
-                            height: 12,
-                            color: d.color,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(d.label, style: const TextStyle(fontSize: 16)),
-                          const Spacer(),
-                          Text('${d.value}',
-                              style: const TextStyle(fontSize: 16)),
-                        ],
-                      ),
-                    )),
-              ],
+            SizedBox(width: 10),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          )
-        ],
-      ),
+          ],
+        ),
+        SizedBox(
+          width: 10,
+        ),
+        Text(
+          '$value',
+          style: TextStyle(
+              fontSize: 16, fontWeight: FontWeight.w700, color: color),
+        ),
+      ],
     );
   }
-}
-
-class ChartData {
-  final String label;
-  final int value;
-  final Color color;
-  ChartData(this.label, this.value, this.color);
 }

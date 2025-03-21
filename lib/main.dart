@@ -17,6 +17,7 @@ import 'package:hrms_app/providers/auth_provider.dart'; // Import AuthProvider
 import 'package:hrms_app/providers/leaves_provider/leavehistory_provider.dart';
 import 'package:hrms_app/providers/attendance_providers/attendance_provider.dart';
 import 'package:hrms_app/providers/payroll/payroll_monthly_salarayy_provider.dart';
+import 'package:hrms_app/providers/new_tickets_providers/ne_tickets_providers.dart';
 import 'package:hrms_app/providers/attendance_providers/attendance_history_provider.dart';
 import 'package:hrms_app/providers/works_Summary_provider/assign_by_me_ticket_provider.dart';
 import 'package:hrms_app/providers/works_Summary_provider/my_ticket_get_summary_provider.dart';
@@ -97,6 +98,7 @@ void main() async {
               create: (context) => MyTicketGetSummaryProvider()),
           ChangeNotifierProvider(
               create: (context) => AssignByMeTicketProvider()),
+          ChangeNotifierProvider(create: (context) => NewTicketProvider()),
         ],
         child: //MyApp(isLoggedIn: isLoggedIn),
             MyApp() // Pass the login status to MyApp

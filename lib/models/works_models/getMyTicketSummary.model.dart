@@ -1,5 +1,5 @@
 class TaskData {
-  int? open;
+  int open;
   int inProgress;
   int closed;
   int severityHigh;

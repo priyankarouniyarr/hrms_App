@@ -7,12 +7,12 @@ import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20cat
 class NoticeDetailScreen extends StatelessWidget {
   final Notices notice;
 
-  NoticeDetailScreen({required this.notice});
+  const NoticeDetailScreen({required this.notice});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBarProfile(title: "Notice Details"),
+      appBar: const CustomAppBarProfile(title: "Notice Details"),
       backgroundColor: cardBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -28,7 +28,7 @@ class NoticeDetailScreen extends StatelessWidget {
                     Expanded(
                       child: Text(
                         notice.title.trim(),
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
@@ -38,14 +38,14 @@ class NoticeDetailScreen extends StatelessWidget {
                         maxLines: 8,
                       ),
                     ),
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                     Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 5, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 5, horizontal: 16),
                       decoration: BoxDecoration(
                         color: Colors.blueAccent,
                         borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
+                        boxShadow: const [
                           BoxShadow(
                             color: Colors.black26,
                             blurRadius: 4,
@@ -55,7 +55,7 @@ class NoticeDetailScreen extends StatelessWidget {
                       ),
                       child: Text(
                         categoryValues.reverse[notice.category] ?? 'Unknown',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 14,
                           color: Colors.white,
                           fontWeight: FontWeight.w600,
@@ -64,7 +64,7 @@ class NoticeDetailScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 15),
+                const SizedBox(height: 15),
                 if (notice.publishedTime != null)
                   Row(
                     mainAxisAlignment:
@@ -72,9 +72,9 @@ class NoticeDetailScreen extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.calendar_today,
+                          const Icon(Icons.calendar_today,
                               size: 18, color: Colors.blue), // Date Icon
-                          SizedBox(width: 6),
+                          const SizedBox(width: 6),
                           Text(
                             DateFormat('yyyy-MM-dd')
                                 .format(notice.publishedTime!), // Only date
@@ -88,9 +88,9 @@ class NoticeDetailScreen extends StatelessWidget {
                       ),
                       Row(
                         children: [
-                          Icon(Icons.access_time,
+                          const Icon(Icons.access_time,
                               size: 18, color: Colors.blue), // Time Icon
-                          SizedBox(width: 6),
+                          const SizedBox(width: 6),
                           Text(
                             DateFormat('HH:mm:ss')
                                 .format(notice.publishedTime!), // Only time
@@ -104,12 +104,12 @@ class NoticeDetailScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                SizedBox(height: 15),
+                const SizedBox(height: 15),
                 Divider(color: Colors.grey[300], thickness: 1),
-                SizedBox(height: 15),
+                const SizedBox(height: 15),
                 Text(
                   notice.content,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     color: Colors.black87,
                     height: 1.6,
