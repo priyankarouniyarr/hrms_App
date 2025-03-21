@@ -1,0 +1,2 @@
+/Users/priyankarouniyar/StudioProjects/hrms_app/android/app/.cxx/RelWithDebInfo/721h6i3m/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/priyankarouniyar/StudioProjects/hrms_app/android/app/.cxx/RelWithDebInfo/721h6i3m/armeabi-v7a/CMakeFiles/rebuild_cache.dir

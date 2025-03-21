@@ -13,43 +13,44 @@ import 'package:hrms_app/providers/payroll/payroll_provider.dart';
 import 'package:hrms_app/models/leaves/leave_history_models.dart';
 import 'package:hrms_app/providers/employee_contract_provider.dart';
 import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
+import 'package:hrms_app/providers/create_tickets/new_tickets_provider.dart';
+import 'package:hrms_app/providers/create_tickets/ne_tickets_providers.dart';
 import 'package:hrms_app/providers/auth_provider.dart'; // Import AuthProvider
 import 'package:hrms_app/providers/leaves_provider/leavehistory_provider.dart';
 import 'package:hrms_app/providers/attendance_providers/attendance_provider.dart';
 import 'package:hrms_app/providers/payroll/payroll_monthly_salarayy_provider.dart';
-import 'package:hrms_app/providers/new_tickets_providers/ne_tickets_providers.dart';
 import 'package:hrms_app/providers/attendance_providers/attendance_history_provider.dart';
 import 'package:hrms_app/providers/works_Summary_provider/assign_by_me_ticket_provider.dart';
 import 'package:hrms_app/providers/works_Summary_provider/my_ticket_get_summary_provider.dart';
 import 'package:hrms_app/providers/leaves_provider/leaves_history%20_contract%20and%20fiscalyear_period.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  // WidgetsFlutterBinding.ensureInitialized();
 
-  // Check if location services are enabled
-  bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!isLocationServiceEnabled) {
-    // Request to enable location services
-    bool serviceEnabled = await Geolocator.openLocationSettings();
-    if (!serviceEnabled) {
-      return;
-    }
-  }
+  // // Check if location services are enabled
+  // bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
+  // if (!isLocationServiceEnabled) {
+  //   // Request to enable location services
+  //   bool serviceEnabled = await Geolocator.openLocationSettings();
+  //   if (!serviceEnabled) {
+  //     return;
+  //   }
+  // }
 
-  // Check location permissions
-  LocationPermission permission = await Geolocator.checkPermission();
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      // Handle the case where the user denied permissions
-      return;
-    }
-  }
+  // // Check location permissions
+  // LocationPermission permission = await Geolocator.checkPermission();
+  // if (permission == LocationPermission.denied) {
+  //   permission = await Geolocator.requestPermission();
+  //   if (permission == LocationPermission.denied) {
+  //     // Handle the case where the user denied permissions
+  //     return;
+  //   }
+  // }
 
-  if (permission == LocationPermission.deniedForever) {
-    // Handle the case where the user permanently denied permissions
-    return;
-  }
+  // if (permission == LocationPermission.deniedForever) {
+  //   // Handle the case where the user permanently denied permissions
+  //   return;
+  // }
 
   // Wait for AuthProvider to load token and refresh if necessary
   // final authProvider = AuthProvider();
@@ -99,6 +100,7 @@ void main() async {
           ChangeNotifierProvider(
               create: (context) => AssignByMeTicketProvider()),
           ChangeNotifierProvider(create: (context) => NewTicketProvider()),
+          ChangeNotifierProvider(create: (context) => TicketProvider()),
         ],
         child: //MyApp(isLoggedIn: isLoggedIn),
             MyApp() // Pass the login status to MyApp

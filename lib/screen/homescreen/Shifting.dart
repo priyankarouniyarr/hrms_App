@@ -65,11 +65,14 @@ class _ShiftScreenState extends State<ShiftScreen> {
             },
             itemBuilder: (context, index) {
               final currentShift = shiftData[index];
-              return ShiftCard(
-                dateNp: currentshifts.currentDateNp,
-                shift: currentShift['shift']!,
-                shifttime: currentShift['shifttime']!,
-                shiftend: currentShift['shiftend']!,
+              return Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: ShiftCard(
+                  dateNp: currentshifts.currentDateNp,
+                  shift: currentShift['shift']!,
+                  shifttime: currentShift['shifttime']!,
+                  shiftend: currentShift['shiftend']!,
+                ),
               );
             },
           ),
