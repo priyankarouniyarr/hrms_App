@@ -10,7 +10,7 @@
 
 
     <application
-        android:label="hrms_app"
+        android:label="DynamicEMR"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

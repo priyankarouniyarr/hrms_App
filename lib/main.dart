@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hrms_app/screen/onboardscreen.dart';
-import 'package:hrms_app/screen/app_main_screen.dart';
 import 'package:hrms_app/providers/notices_provider.dart';
 import 'package:hrms_app/providers/holidays_provider.dart';
 import 'package:hrms_app/providers/check_in_provider.dart';
@@ -10,13 +9,13 @@ import 'package:hrms_app/providers/branch_id_provider.dart';
 import 'package:hrms_app/providers/fiscal_year_provider.dart';
 import 'package:hrms_app/providers/hosptial_code_provider.dart';
 import 'package:hrms_app/providers/payroll/payroll_provider.dart';
-import 'package:hrms_app/models/leaves/leave_history_models.dart';
 import 'package:hrms_app/providers/employee_contract_provider.dart';
 import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
 import 'package:hrms_app/providers/create_tickets/new_tickets_provider.dart';
 import 'package:hrms_app/providers/create_tickets/ne_tickets_providers.dart';
 import 'package:hrms_app/providers/auth_provider.dart'; // Import AuthProvider
 import 'package:hrms_app/providers/leaves_provider/leavehistory_provider.dart';
+import 'package:hrms_app/providers/leaves_provider/leave_request_provider.dart';
 import 'package:hrms_app/providers/attendance_providers/attendance_provider.dart';
 import 'package:hrms_app/providers/payroll/payroll_monthly_salarayy_provider.dart';
 import 'package:hrms_app/providers/attendance_providers/attendance_history_provider.dart';
@@ -25,36 +24,14 @@ import 'package:hrms_app/providers/works_Summary_provider/my_ticket_get_summary_
 import 'package:hrms_app/providers/leaves_provider/leaves_history%20_contract%20and%20fiscalyear_period.dart';
 
 void main() async {
-  // WidgetsFlutterBinding.ensureInitialized();
+  //WidgetsFlutterBinding.ensureInitialized();
 
-  // // Check if location services are enabled
-  // bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
-  // if (!isLocationServiceEnabled) {
-  //   // Request to enable location services
-  //   bool serviceEnabled = await Geolocator.openLocationSettings();
-  //   if (!serviceEnabled) {
-  //     return;
-  //   }
-  // }
+  // await handleLocationPermission();
 
-  // // Check location permissions
-  // LocationPermission permission = await Geolocator.checkPermission();
-  // if (permission == LocationPermission.denied) {
-  //   permission = await Geolocator.requestPermission();
-  //   if (permission == LocationPermission.denied) {
-  //     // Handle the case where the user denied permissions
-  //     return;
-  //   }
-  // }
-
-  // if (permission == LocationPermission.deniedForever) {
-  //   // Handle the case where the user permanently denied permissions
-  //   return;
-  // }
-
-  // Wait for AuthProvider to load token and refresh if necessary
+  //Wait for AuthProvider to load token and refresh if necessary
   // final authProvider = AuthProvider();
   // await authProvider.loadToken();
+  // await authProvider.loadUsername();
   // await authProvider.loadRefreshToken();
 
   // // Check if the token is expired
@@ -62,6 +39,7 @@ void main() async {
 
   // if (authProvider.token == null) {
   //   print("hello");
+
   //   isLoggedIn = false;
   // } else {
   //   // Token is present, check if it needs refreshing
@@ -76,37 +54,74 @@ void main() async {
 
   runApp(
     MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (context) => HospitalCodeProvider()),
-          ChangeNotifierProvider(create: (context) => AuthProvider()),
-          ChangeNotifierProvider(create: (context) => BranchProvider()),
-          ChangeNotifierProvider(create: (context) => FiscalYearProvider()),
-          ChangeNotifierProvider(create: (context) => CheckInProvider()),
-          ChangeNotifierProvider(create: (context) => HolidayProvider()),
-          ChangeNotifierProvider(create: (context) => NoticesProvider()),
-          ChangeNotifierProvider(create: (context) => AttendanceProvider()),
-          ChangeNotifierProvider(
-              create: (context) => AttendanceDetailsProvider()),
-          ChangeNotifierProvider(create: (context) => EmployeeProvider()),
-          ChangeNotifierProvider(
-              create: (context) => EmployeeContractProvider()),
-          ChangeNotifierProvider(create: (context) => LoanAndAdvanceProvider()),
-          ChangeNotifierProvider(create: (context) => LeaveProvider()),
-          ChangeNotifierProvider(
-              create: (context) => LeaveContractandFiscalYearProvider()),
-          ChangeNotifierProvider(create: (context) => SalaryProvider()),
-          ChangeNotifierProvider(
-              create: (context) => MyTicketGetSummaryProvider()),
-          ChangeNotifierProvider(
-              create: (context) => AssignByMeTicketProvider()),
-          ChangeNotifierProvider(create: (context) => NewTicketProvider()),
-          ChangeNotifierProvider(create: (context) => TicketProvider()),
-        ],
-        child: //MyApp(isLoggedIn: isLoggedIn),
-            MyApp() // Pass the login status to MyApp
-        ),
+      providers: [
+        ChangeNotifierProvider(create: (context) => HospitalCodeProvider()),
+        ChangeNotifierProvider(create: (context) => AuthProvider()),
+        ChangeNotifierProvider(create: (context) => BranchProvider()),
+        ChangeNotifierProvider(create: (context) => FiscalYearProvider()),
+        ChangeNotifierProvider(create: (context) => CheckInProvider()),
+        ChangeNotifierProvider(create: (context) => HolidayProvider()),
+        ChangeNotifierProvider(create: (context) => NoticesProvider()),
+        ChangeNotifierProvider(create: (context) => AttendanceProvider()),
+        ChangeNotifierProvider(
+            create: (context) => AttendanceDetailsProvider()),
+        ChangeNotifierProvider(create: (context) => EmployeeProvider()),
+        ChangeNotifierProvider(create: (context) => EmployeeContractProvider()),
+        ChangeNotifierProvider(create: (context) => LoanAndAdvanceProvider()),
+        ChangeNotifierProvider(create: (context) => LeaveProvider()),
+        ChangeNotifierProvider(
+            create: (context) => LeaveContractandFiscalYearProvider()),
+        ChangeNotifierProvider(create: (context) => SalaryProvider()),
+        ChangeNotifierProvider(
+            create: (context) => MyTicketGetSummaryProvider()),
+        ChangeNotifierProvider(create: (context) => AssignByMeTicketProvider()),
+        ChangeNotifierProvider(create: (context) => NewTicketProvider()),
+        ChangeNotifierProvider(create: (context) => TicketProvider()),
+        ChangeNotifierProvider(create: (context) => LeaveRequestProvider()),
+      ],
+      child:
+          //MyApp(isLoggedIn: isLoggedIn),
+          MyApp(),
+      // Pass the login status to MyApp
+    ),
   );
 }
+
+// Future<void> handleLocationPermission() async {
+//   // Check if location services are enabled
+//   bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
+
+//   if (!isLocationServiceEnabled) {
+//     print("Location service is OFF. Opening location settings...");
+//     await Geolocator.openLocationSettings();
+
+//   } else {
+//     print("Location service is ON");
+//   }
+
+//   // Check location permission
+//   LocationPermission permission = await Geolocator.checkPermission();
+//   print("Initial permission: $permission");
+
+//   if (permission == LocationPermission.denied) {
+//     permission = await Geolocator.requestPermission();
+//     print("Permission after request: $permission");
+//   }
+
+//   if (permission == LocationPermission.deniedForever) {
+//     print("Permission permanently denied. Opening App Settings...");
+//     await Geolocator.openAppSettings();
+//     // Continue the app
+//   }
+
+//   if (permission == LocationPermission.always ||
+//       permission == LocationPermission.whileInUse) {
+//     Position position = await Geolocator.getCurrentPosition();
+//     print('Location: ${position.latitude}, ${position.longitude}');
+//   } else {
+//     print("Location permission denied or not granted.");
+//   }
+// }
 
 class MyApp extends StatelessWidget {
   // final bool isLoggedIn;

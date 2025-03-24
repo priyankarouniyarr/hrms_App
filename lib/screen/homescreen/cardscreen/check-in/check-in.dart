@@ -57,7 +57,6 @@ class _CheckInScreenState extends State<CheckInScreen> {
                   Expanded(
                     child: GestureDetector(
                       onTap: () async {
-                        //  await checkInProvider.punchPost();
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -124,7 +123,10 @@ class _CheckInScreenState extends State<CheckInScreen> {
                         visible: true,
                         markerId: MarkerId("current_location"),
                         position: userLocation,
-                        infoWindow: InfoWindow(title: checkInProvider.aDDress),
+                        infoWindow: InfoWindow(
+                            title: checkInProvider.aDDress,
+                            snippet:
+                                'Lat: ${userLocation.latitude}, Lng: ${userLocation.longitude}'),
                       )
                     },
                     onMapCreated: (GoogleMapController controller) {

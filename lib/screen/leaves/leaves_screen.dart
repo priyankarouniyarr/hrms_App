@@ -458,7 +458,7 @@ class _LeavesScreenState extends State<LeavesScreen> {
         text,
         style: TextStyle(
           fontWeight: FontWeight.bold,
-          fontSize: 16,
+          fontSize: 18,
         ),
         textAlign: TextAlign.left,
       ),
@@ -470,6 +470,9 @@ class _LeavesScreenState extends State<LeavesScreen> {
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: Text(
         text,
+        style: TextStyle(
+          fontSize: 16,
+        ),
         textAlign: TextAlign.left,
       ),
     );

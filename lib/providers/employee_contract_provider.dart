@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hrms_app/storage/securestorage.dart';
 import '../models/profile_models/employee_contract.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class EmployeeContractProvider with ChangeNotifier {
   List<EmployeeContract> _contracts = [];

@@ -68,10 +68,6 @@ class AttendanceDetailsProvider with ChangeNotifier {
             .map((attendanceData) => AttendanceDetails.fromJson(attendanceData))
             .toList();
 
-        if (_attendanceReport != null) {
-          String shiftTypeFromAPI = _attendanceReport!.filter.shiftType;
-        }
-
         notifyListeners();
       } else {
         _errorMessage =

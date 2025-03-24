@@ -5,24 +5,31 @@ import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/leaves/leave_history_models.dart';
 
 class LeaveContractandFiscalYearProvider extends ChangeNotifier {
-  List<LeaveContractPeriodAndFiscalYeAR> _leavecontractyear = [];
-  List<LeaveContractPeriodAndFiscalYeAR> _leavefiscalyear = [];
+  List<LeaveContractPeriodAndFiscalYeAR> _leaveContractList = [];
+  List<LeaveContractPeriodAndFiscalYeAR> _leaveFiscalYearList = [];
+  List<Leave> _leavefiscalandcontractId = [];
+  List<LeaveApplication> _leavecontractandfiscalIdDetails = [];
+
   bool _isLoading = false;
   String _errorMessage = '';
   final SecureStorageService _secureStorageService = SecureStorageService();
+
   String? _branchId;
   String? _token;
   String? _fiscalYear;
 
-  List<LeaveContractPeriodAndFiscalYeAR> get leaveFiscalYear =>
-      _leavefiscalyear;
-  List<LeaveContractPeriodAndFiscalYeAR> get leaveContractYear =>
-      _leavecontractyear;
-
+  List<LeaveContractPeriodAndFiscalYeAR> get leaveFiscalYearList =>
+      _leaveFiscalYearList;
+  List<LeaveContractPeriodAndFiscalYeAR> get leaveContractList =>
+      _leaveContractList;
+  List<Leave> get leavefiscalandcontractId => _leavefiscalandcontractId;
+  List<LeaveApplication> get leavecontractandfiscalIdDetails =>
+      _leavecontractandfiscalIdDetails;
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
 
-  Future<void> fetchEmployeeLeaveHistory() async {
+  ///  Fetch all contracts (Initial Call)
+  Future<void> fetchLeaveContracts() async {
     _isLoading = true;
     notifyListeners();
 
@@ -39,9 +46,7 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
         return;
       }
 
-      const String url3 =
-          "http://45.117.153.90:5004/api/LeaveApplication/GetContractFiscalYearByContctId/3";
-      const String url4 =
+      const String urlGetContracts =
           "http://45.117.153.90:5004/api/LeaveApplication/GetContracts";
 
       final headers = {
@@ -50,26 +55,123 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
         'workingFinancialId': _fiscalYear!,
       };
 
-      final response4 = await http.get(Uri.parse(url3), headers: headers);
-      final response5 = await http.get(Uri.parse(url4), headers: headers);
+      final response =
+          await http.get(Uri.parse(urlGetContracts), headers: headers);
 
-      if (response4.statusCode == 200 && response5.statusCode == 200) {
-        final List<dynamic> jsonFiscalYear = json.decode(response4.body);
-
-        final List<dynamic> jsoncontractPeriod = json.decode(response5.body);
-
-        _leavefiscalyear = jsonFiscalYear
-            .map((e) => LeaveContractPeriodAndFiscalYeAR.fromJson(e))
-            .toList();
-
-        _leavecontractyear = jsoncontractPeriod
+      if (response.statusCode == 200) {
+        final List<dynamic> contractListJson = json.decode(response.body);
+        _leaveContractList = contractListJson
             .map((e) => LeaveContractPeriodAndFiscalYeAR.fromJson(e))
             .toList();
       } else {
-        _errorMessage = "Failed to fetch leave history";
+        _errorMessage = "Failed to fetch contract data";
       }
     } catch (error) {
-      _errorMessage = "Error fetching leave history: $error";
+      _errorMessage = "Error fetching contracts: $error";
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // Fetch Fiscal Year by passing the contractId
+  Future<void> fetchFiscalYearByContractId({required int contractId}) async {
+    _isLoading = true;
+
+    notifyListeners();
+
+    try {
+      _branchId = await _secureStorageService.readData('workingBranchId');
+      _token = await _secureStorageService.readData('auth_token');
+      _fiscalYear =
+          await _secureStorageService.readData('selected_fiscal_year');
+
+      if (_token == null || _branchId == null || _fiscalYear == null) {
+        _errorMessage = 'Missing required credentials';
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
+
+      final String urlFiscalYear =
+          "http://45.117.153.90:5004/api/LeaveApplication/GetContractFiscalYearByContctId/$contractId";
+
+      final headers = {
+        'Authorization': 'Bearer $_token',
+        'workingBranchId': _branchId!,
+        'workingFinancialId': _fiscalYear!,
+      };
+
+      final response =
+          await http.get(Uri.parse(urlFiscalYear), headers: headers);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> fiscalYearListJson = json.decode(response.body);
+        _leaveFiscalYearList = fiscalYearListJson
+            .map((e) => LeaveContractPeriodAndFiscalYeAR.fromJson(e))
+            .toList();
+      } else {
+        _errorMessage = "Failed to fetch fiscal year data";
+      }
+    } catch (error) {
+      _errorMessage = "Error fetching fiscal year: $error";
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  //// Fetch Fiscal Year by passing the contractId and fiscalYearId
+  Future<void> fetchFiscalYearByContractIdandFiscalYearId(
+      {required int contractId, required int fiscalYearId}) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      _branchId = await _secureStorageService.readData('workingBranchId');
+      _token = await _secureStorageService.readData('auth_token');
+      _fiscalYear =
+          await _secureStorageService.readData('selected_fiscal_year');
+
+      if (_token == null || _branchId == null || _fiscalYear == null) {
+        _errorMessage = 'Missing required credentials';
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
+
+      final String urlContractandFiscalYear =
+          "http://45.117.153.90:5004/api/LeaveApplication/EmployeeLeaveHistoryByContractIdAndFiscalYearId/$contractId/$fiscalYearId"; //table to get
+      final String employeeLeavesByContractIdAndFiscalYearId =
+          "http://45.117.153.90:5004/api/LeaveApplication/EmployeeLeavesByContractIdAndFiscalYearId/$contractId/$fiscalYearId"; //leave details
+      final headers = {
+        'Authorization': 'Bearer $_token',
+        'workingBranchId': _branchId!,
+        'workingFinancialId': _fiscalYear!,
+      };
+
+      final response =
+          await http.get(Uri.parse(urlContractandFiscalYear), headers: headers);
+      final responseLeaves = await http.get(
+          Uri.parse(employeeLeavesByContractIdAndFiscalYearId),
+          headers: headers);
+
+      if (response.statusCode == 200 && responseLeaves.statusCode == 200) {
+        final List<dynamic> contractandFiscalJson = json.decode(response.body);
+        _leavefiscalandcontractId = contractandFiscalJson
+            .map((e) => Leave.fromJson(e))
+            .toList(); //table
+        //   print(_leavefiscalandcontractId);
+        final List<dynamic> leavecontractandFiscalJson =
+            json.decode(responseLeaves.body);
+        _leavecontractandfiscalIdDetails = leavecontractandFiscalJson
+            .map((e) => LeaveApplication.fromJson(e))
+            .toList();
+      } else {
+        _errorMessage = "Failed to fetch fiscal year data";
+      }
+    } catch (error) {
+      _errorMessage = "Error fetching fiscal year: $error";
     } finally {
       _isLoading = false;
       notifyListeners();

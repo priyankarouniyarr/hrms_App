@@ -29,6 +29,8 @@ class _PayrollScreenState extends State<PayrollScreen> {
 
       Provider.of<SalaryProvider>(context, listen: false)
           .fetchCurrentMonthSalary();
+      Provider.of<SalaryProvider>(context, listen: false)
+          .fetchMonthSalary(currentMonth, currentYear);
     });
     //
   }
@@ -125,11 +127,8 @@ class _PayrollScreenState extends State<PayrollScreen> {
                         ),
                       ),
                       if (salaryProvider
-                                  .monthSalary?.monthlySalaryData.isEmpty ==
-                              true ||
-                          salaryProvider.currentMonthSalary?.monthlySalaryData
-                                  .isEmpty ==
-                              true)
+                              .monthSalary?.monthlySalaryData.isEmpty ==
+                          true)
                         Center(
                           child: Padding(
                             padding: EdgeInsets.all(16.0),

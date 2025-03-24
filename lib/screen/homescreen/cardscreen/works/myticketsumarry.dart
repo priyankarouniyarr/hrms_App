@@ -140,16 +140,13 @@ class _MyticketsumarryState extends State<Myticketsumarry> {
           children: [
             // Summary Cards
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 SummaryCard(
                   title: "Open",
                   count: '${provider.myTicketSummary!.open}',
                   countColor: Colors.red,
                   screenWidth: screenWidth,
-                ),
-                SizedBox(
-                  width: 10,
                 ),
                 SummaryCard(
                   title: "Closed",

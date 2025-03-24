@@ -73,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.all(25.0),
+                padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -97,15 +97,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-              SizedBox(height: 10),
+
               // Shifting screen
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: provider.currentShift == null
-                    ? SizedBox.shrink()
-                    : ShiftScreen(),
-              ),
-              SizedBox(height: 20),
+              provider.currentShift == null
+                  ? SizedBox.shrink()
+                  : Padding(
+                      padding: const EdgeInsets.only(left: 10.0, right: 10),
+                      child: ShiftScreen(),
+                    ),
+              SizedBox(height: 15),
               Container(
                 height: MediaQuery.of(context).size.height / 2.5,
                 decoration: BoxDecoration(
@@ -118,8 +118,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: EdgeInsets.all(16),
                 child: GridView.builder(
                   shrinkWrap: true,
-                  //Set physics to NeverScrollableScrollPhysics to avoid scrolling conflicts
-                  //  physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
                     crossAxisSpacing: 10,

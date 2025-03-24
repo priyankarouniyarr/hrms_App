@@ -47,7 +47,6 @@ class TicketProvider with ChangeNotifier {
         print('Ticket created successfully');
         notifyListeners();
       } else {
-        // Handle error
         _errorMessage = 'Failed to create ticket: ${response.body}';
       }
     } catch (error) {

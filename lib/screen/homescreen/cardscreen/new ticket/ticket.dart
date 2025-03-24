@@ -104,6 +104,7 @@ class _CreateTicketScreenState extends State<CreateTicketScreen> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
+
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text(

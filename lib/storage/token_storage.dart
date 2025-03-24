@@ -32,4 +32,13 @@ class TokenStorage {
   Future<void> removeRefreshToken() async {
     await _secureStorage.delete(key: 'refresh_token');
   }
+
+//username
+  storeUsername(refreshToken) async {
+    await _secureStorage.write(key: 'username', value: refreshToken);
+  }
+
+  Future<String?> getUsername() async {
+    return await _secureStorage.read(key: 'username');
+  }
 }

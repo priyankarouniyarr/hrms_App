@@ -108,7 +108,7 @@ class CustomDropdown2 extends StatelessWidget {
       onChanged: onChanged,
       decoration: InputDecoration(
         contentPadding: EdgeInsets.symmetric(
-          vertical: 16,
+          vertical: 12,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),

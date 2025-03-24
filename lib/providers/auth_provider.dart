@@ -19,6 +19,8 @@ class AuthProvider with ChangeNotifier {
   String? get token => _token;
   String? get username => _username;
 
+//
+
   Future<void> login(
       String username, String password, BuildContext context) async {
     _setLoading(true);
@@ -51,6 +53,7 @@ class AuthProvider with ChangeNotifier {
         _username = username;
 
         await _tokenStorage.storeToken(token);
+        await _tokenStorage.storeUsername(username);
         await _tokenStorage.storeRefreshToken(refreshToken);
 
         _token = token;
@@ -79,6 +82,14 @@ class AuthProvider with ChangeNotifier {
   // Load access token securely
   Future<void> loadToken() async {
     _token = await _tokenStorage.getToken();
+    notifyListeners();
+  }
+//
+
+  Future<void> loadUsername() async {
+    _username = await _tokenStorage.getUsername();
+    print(_username);
+    print("iiiii");
     notifyListeners();
   }
 

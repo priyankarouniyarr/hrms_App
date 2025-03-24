@@ -54,7 +54,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
     return Column(
       children: [
         SizedBox(
-          height: MediaQuery.of(context).size.height / 5,
+          height: MediaQuery.of(context).size.height / 4,
           child: PageView.builder(
             controller: _pageController,
             itemCount: shiftData.length,
@@ -146,7 +146,7 @@ class ShiftCard extends StatelessWidget {
                       fontWeight: FontWeight.bold)),
               Container(
                 padding:
-                    const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
                 decoration: BoxDecoration(
                     color: cardBackgroundColor,
                     borderRadius: BorderRadius.circular(8)),
