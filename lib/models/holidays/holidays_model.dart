@@ -1,13 +1,4 @@
 import 'dart:convert';
-// To parse this JSON data, do
-//
-//     final holidays = holidaysFromJson(jsonString);
-
-List<Holidays> holidaysFromJson(String str) =>
-    List<Holidays>.from(json.decode(str).map((x) => Holidays.fromJson(x)));
-
-String holidaysToJson(List<Holidays> data) =>
-    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class Holidays {
   int id;

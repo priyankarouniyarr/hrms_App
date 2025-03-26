@@ -164,10 +164,9 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        onPressed:
-                            enteredCode.length == 6 ? _validateAndSubmit : null,
+                        onPressed: _clearOtpField,
                         child: const Text(
-                          "Continue Login",
+                          "Cancel",
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.white,
@@ -188,9 +187,10 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        onPressed: _clearOtpField,
+                        onPressed:
+                            enteredCode.length == 6 ? _validateAndSubmit : null,
                         child: const Text(
-                          "Cancel",
+                          "Continue Login",
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.white,

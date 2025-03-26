@@ -93,9 +93,7 @@ class SalaryProvider with ChangeNotifier {
 
       if (response.statusCode == 200) {
         _monthSalary = GetMyMonthSalary.fromJson(json.decode(response.body));
-        print(_monthSalary!.grossTotal);
-        print(_monthSalary!.month);
-        print(_monthSalary!.year);
+
         notifyListeners();
       } else {
         _errorMessage = 'Failed to load month salary';

@@ -278,8 +278,7 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
                                             Flexible(
                                               child: Text(
                                                 provider.detailsAttendance[i]
-                                                        .statusFullName ??
-                                                    '-',
+                                                    .statusFullName,
                                                 style: TextStyle(
                                                   fontSize: 18,
                                                   fontWeight: FontWeight.w500,

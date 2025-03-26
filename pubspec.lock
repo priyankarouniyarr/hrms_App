@@ -230,6 +230,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_bs_ad_calendar:
+    dependency: "direct main"
+    description:
+      name: flutter_bs_ad_calendar
+      sha256: "9b820b66c96d8b333476e84206d8ab5b9960fd89daa7fb15ab4f83bd886489e2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.4"
   flutter_launcher_icons:
     dependency: "direct main"
     description:
@@ -556,10 +564,10 @@ packages:
     dependency: "direct main"
     description:
       name: intl
-      sha256: "3df61194eb431efc39c4ceba583b95633a403f46c9fd341e550ce0bfa50e9aa5"
+      sha256: "3bc132a9dbce73a7e4a21a17d06e1878839ffbf975568bc875c60537824b0c4d"
       url: "https://pub.dev"
     source: hosted
-    version: "0.20.2"
+    version: "0.18.1"
   js:
     dependency: transitive
     description:

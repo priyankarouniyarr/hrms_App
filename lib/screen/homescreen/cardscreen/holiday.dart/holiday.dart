@@ -1,107 +1,123 @@
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:nepali_utils/nepali_utils.dart';
 import 'package:hrms_app/constants/colors.dart';
-import 'package:hrms_app/models/holidays_model.dart';
-import 'package:hrms_app/providers/holidays_provider.dart';
-import 'package:hrms_app/screen/homescreen/cardscreen/holiday.dart/hoildays_details_screen.dart';
+import 'package:hrms_app/models/holidays/holidays_model.dart';
+import 'package:flutter_bs_ad_calendar/flutter_bs_ad_calendar.dart';
+import 'package:hrms_app/providers/create_tickets/holidays_provider.dart';
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
 
-class HolidayScreen extends StatelessWidget {
+class HolidayScreen extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: cardBackgroundColor,
-      appBar: const CustomAppBarProfile(
-        title: "My Office",
-      ),
-      body: FutureBuilder(
-        future: Future.wait([
-          Provider.of<HolidayProvider>(context, listen: false)
-              .fetchPastHolidays(),
-          Provider.of<HolidayProvider>(context, listen: false)
-              .fetchUpcomingHolidays(),
-          Provider.of<HolidayProvider>(context, listen: false)
-              .fetchAllHolidays(),
-        ]),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else {
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  _buildHolidayCard(
-                      context,
-                      'Past Holidays',
-                      Provider.of<HolidayProvider>(context).pastHolidays,
-                      accentColor),
-                  _buildHolidayCard(
-                    context,
-                    'Upcoming Holidays',
-                    Provider.of<HolidayProvider>(context).upcomingHolidays,
-                    const Color.fromARGB(255, 5, 239, 126),
-                  ),
-                  _buildHolidayCard(
-                    context,
-                    'All Holidays',
-                    Provider.of<HolidayProvider>(context).allHolidays,
-                    Colors.blueAccent,
-                  ),
-                ],
-              ),
-            );
-          }
-        },
-      ),
-    );
+  State<HolidayScreen> createState() => _HolidayScreenState();
+}
+
+class _HolidayScreenState extends State<HolidayScreen> {
+  DateTime? selectedDate;
+  List<Map<String, dynamic>> selectedDateHolidays = [];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<HolidayProvider>(context, listen: false).fetchPastHolidays();
+      Provider.of<HolidayProvider>(context, listen: false).fetchAllHolidays();
+      Provider.of<HolidayProvider>(context, listen: false)
+          .fetchUpcomingHolidays();
+    });
   }
 
-  /// Creates a Card for each Holiday Category
-  Widget _buildHolidayCard(BuildContext context, String title,
-      List<Holidays> holidays, Color color) {
-    return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              HolidayDetailsScreen(title: title, holidays: holidays),
+  @override
+  Widget build(BuildContext context) {
+    final holidaysProvider = Provider.of<HolidayProvider>(context);
+
+    List<DateTime> holidayDates = holidaysProvider.allHolidayDatePairs
+        .map((holiday) => holiday['enDate'] as DateTime)
+        .toList();
+
+    return Scaffold(
+        backgroundColor: cardBackgroundColor,
+        appBar: const CustomAppBarProfile(
+          title: "My Office",
         ),
-      ),
-      child: Card(
-        color: color,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 4,
-        margin: const EdgeInsets.only(bottom: 16),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: cardBackgroundColor,
-                ),
-              ),
-              CircleAvatar(
-                backgroundColor: cardBackgroundColor,
-                child: Text(
-                  holidays.length.toString(),
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+        body: SafeArea(
+            child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: SingleChildScrollView(
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          "Holidays",
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Card(
+                        elevation: 6,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        color: cardBackgroundColor,
+                        shadowColor: Colors.grey.withOpacity(0.5),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: SizedBox(
+                            height: 400,
+                            child: Transform.scale(
+                              scale: 1.1,
+                              child: FlutterBSADCalendar(
+                                weekColor: Colors.green,
+                                calendarType: CalendarType.bs,
+
+                                primaryColor: Colors.blueAccent,
+                                holidays: holidayDates,
+                                holidayColor: Colors.red,
+                                mondayWeek: false,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(1900),
+                                lastDate: DateTime(2048),
+                                todayDecoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(5)),
+                                  color: Theme.of(context).primaryColorLight,
+                                  border: Border.all(
+                                    color: Colors.black,
+                                  ),
+                                  shape: BoxShape.rectangle,
+                                ),
+                                selectedDayDecoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(5)),
+                                  color: Theme.of(context).primaryColorDark,
+                                  border: Border.all(
+                                    color: Colors.black,
+                                  ),
+                                  shape: BoxShape.rectangle,
+                                ),
+                                // onMonthChanged: (date, events) {
+                                //   setState(() {
+                                //     selectedDate = date;
+                                //   });
+                                //   print("hello");
+                                // },
+                                onDateSelected: (date, events) {
+                                  setState(() {
+                                    selectedDate = date;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ])))));
   }
 }

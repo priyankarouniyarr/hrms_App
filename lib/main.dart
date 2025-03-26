@@ -3,13 +3,13 @@ import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hrms_app/screen/onboardscreen.dart';
 import 'package:hrms_app/providers/notices_provider.dart';
-import 'package:hrms_app/providers/holidays_provider.dart';
 import 'package:hrms_app/providers/check_in_provider.dart';
 import 'package:hrms_app/providers/branch_id_provider.dart';
 import 'package:hrms_app/providers/fiscal_year_provider.dart';
 import 'package:hrms_app/providers/hosptial_code_provider.dart';
 import 'package:hrms_app/providers/payroll/payroll_provider.dart';
 import 'package:hrms_app/providers/employee_contract_provider.dart';
+import 'package:hrms_app/providers/create_tickets/holidays_provider.dart';
 import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
 import 'package:hrms_app/providers/create_tickets/new_tickets_provider.dart';
 import 'package:hrms_app/providers/create_tickets/ne_tickets_providers.dart';
@@ -24,9 +24,9 @@ import 'package:hrms_app/providers/works_Summary_provider/my_ticket_get_summary_
 import 'package:hrms_app/providers/leaves_provider/leaves_history%20_contract%20and%20fiscalyear_period.dart';
 
 void main() async {
-  //WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
 
-  // await handleLocationPermission();
+  await handleLocationPermission();
 
   //Wait for AuthProvider to load token and refresh if necessary
   // final authProvider = AuthProvider();
@@ -87,41 +87,50 @@ void main() async {
   );
 }
 
-// Future<void> handleLocationPermission() async {
-//   // Check if location services are enabled
-//   bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
+Future<void> handleLocationPermission() async {
+  // Check if location services are enabled
+  bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
 
-//   if (!isLocationServiceEnabled) {
-//     print("Location service is OFF. Opening location settings...");
-//     await Geolocator.openLocationSettings();
+  if (!isLocationServiceEnabled) {
+    print(
+        "Location service is OFF. You can prompt the user to enable it if needed.");
+  } else {
+    print("Location service is ON");
+  }
 
-//   } else {
-//     print("Location service is ON");
-//   }
+  // Check location permission
+  LocationPermission permission = await Geolocator.checkPermission();
+  print("Initial permission: $permission");
 
-//   // Check location permission
-//   LocationPermission permission = await Geolocator.checkPermission();
-//   print("Initial permission: $permission");
+  if (permission == LocationPermission.denied) {
+    // Request permission if not granted
+    permission = await Geolocator.requestPermission();
+    print("Permission after request: $permission");
 
-//   if (permission == LocationPermission.denied) {
-//     permission = await Geolocator.requestPermission();
-//     print("Permission after request: $permission");
-//   }
+    if (permission == LocationPermission.denied) {
+      print("Permission denied. App will continue without location access.");
+    }
+  }
 
-//   if (permission == LocationPermission.deniedForever) {
-//     print("Permission permanently denied. Opening App Settings...");
-//     await Geolocator.openAppSettings();
-//     // Continue the app
-//   }
+  if (permission == LocationPermission.deniedForever) {
+    print(
+        "Permission permanently denied. App will continue without location access.");
+  }
 
-//   if (permission == LocationPermission.always ||
-//       permission == LocationPermission.whileInUse) {
-//     Position position = await Geolocator.getCurrentPosition();
-//     print('Location: ${position.latitude}, ${position.longitude}');
-//   } else {
-//     print("Location permission denied or not granted.");
-//   }
-// }
+  // If permission is granted, get the current location
+  if (permission == LocationPermission.always ||
+      permission == LocationPermission.whileInUse) {
+    try {
+      Position position = await Geolocator.getCurrentPosition();
+      print('Location: ${position.latitude}, ${position.longitude}');
+    } catch (e) {
+      print("Error getting location: $e");
+    }
+  } else {
+    print(
+        "Location permission denied or not granted. App will continue without location access.");
+  }
+}
 
 class MyApp extends StatelessWidget {
   // final bool isLoggedIn;

@@ -18,7 +18,7 @@ dependencies:
   
   cupertino_icons: ^1.0.8
   dropdown_button2: ^2.3.9
-  intl: ^0.20.2
+  intl: ^0.18.0
 
   dotted_line: ^3.2.3
   flutter_native_splash: ^2.4.4
@@ -40,6 +40,8 @@ dependencies:
   fl_chart: ^0.70.2
   image_picker: ^1.1.2
   flutter_launcher_icons: ^0.14.3
+  flutter_bs_ad_calendar: ^1.0.4
+  
 
   
 flutter_icons:
@@ -47,7 +49,17 @@ flutter_icons:
   ios: true
   image_path: "assets/logo/logo.jpeg"
 
+flutter_native_splash:
+  android: true
+  ios: true
+  web: true
 
+  image: "assets/logo/logo.jpeg"   # Path to your image
+  android_12:
+    image: "assets/logo/logo.jpeg"  # Path to your image for Android 12+
+    
+  
+  
   
   
 
