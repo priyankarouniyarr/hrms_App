@@ -23,46 +23,37 @@ class HolidayProvider with ChangeNotifier {
         dates.add({
           'npDate': holiday.fromDateNp, // Nepali date from Holidays
           'enDate': holidayDate.holidayDate, // English date from HolidayDate
-          'title': holidayDate.description,
-
+          'description': holidayDate.description,
+          'weekDay': holidayDate.isWeekOff,
           'color': holiday.color,
         });
         //  print(dates);
       }
     }
 
-    // Uncomment if you want upcoming holidays too
     for (var holiday in _upcomingHolidays) {
       for (var holidayDate in holiday.holidayDates) {
         dates.add({
           'npDate': holiday.fromDateNp,
           'enDate': holidayDate.holidayDate,
-          'title': holidayDate.description,
+          'description': holidayDate.description,
           'color': holiday.color,
+          'weekDay': holidayDate.isWeekOff,
         });
       }
     }
-    for (var holiday in _allHolidays) {
-      for (var holidayDate in holiday.holidayDates) {
-        dates.add({
-          'npDate': holiday.fromDateNp,
-          'enDate': holidayDate.holidayDate,
-          'title': holidayDate.description,
-          'color': holiday.color,
-        });
-      }
-    }
+    // for (var holiday in _allHolidays) {
+    //   for (var holidayDate in holiday.holidayDates) {
+    //     dates.add({
+    //       'npDate': holiday.fromDateNp,
+    //       'enDate': holidayDate.holidayDate,
+    //       'description': holidayDate.description,
+    //       'color': holiday.color,
+    //     });
+    //   }
+    // }
 
     return dates;
-  }
-
-  List<Map<String, dynamic>> getHolidaysByNepaliMonth(int nepaliMonth) {
-    return allHolidayDatePairs.where((holiday) {
-      // Extract the Nepali month from the 'npDate'
-      String npDate = holiday['npDate'];
-      int month = int.tryParse(npDate.split('-')[1]) ?? 0;
-      return month == nepaliMonth;
-    }).toList();
   }
 
   Future<void> fetchPastHolidays() async {

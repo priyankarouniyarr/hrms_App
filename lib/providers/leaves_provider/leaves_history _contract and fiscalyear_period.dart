@@ -155,18 +155,26 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
       final responseLeaves = await http.get(
           Uri.parse(employeeLeavesByContractIdAndFiscalYearId),
           headers: headers);
+      //print(responseLeaves.body);
 
       if (response.statusCode == 200 && responseLeaves.statusCode == 200) {
         final List<dynamic> contractandFiscalJson = json.decode(response.body);
         _leavefiscalandcontractId = contractandFiscalJson
             .map((e) => Leave.fromJson(e))
             .toList(); //table
-        //   print(_leavefiscalandcontractId);
+
+//leaves details
+
         final List<dynamic> leavecontractandFiscalJson =
             json.decode(responseLeaves.body);
+        print("hlo");
+
         _leavecontractandfiscalIdDetails = leavecontractandFiscalJson
             .map((e) => LeaveApplication.fromJson(e))
             .toList();
+
+        print(_leavecontractandfiscalIdDetails);
+        print("hello");
       } else {
         _errorMessage = "Failed to fetch fiscal year data";
       }

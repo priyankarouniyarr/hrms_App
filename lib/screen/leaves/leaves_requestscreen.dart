@@ -19,8 +19,10 @@ class LeavesRequestscreen extends StatefulWidget {
 }
 
 class _LeavesRequestscreenState extends State<LeavesRequestscreen> {
-  TextEditingController _startdatecontroller = TextEditingController();
-  TextEditingController _enddatecontroller = TextEditingController();
+  TextEditingController _primarystartcontroller = TextEditingController();
+  TextEditingController _primaryenddatecontroller = TextEditingController();
+  TextEditingController _extendedstartcontroller = TextEditingController();
+  TextEditingController _extendedenddatecontroller = TextEditingController();
   DateTime? _startDate;
   int? _selectedPrimaryleaveType;
   int? _selectedExtendedleaveType;
@@ -136,21 +138,22 @@ class _LeavesRequestscreenState extends State<LeavesRequestscreen> {
                                   ),
                                   SizedBox(height: 5),
                                   CustomTextFormField(
-                                    controller: _startdatecontroller,
+                                    controller: _primarystartcontroller,
                                     hintText: " Start date",
                                     readOnly: true,
                                     onTap: () async {
                                       DateTime? pickedDate =
                                           await showDatePicker(
                                         context: context,
-                                        initialDate: DateTime.now(),
+                                        initialDate: DateTime.now()
+                                            .add(Duration(days: 1)),
                                         firstDate: DateTime.now(),
                                         lastDate: DateTime(2100),
                                       );
                                       if (pickedDate != null) {
                                         setState(() {
                                           _startDate = pickedDate;
-                                          _startdatecontroller.text =
+                                          _primarystartcontroller.text =
                                               DateFormat('yyyy-MM-dd')
                                                   .format(pickedDate);
                                         });
@@ -172,7 +175,7 @@ class _LeavesRequestscreenState extends State<LeavesRequestscreen> {
                                   ),
                                   SizedBox(height: 5),
                                   CustomTextFormField(
-                                    controller: _enddatecontroller,
+                                    controller: _primaryenddatecontroller,
                                     hintText: "End date",
                                     readOnly: true,
                                     onTap: () async {
@@ -203,7 +206,7 @@ class _LeavesRequestscreenState extends State<LeavesRequestscreen> {
                                       );
                                       if (pickedDate != null) {
                                         setState(() {
-                                          _enddatecontroller.text =
+                                          _primaryenddatecontroller.text =
                                               DateFormat('yyyy-MM-dd')
                                                   .format(pickedDate);
                                         });
@@ -298,21 +301,22 @@ class _LeavesRequestscreenState extends State<LeavesRequestscreen> {
                                   ),
                                   SizedBox(height: 5),
                                   CustomTextFormField(
-                                    controller: _startdatecontroller,
+                                    controller: _extendedstartcontroller,
                                     hintText: " Start date",
                                     readOnly: true,
                                     onTap: () async {
                                       DateTime? pickedDate =
                                           await showDatePicker(
                                         context: context,
-                                        initialDate: DateTime.now(),
+                                        initialDate: DateTime.now()
+                                            .add(Duration(days: 1)),
                                         firstDate: DateTime.now(),
                                         lastDate: DateTime(2100),
                                       );
                                       if (pickedDate != null) {
                                         setState(() {
                                           _startDate = pickedDate;
-                                          _startdatecontroller.text =
+                                          _extendedstartcontroller.text =
                                               DateFormat('yyyy-MM-dd')
                                                   .format(pickedDate);
                                         });
@@ -334,7 +338,7 @@ class _LeavesRequestscreenState extends State<LeavesRequestscreen> {
                                   ),
                                   SizedBox(height: 5),
                                   CustomTextFormField(
-                                    controller: _enddatecontroller,
+                                    controller: _extendedenddatecontroller,
                                     hintText: "End date",
                                     readOnly: true,
                                     onTap: () async {
@@ -365,7 +369,7 @@ class _LeavesRequestscreenState extends State<LeavesRequestscreen> {
                                       );
                                       if (pickedDate != null) {
                                         setState(() {
-                                          _enddatecontroller.text =
+                                          _extendedenddatecontroller.text =
                                               DateFormat('yyyy-MM-dd')
                                                   .format(pickedDate);
                                         });

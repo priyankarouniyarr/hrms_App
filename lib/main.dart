@@ -9,8 +9,8 @@ import 'package:hrms_app/providers/fiscal_year_provider.dart';
 import 'package:hrms_app/providers/hosptial_code_provider.dart';
 import 'package:hrms_app/providers/payroll/payroll_provider.dart';
 import 'package:hrms_app/providers/employee_contract_provider.dart';
-import 'package:hrms_app/providers/create_tickets/holidays_provider.dart';
 import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
+import 'package:hrms_app/providers/holidays_provider/holidays_provider.dart';
 import 'package:hrms_app/providers/create_tickets/new_tickets_provider.dart';
 import 'package:hrms_app/providers/create_tickets/ne_tickets_providers.dart';
 import 'package:hrms_app/providers/auth_provider.dart'; // Import AuthProvider

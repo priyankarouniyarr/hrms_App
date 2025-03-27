@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:nepali_utils/nepali_utils.dart';
 import 'package:hrms_app/constants/colors.dart';
-import 'package:hrms_app/models/holidays/holidays_model.dart';
+import 'package:nepali_date_picker/nepali_date_picker.dart';
 import 'package:flutter_bs_ad_calendar/flutter_bs_ad_calendar.dart';
-import 'package:hrms_app/providers/create_tickets/holidays_provider.dart';
-import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
+import 'package:hrms_app/providers/holidays_provider/holidays_provider.dart';
+import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen categories/customprofile_appbar.dart';
 
 class HolidayScreen extends StatefulWidget {
   @override
@@ -16,108 +16,282 @@ class HolidayScreen extends StatefulWidget {
 class _HolidayScreenState extends State<HolidayScreen> {
   DateTime? selectedDate;
   List<Map<String, dynamic>> selectedDateHolidays = [];
+  List<Map<String, dynamic>> selectedMonthHolidays = [];
 
+  DateTime? currentDisplayedMonth;
   @override
   void initState() {
     super.initState();
+    currentDisplayedMonth = DateTime.now(); // Initialize with current month
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<HolidayProvider>(context, listen: false).fetchPastHolidays();
-      Provider.of<HolidayProvider>(context, listen: false).fetchAllHolidays();
       Provider.of<HolidayProvider>(context, listen: false)
           .fetchUpcomingHolidays();
+      //_updateMonthHolidays(DateTime.now());
     });
-  }
+  } // Helper method to update holidays for the current month
+
+  // void _updateMonthHolidays(DateTime month) {
+  //   final holidaysProvider =
+  //       Provider.of<HolidayProvider>(context, listen: false);
+  //   setState(() {
+  //     currentDisplayedMonth = month;
+  //     selectedMonthHolidays =
+  //         holidaysProvider.allHolidayDatePairs.where((holiday) {
+  //       DateTime holidayDate = holiday['enDate'];
+  //       return holidayDate.year == month.year &&
+  //           holidayDate.month == month.month;
+  //     }).toList();
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
     final holidaysProvider = Provider.of<HolidayProvider>(context);
+    final theme = Theme.of(context);
 
     List<DateTime> holidayDates = holidaysProvider.allHolidayDatePairs
         .map((holiday) => holiday['enDate'] as DateTime)
         .toList();
 
     return Scaffold(
-        backgroundColor: cardBackgroundColor,
-        appBar: const CustomAppBarProfile(
-          title: "My Office",
-        ),
-        body: SafeArea(
-            child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: SingleChildScrollView(
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: Text(
-                          "Holidays",
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Card(
-                        elevation: 6,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        color: cardBackgroundColor,
-                        shadowColor: Colors.grey.withOpacity(0.5),
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: SizedBox(
-                            height: 400,
-                            child: Transform.scale(
-                              scale: 1.1,
-                              child: FlutterBSADCalendar(
-                                weekColor: Colors.green,
-                                calendarType: CalendarType.bs,
+      backgroundColor: cardBackgroundColor,
+      appBar: const CustomAppBarProfile(
+        title: "Office Holidays",
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header Section
+              _buildHeaderSection(),
+              const SizedBox(height: 16),
 
-                                primaryColor: Colors.blueAccent,
-                                holidays: holidayDates,
-                                holidayColor: Colors.red,
-                                mondayWeek: false,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime(1900),
-                                lastDate: DateTime(2048),
-                                todayDecoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(5)),
-                                  color: Theme.of(context).primaryColorLight,
-                                  border: Border.all(
-                                    color: Colors.black,
-                                  ),
-                                  shape: BoxShape.rectangle,
-                                ),
-                                selectedDayDecoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(5)),
-                                  color: Theme.of(context).primaryColorDark,
-                                  border: Border.all(
-                                    color: Colors.black,
-                                  ),
-                                  shape: BoxShape.rectangle,
-                                ),
-                                // onMonthChanged: (date, events) {
-                                //   setState(() {
-                                //     selectedDate = date;
-                                //   });
-                                //   print("hello");
-                                // },
-                                onDateSelected: (date, events) {
-                                  setState(() {
-                                    selectedDate = date;
-                                  });
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ])))));
+              // Calendar Card
+              _buildCalendarCard(holidayDates, theme),
+              const SizedBox(height: 24),
+
+              // Holiday List Section
+              _buildHolidayListSection(holidaysProvider, theme),
+
+              // Add some extra padding at the bottom
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeaderSection() {
+    return Text(
+      "Holiday Calendar",
+      style: TextStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.w600,
+        color: Colors.black,
+      ),
+    );
+  }
+
+  Widget _buildCalendarCard(List<DateTime> holidayDates, ThemeData theme) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SizedBox(
+          height: 400,
+          child: FlutterBSADCalendar(
+            weekColor: Colors.green,
+            calendarType: CalendarType.ad,
+            primaryColor: theme.primaryColor,
+            holidays: holidayDates,
+            holidayColor: accentColor,
+            mondayWeek: false,
+            initialDate: DateTime.now(),
+            firstDate: DateTime.now().subtract(const Duration(days: 365)),
+            lastDate: DateTime.now().add(const Duration(days: 365)),
+            todayDecoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: theme.primaryColor.withOpacity(0.2),
+              border: Border.all(
+                color: theme.primaryColor,
+                width: 1.5,
+              ),
+            ),
+            selectedDayDecoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: theme.primaryColor,
+              boxShadow: [
+                BoxShadow(
+                  color: theme.primaryColor.withOpacity(0.3),
+                  blurRadius: 6,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            onDateSelected: (date, events) {
+              setState(() {
+                selectedDate = date;
+                selectedDateHolidays =
+                    Provider.of<HolidayProvider>(context, listen: false)
+                        .allHolidayDatePairs
+                        .where((holiday) {
+                  DateTime holidayDate = holiday['enDate'];
+                  return holidayDate.year == date.year &&
+                      holidayDate.month == date.month &&
+                      holidayDate.day == date.day;
+                }).toList();
+              });
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHolidayListSection(
+      HolidayProvider holidaysProvider, ThemeData theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (selectedDate != null)
+          Text(
+            selectedDateHolidays.isNotEmpty
+                ? " ${NepaliDateFormat('d MMMM y').format(selectedDate!.toNepaliDateTime())}"
+                : "",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.black,
+            ),
+          ),
+        const SizedBox(height: 12),
+        if (selectedDate != null && selectedDateHolidays.isNotEmpty)
+          ListView.separated(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: selectedDateHolidays.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 8),
+            itemBuilder: (context, index) {
+              final holiday = selectedDateHolidays[index];
+              return _buildHolidayCard(holiday);
+            },
+          ),
+      ],
+    );
+  }
+
+  Widget _buildHolidayCard(Map<String, dynamic> holiday) {
+    final nepaliDate = (holiday['enDate'] as DateTime).toNepaliDateTime();
+
+    return Card(
+      color: Colors.red,
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    holiday['description'] ?? 'Holiday',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: cardBackgroundColor,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: cardBackgroundColor,
+                    ),
+                  ),
+                  child: Text(
+                    "Holiday",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: accentColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                _buildDateChip(
+                  "AD",
+                  DateFormat('MMM d, yyyy').format(holiday['enDate']),
+                ),
+                const SizedBox(width: 8),
+                _buildDateChip(
+                  "BS",
+                  NepaliDateFormat('y MMMM d').format(nepaliDate),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDateChip(String label, String date) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.grey[50],
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: Colors.grey[200]!,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              date,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: primarySwatch,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

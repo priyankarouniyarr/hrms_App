@@ -529,58 +529,69 @@ class LeaveApplication {
 
   factory LeaveApplication.fromJson(Map<String, dynamic> json) {
     return LeaveApplication(
-      id: json['id'],
-      applicationDate: DateTime.parse(json['applicationDate']),
-      applicationDateNp: json['applicationDateNp'],
-      leaveTypeId: json['leaveTypeId'],
-      employeeId: json['employeeId'],
-      fromDate: DateTime.parse(json['fromDate']),
-      fromDateNp: json['fromDateNp'],
-      toDate: DateTime.parse(json['toDate']),
-      toDateNp: json['toDateNp'],
+      id: json['id'] ?? 0, // Default to 0 if null
+      applicationDate: json['applicationDate'] != null
+          ? DateTime.parse(json['applicationDate'])
+          : DateTime.now(), // Default to current date if null
+      applicationDateNp: json['applicationDateNp'] ?? '',
+      leaveTypeId: json['leaveTypeId'] ?? 0,
+      employeeId: json['employeeId'] ?? 0,
+      fromDate: json['fromDate'] != null
+          ? DateTime.parse(json['fromDate'])
+          : DateTime.now(),
+      fromDateNp: json['fromDateNp'] ?? '',
+      toDate: json['toDate'] != null
+          ? DateTime.parse(json['toDate'])
+          : DateTime.now(),
+      toDateNp: json['toDateNp'] ?? '',
       halfDayStatus: json['halfDayStatus'] ?? '',
-      totalLeaveDays: json['totalLeaveDays'] ?? 0.0,
+      totalLeaveDays: (json['totalLeaveDays'] ?? 0.0).toDouble(),
+
       extendedFromDate: json['extendedFromDate'] != null
-          ? DateTime.parse(json['extendedFromDate'])
+          ? DateTime.tryParse(json['extendedFromDate'])
           : null,
       extendedToDate: json['extendedToDate'] != null
-          ? DateTime.parse(json['extendedToDate'])
+          ? DateTime.tryParse(json['extendedToDate'])
           : null,
       extendedFromDateNp: json['extendedFromDateNp'],
       extendedToDateNp: json['extendedToDateNp'],
       extendedLeaveTypeId: json['extendedLeaveTypeId'],
       extendedHalfDayStatus: json['extendedHalfDayStatus'],
-      extendedTotalLeaveDays: json['extendedTotalLeaveDays'] ?? 0.0,
-      reason: json['reason'],
-      status: json['status'],
-      leaveTypeName: json['leaveTypeName'],
+      extendedTotalLeaveDays:
+          (json['extendedTotalLeaveDays'] ?? 0.0).toDouble(),
+
+      reason: json['reason'] ?? '',
+      status: json['status'] ?? '',
+      leaveTypeName: json['leaveTypeName'] ?? '',
       extendedLeaveTypeName: json['extendedLeaveTypeName'],
-      employeeDisplayName: json['employeeDisplayName'],
-      isRecommendationApproved: json['isRecommendationApproved'],
-      isApproved: json['isApproved'],
-      isSubstituteAccepted: json['isSubstituteAccepted'],
-      substitutationStatus: json['substitutationStatus'],
-      recommendationStatus: json['recommendationStatus'],
-      leaveNo: json['leaveNo'],
-      isInValidForApproval: json['isInValidForApproval'],
+      employeeDisplayName: json['employeeDisplayName'] ?? '',
+
+      isRecommendationApproved: json['isRecommendationApproved'] ?? false,
+      isApproved: json['isApproved'] ?? false,
+      isSubstituteAccepted: json['isSubstituteAccepted'] ?? false,
+      substitutationStatus: json['substitutationStatus'] ?? '',
+      recommendationStatus: json['recommendationStatus'] ?? '',
+      leaveNo: json['leaveNo'] ?? '',
+      isInValidForApproval: json['isInValidForApproval'] ?? false,
+
       leaveApprovedBy: json['leaveApprovedBy'],
       approveRemarks: json['approveRemarks'],
       leaveApprovedOn: json['leaveApprovedOn'] != null
-          ? DateTime.parse(json['leaveApprovedOn'])
+          ? DateTime.tryParse(json['leaveApprovedOn'])
           : null,
       rejectedBy: json['rejectedBy'],
       recommendationApprovedBy: json['recommendationApprovedBy'],
       recommendationApprovedOn: json['recommendationApprovedOn'] != null
-          ? DateTime.parse(json['recommendationApprovedOn'])
+          ? DateTime.tryParse(json['recommendationApprovedOn'])
           : null,
       recommendationRemarks: json['recommendationRemarks'],
       substituteAcceptRejectBy: json['substituteAcceptRejectBy'],
       substituteAcceptRejectOn: json['substituteAcceptRejectOn'] != null
-          ? DateTime.parse(json['substituteAcceptRejectOn'])
+          ? DateTime.tryParse(json['substituteAcceptRejectOn'])
           : null,
       substituteRemarks: json['substituteRemarks'],
       substituteEmployeeName: json['substituteEmployeeName'],
-      recommendedByEmployeeName: json['recommendedByEmployeeName'],
+      recommendedByEmployeeName: json['recommendedByEmployeeName'] ?? '',
     );
   }
 
