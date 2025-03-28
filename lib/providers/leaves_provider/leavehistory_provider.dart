@@ -6,8 +6,8 @@ import 'package:hrms_app/models/leaves/leave_history_models.dart';
 
 class LeaveProvider extends ChangeNotifier {
   List<Leave> _leaves = [];
-  List<LeaveApproval> _leaveApproval = [];
-  List<LeaveNotApproval> _leaveNotApproval = [];
+  List<LeaveApplication> _leaveApproval = [];
+  List<LeaveApplication> _leaveNotApproval = [];
   List<LeaveContractPeriodAndFiscalYeAR> _leavecontractyear = [];
   List<LeaveContractPeriodAndFiscalYeAR> _leavefiscalyear = [];
   bool _isLoading = false;
@@ -22,8 +22,8 @@ class LeaveProvider extends ChangeNotifier {
       _leavefiscalyear;
   List<LeaveContractPeriodAndFiscalYeAR> get leaveContractYear =>
       _leavecontractyear;
-  List<LeaveApproval> get leaveApprovals => _leaveApproval;
-  List<LeaveNotApproval> get leaveNotApprovals => _leaveNotApproval;
+  List<LeaveApplication> get leaveApprovals => _leaveApproval;
+  List<LeaveApplication> get leaveNotApprovals => _leaveNotApproval;
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
 
@@ -76,10 +76,10 @@ class LeaveProvider extends ChangeNotifier {
         _leaves = jsonData.map((e) => Leave.fromJson(e)).toList();
 
         _leaveApproval =
-            jsonApprovalData.map((e) => LeaveApproval.fromJson(e)).toList();
+            jsonApprovalData.map((e) => LeaveApplication.fromJson(e)).toList();
 
         _leaveNotApproval = jsonNotApprovalData
-            .map((e) => LeaveNotApproval.fromJson(e))
+            .map((e) => LeaveApplication.fromJson(e))
             .toList();
       } else {
         _errorMessage = "Failed to fetch leave history";

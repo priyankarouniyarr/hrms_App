@@ -110,7 +110,11 @@ class _LeavesScreenState extends State<LeavesScreen> {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
                 child: leaveProvider.leaveNotApprovals.isEmpty
-                    ? Center(child: Text('No approved leave requests found.'))
+                    ? Center(
+                        child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Text('No approved leave requests found.'),
+                      ))
                     : Column(
                         children: leaveProvider.leaveNotApprovals.map((leave) {
                           return Card(
@@ -227,6 +231,112 @@ class _LeavesScreenState extends State<LeavesScreen> {
                                       ),
                                     ],
                                   ),
+                                  if (leave.extendedFromDate != null &&
+                                      leave.extendedToDate != null) ...[
+                                    const SizedBox(height: 8),
+                                    const Text("Extended Leave Details",
+                                        style: TextStyle(
+                                            fontSize: 16.0,
+                                            fontWeight: FontWeight.bold)),
+                                    const SizedBox(height: 8),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Leave From",
+                                          style: TextStyle(fontSize: 14.0),
+                                        ),
+                                        Text(
+                                          leave.extendedFromDate is DateTime
+                                              ? DateFormat('yyyy-MM-dd').format(
+                                                  leave.leaveApprovedOn
+                                                      as DateTime)
+                                              : (leave.extendedFromDate != null
+                                                  ? DateFormat('yyyy-MM-dd')
+                                                      .format(DateTime.parse(
+                                                          leave
+                                                              .extendedFromDate))
+                                                  : '-'),
+                                          style: TextStyle(
+                                            fontSize: 14.0,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 8.0,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "To Date",
+                                          style: TextStyle(fontSize: 14.0),
+                                        ),
+                                        Text(
+                                          leave.extendedToDate is DateTime
+                                              ? DateFormat('yyyy-MM-dd').format(
+                                                  leave.extendedToDate
+                                                      as DateTime)
+                                              : (leave.extendedToDate != null
+                                                  ? DateFormat('yyyy-MM-dd')
+                                                      .format(DateTime.parse(
+                                                          leave.extendedToDate))
+                                                  : '-'),
+                                          style: TextStyle(
+                                            fontSize: 14.0,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 8.0,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          " No of Days",
+                                          style: TextStyle(
+                                            fontSize: 14.0,
+                                          ),
+                                        ),
+                                        Text(
+                                          ' ${leave.extendedTotalLeaveDays.toInt()}',
+                                          style: TextStyle(
+                                            fontSize: 14.0,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 8.0,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 5.0, right: 0.0),
+                                      child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              "Leave Type",
+                                              style: TextStyle(
+                                                fontSize: 14.0,
+                                              ),
+                                            ),
+                                            Text(
+                                              ' ${leave.extendedLeaveTypeName}',
+                                              style: TextStyle(
+                                                  fontSize: 14.0,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ]),
+                                    ),
+                                  ]
                                 ],
                               ),
                             ),
@@ -245,7 +355,11 @@ class _LeavesScreenState extends State<LeavesScreen> {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0),
                 child: leaveProvider.leaveApprovals.isEmpty
-                    ? Center(child: Text('No approved leave requests found.'))
+                    ? Center(
+                        child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Text('No approved leave requests found.'),
+                      ))
                     : Column(
                         children: leaveProvider.leaveApprovals.map((leave) {
                           return Card(
@@ -258,139 +372,249 @@ class _LeavesScreenState extends State<LeavesScreen> {
                             ),
                             margin: const EdgeInsets.symmetric(vertical: 15.0),
                             child: Padding(
-                              padding: EdgeInsets.all(16.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Leave Type
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        ' ${leave.leaveTypeName}',
-                                        style: TextStyle(
-                                          fontSize: 16.0,
-                                          fontWeight: FontWeight.bold,
+                                padding: EdgeInsets.all(16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Leave Type
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          ' ${leave.leaveTypeName}',
+                                          style: TextStyle(
+                                            fontSize: 16.0,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
-                                      ),
-                                      Text(
-                                        ' ${leave.status}',
-                                        style: TextStyle(
-                                          fontSize: 14.0,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.green,
+                                        Text(
+                                          ' ${leave.status}',
+                                          style: TextStyle(
+                                            fontSize: 14.0,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.green,
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
+                                      ],
+                                    ),
 
-                                  SizedBox(height: 8.0),
+                                    SizedBox(height: 8.0),
 
-                                  // Dates
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        "Leave From",
-                                        style: TextStyle(fontSize: 14.0),
-                                      ),
-                                      Text(
-                                        '   ${DateFormat('yyyy-MM-dd').format(DateTime.parse(leave.fromDate))} ',
-                                        style: TextStyle(
-                                          fontSize: 14.0,
+                                    // Dates
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Leave From",
+                                          style: TextStyle(fontSize: 14.0),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 8.0,
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        "To From",
-                                        style: TextStyle(fontSize: 14.0),
-                                      ),
-                                      Text(
-                                        '${DateFormat('yyyy-MM-dd').format(DateTime.parse(leave.toDate)) ?? '-'}',
-                                        style: TextStyle(
-                                          fontSize: 14.0,
+                                        Text(
+                                          '   ${DateFormat('yyyy-MM-dd').format(DateTime.parse(leave.fromDate))} ',
+                                          style: TextStyle(
+                                            fontSize: 14.0,
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 8.0),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 8.0,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "To From",
+                                          style: TextStyle(fontSize: 14.0),
+                                        ),
+                                        Text(
+                                          '${DateFormat('yyyy-MM-dd').format(DateTime.parse(leave.toDate)) ?? '-'}',
+                                          style: TextStyle(
+                                            fontSize: 14.0,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 8.0),
 
-                                  // Total Leave Days
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        "No of Days",
-                                        style: TextStyle(fontSize: 14.0),
-                                      ),
-                                      Text(
-                                        ' ${leave.totalLeaveDays.toInt()}',
-                                        style: TextStyle(
-                                          fontSize: 14.0,
+                                    // Total Leave Days
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "No of Days",
+                                          style: TextStyle(fontSize: 14.0),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 8.0),
-
-                                  // Request Date
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        "Request Date",
-                                        style: TextStyle(fontSize: 14.0),
-                                      ),
-                                      Text(
-                                        '  ${DateFormat('yyyy-MM-dd').format(DateTime.parse(leave.applicationDate)) ?? '-'}',
-                                        style: TextStyle(
-                                          fontSize: 14.0,
+                                        Text(
+                                          ' ${leave.totalLeaveDays.toInt()}',
+                                          style: TextStyle(
+                                            fontSize: 14.0,
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 8.0),
+                                      ],
+                                    ),
+                                    SizedBox(height: 8.0),
 
-                                  // Approval Date
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        "Approval Date",
-                                        style: TextStyle(fontSize: 14.0),
-                                      ),
-                                      Text(
-                                        leave.leaveApprovedOn is DateTime
-                                            ? DateFormat('yyyy-MM-dd').format(
-                                                leave.leaveApprovedOn
-                                                    as DateTime)
-                                            : (leave.leaveApprovedOn != null
+                                    // Request Date
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Request Date",
+                                          style: TextStyle(fontSize: 14.0),
+                                        ),
+                                        Text(
+                                          '  ${DateFormat('yyyy-MM-dd').format(DateTime.parse(leave.applicationDate)) ?? '-'}',
+                                          style: TextStyle(
+                                            fontSize: 14.0,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 8.0),
+
+                                    // Approval Date
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Approval Date",
+                                          style: TextStyle(fontSize: 14.0),
+                                        ),
+                                        Text(
+                                          leave.leaveApprovedOn is DateTime
+                                              ? DateFormat('yyyy-MM-dd').format(
+                                                  leave.leaveApprovedOn
+                                                      as DateTime)
+                                              : (leave.leaveApprovedOn != null
+                                                  ? DateFormat('yyyy-MM-dd')
+                                                      .format(DateTime.parse(
+                                                          leave
+                                                              .leaveApprovedOn))
+                                                  : '-'),
+                                          style: TextStyle(
+                                            fontSize: 14.0,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    if (leave.extendedFromDate != null &&
+                                        leave.extendedToDate != null) ...[
+                                      const SizedBox(height: 8),
+                                      const Text("Extended Leave Details",
+                                          style: TextStyle(
+                                              fontSize: 16.0,
+                                              fontWeight: FontWeight.bold)),
+                                      const SizedBox(height: 8),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            "Leave From",
+                                            style: TextStyle(fontSize: 14.0),
+                                          ),
+                                          Text(
+                                            leave.extendedFromDate is DateTime
                                                 ? DateFormat('yyyy-MM-dd')
-                                                    .format(DateTime.parse(
-                                                        leave.leaveApprovedOn))
-                                                : '-'),
-                                        style: TextStyle(
-                                          fontSize: 14.0,
-                                        ),
+                                                    .format(
+                                                        leave.leaveApprovedOn
+                                                            as DateTime)
+                                                : (leave.extendedFromDate !=
+                                                        null
+                                                    ? DateFormat('yyyy-MM-dd')
+                                                        .format(DateTime.parse(
+                                                            leave
+                                                                .extendedFromDate))
+                                                    : '-'),
+                                            style: TextStyle(
+                                              fontSize: 14.0,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height: 8.0,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            "To Date",
+                                            style: TextStyle(fontSize: 14.0),
+                                          ),
+                                          Text(
+                                            leave.extendedToDate is DateTime
+                                                ? DateFormat('yyyy-MM-dd')
+                                                    .format(leave.extendedToDate
+                                                        as DateTime)
+                                                : (leave.extendedToDate != null
+                                                    ? DateFormat('yyyy-MM-dd')
+                                                        .format(DateTime.parse(
+                                                            leave
+                                                                .extendedToDate))
+                                                    : '-'),
+                                            style: TextStyle(
+                                              fontSize: 14.0,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height: 8.0,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            " No of Days",
+                                            style: TextStyle(
+                                              fontSize: 14.0,
+                                            ),
+                                          ),
+                                          Text(
+                                            ' ${leave.extendedTotalLeaveDays.toInt()}',
+                                            style: TextStyle(
+                                              fontSize: 14.0,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height: 8.0,
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 5.0, right: 0.0),
+                                        child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                "Leave Type",
+                                                style: TextStyle(
+                                                  fontSize: 14.0,
+                                                ),
+                                              ),
+                                              Text(
+                                                ' ${leave.extendedLeaveTypeName}',
+                                                style: TextStyle(
+                                                    fontSize: 14.0,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ]),
                                       ),
                                     ],
-                                  ),
-                                ],
-                              ),
-                            ),
+                                  ],
+                                )),
                           );
                         }).toList(),
                       ),

@@ -63,6 +63,7 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
         _leaveContractList = contractListJson
             .map((e) => LeaveContractPeriodAndFiscalYeAR.fromJson(e))
             .toList();
+        notifyListeners();
       } else {
         _errorMessage = "Failed to fetch contract data";
       }
@@ -110,6 +111,7 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
         _leaveFiscalYearList = fiscalYearListJson
             .map((e) => LeaveContractPeriodAndFiscalYeAR.fromJson(e))
             .toList();
+        notifyListeners();
       } else {
         _errorMessage = "Failed to fetch fiscal year data";
       }
@@ -168,6 +170,7 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
         final List<dynamic> leavecontractandFiscalJson =
             json.decode(responseLeaves.body);
         print("hlo");
+        print(leavecontractandFiscalJson);
 
         _leavecontractandfiscalIdDetails = leavecontractandFiscalJson
             .map((e) => LeaveApplication.fromJson(e))
@@ -175,6 +178,7 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
 
         print(_leavecontractandfiscalIdDetails);
         print("hello");
+        notifyListeners();
       } else {
         _errorMessage = "Failed to fetch fiscal year data";
       }

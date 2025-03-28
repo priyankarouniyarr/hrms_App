@@ -55,10 +55,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   size: 28,
                 ),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => NoticesScreen()),
-                  );
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(builder: (context) => NoticesScreen()),
+                  // );
                 },
                 splashRadius: 24,
               ),
