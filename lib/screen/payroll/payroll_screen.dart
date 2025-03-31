@@ -152,6 +152,7 @@ class _PayrollScreenState extends State<PayrollScreen> {
                           itemBuilder: (context, index) {
                             final salaryData = salaryProvider
                                 .monthSalary?.monthlySalaryData[index];
+                            if (salaryData == null) return Container();
 
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -160,7 +161,7 @@ class _PayrollScreenState extends State<PayrollScreen> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    salaryData!.payHead,
+                                    salaryData.payHead,
                                     style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500),
@@ -399,8 +400,9 @@ class _PayrollScreenState extends State<PayrollScreen> {
                           ],
                         ),
                       ),
-                      for (var item
-                          in provider.loanAndAdvanceModel!.loanAndAdvanceData)
+                      for (var item in (provider
+                              .loanAndAdvanceModel?.loanAndAdvanceData ??
+                          []))
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Row(
@@ -462,7 +464,7 @@ class _PayrollScreenState extends State<PayrollScreen> {
                                 style: TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.bold)),
                             Text(
-                                'Rs ${provider.loanAndAdvanceModel!.balanceAmount}',
+                                'Rs ${provider.loanAndAdvanceModel?.balanceAmount}',
                                 style: const TextStyle(
                                     fontSize: 16, fontWeight: FontWeight.bold)),
                           ],

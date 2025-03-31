@@ -100,11 +100,11 @@ class _SelectFiscalYearScreenState extends State<SelectFiscalYearScreen> {
                   GestureDetector(
                     onTap: selectedFiscalYear != null
                         ? () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => AppMainScreen()),
-                            );
+                            Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => AppMainScreen()),
+                                (route) => false);
                           }
                         : null,
                     child: Container(

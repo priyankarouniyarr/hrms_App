@@ -24,9 +24,10 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
           Provider.of<HospitalCodeProvider>(context, listen: false);
       await provider.fetchBaseUrl(enteredCode);
       if (provider.baseUrl.isNotEmpty) {
-        Navigator.push(
+        Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => LoginScreen()),
+          (route) => false, // Remove all routes
         );
       }
     }

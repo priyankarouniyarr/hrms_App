@@ -21,12 +21,6 @@ class _LeaveStatementScreenState extends State<LeaveStatementScreen> {
     Future.microtask(() {
       Provider.of<LeaveContractandFiscalYearProvider>(context, listen: false)
           .fetchLeaveContracts();
-      // Provider.of<LeaveContractandFiscalYearProvider>(context, listen: false)
-      //     .fetchFiscalYearByContractId(contractId: selectedContractPeriod!);
-      // Provider.of<LeaveContractandFiscalYearProvider>(context, listen: false)
-      //     .fetchFiscalYearByContractIdandFiscalYearId(
-      //         contractId: selectedContractPeriod!,
-      //         fiscalYearId: selectedFiscalYear!);
     });
   }
 
@@ -225,7 +219,7 @@ class _LeaveStatementScreenState extends State<LeaveStatementScreen> {
                                                         fontSize: 14.0),
                                                   ),
                                                   Text(
-                                                    ' ${leave.totalLeaveDays.toInt()}',
+                                                    ' ${leave.totalLeaveDays.toDouble()}',
                                                     style: TextStyle(
                                                       fontSize: 14.0,
                                                     ),
@@ -265,9 +259,7 @@ class _LeaveStatementScreenState extends State<LeaveStatementScreen> {
                                                         fontSize: 14.0),
                                                   ),
                                                   Text(
-                                                    leave.reason != null
-                                                        ? ' ${leave.reason}'
-                                                        : 'N/A',
+                                                    ' ${leave.reason}',
                                                     style: TextStyle(
                                                       fontSize: 14.0,
                                                     ),
@@ -276,9 +268,7 @@ class _LeaveStatementScreenState extends State<LeaveStatementScreen> {
                                               ),
 
                                               SizedBox(height: 8.0),
-                                              SizedBox(
-                                                height: 8.0,
-                                              ),
+
                                               Row(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment
@@ -476,7 +466,7 @@ class _LeaveStatementScreenState extends State<LeaveStatementScreen> {
                                                       ),
                                                     ),
                                                     Text(
-                                                      ' ${leave.extendedTotalLeaveDays.toInt()}',
+                                                      ' ${leave.extendedTotalLeaveDays.toDouble()}',
                                                       style: TextStyle(
                                                         fontSize: 14.0,
                                                       ),

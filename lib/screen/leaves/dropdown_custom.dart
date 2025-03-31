@@ -83,21 +83,26 @@ class CustomDropdown2 extends StatelessWidget {
   final String hintText;
   final ValueChanged<int?> onChanged;
 
+  final String? Function(int?)? validator;
+
   const CustomDropdown2({
     Key? key,
     required this.value,
     required this.items,
     required this.hintText,
     required this.onChanged,
+    this.validator,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField2<int>(
         isExpanded: true,
-        autofocus: true,
-        style: TextStyle(
-            color: Colors.black.withOpacity(0.8), fontSize: 14, height: 1.5),
+        //sautofocus: true,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        validator: validator,
+        // style: TextStyle(
+        //     color: Colors.black.withOpacity(0.8), fontSize: 14, height: 1.5),
 
         // Ensures the dropdown takes full width
         value: value,

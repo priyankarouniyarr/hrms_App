@@ -204,7 +204,7 @@ class _LeavesScreenState extends State<LeavesScreen> {
                                         style: TextStyle(fontSize: 14.0),
                                       ),
                                       Text(
-                                        ('${leave.totalLeaveDays.toInt()}'),
+                                        ('${leave.totalLeaveDays.toDouble()}'),
                                         style: TextStyle(fontSize: 14.0),
                                       ),
                                     ],
@@ -305,7 +305,7 @@ class _LeavesScreenState extends State<LeavesScreen> {
                                           ),
                                         ),
                                         Text(
-                                          ' ${leave.extendedTotalLeaveDays.toInt()}',
+                                          ' ${leave.extendedTotalLeaveDays.toDouble()}',
                                           style: TextStyle(
                                             fontSize: 14.0,
                                           ),

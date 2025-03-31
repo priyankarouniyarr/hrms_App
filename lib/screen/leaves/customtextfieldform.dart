@@ -3,11 +3,11 @@ import 'package:hrms_app/constants/colors.dart';
 
 class CustomTextFormField extends StatelessWidget {
   final TextEditingController controller;
-
   final String hintText;
   final bool readOnly;
   final VoidCallback? onTap;
-  final FormFieldValidator<String>? validator;
+  final String? Function(String?)? validator;
+  // Corrected validator type
 
   const CustomTextFormField({
     Key? key,
@@ -24,9 +24,9 @@ class CustomTextFormField extends StatelessWidget {
       controller: controller,
       readOnly: readOnly,
       onTap: onTap,
-      validator: validator,
       decoration: InputDecoration(
         hintText: hintText,
+        hintStyle: TextStyle(color: Colors.grey),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
         ),
@@ -38,8 +38,14 @@ class CustomTextFormField extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(color: primarySwatch, width: 2.0),
         ),
-        suffixIcon: Icon(Icons.calendar_month, color: primarySwatch[900]),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        filled: true,
+        fillColor: Colors.white,
+        suffixIcon: onTap != null
+            ? Icon(Icons.calendar_month, color: primarySwatch[900])
+            : null,
       ),
+      validator: validator,
     );
   }
 }

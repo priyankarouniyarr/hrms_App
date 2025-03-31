@@ -169,20 +169,21 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
 
         final List<dynamic> leavecontractandFiscalJson =
             json.decode(responseLeaves.body);
-        print("hlo");
-        print(leavecontractandFiscalJson);
+        //  print("hlo");
+        // print(leavecontractandFiscalJson);
 
         _leavecontractandfiscalIdDetails = leavecontractandFiscalJson
             .map((e) => LeaveApplication.fromJson(e))
             .toList();
-
-        print(_leavecontractandfiscalIdDetails);
+//
+        //   print(_leavecontractandfiscalIdDetails);
         print("hello");
         notifyListeners();
       } else {
         _errorMessage = "Failed to fetch fiscal year data";
       }
     } catch (error) {
+      print(error);
       _errorMessage = "Error fetching fiscal year: $error";
     } finally {
       _isLoading = false;

@@ -59,8 +59,10 @@ class AuthProvider with ChangeNotifier {
         _token = token;
         notifyListeners();
 
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => SelectBranchScreen()));
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => SelectBranchScreen()),
+            (route) => false);
       } else {
         _setErrorMessage("Invalid username or password");
       }

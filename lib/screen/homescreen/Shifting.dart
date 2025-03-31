@@ -124,8 +124,9 @@ class ShiftCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    DateTime shiftStartTime = DateTime.parse(shifttime!);
-    DateTime shiftEndTime = DateTime.parse(shiftend!);
+    DateTime? shiftStartTime = DateTime.tryParse(shifttime!);
+
+    DateTime? shiftEndTime = DateTime.tryParse(shiftend!);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -167,9 +168,10 @@ class ShiftCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildTimeColumn("Shift Start", shiftStartTime),
+                _buildTimeColumn(
+                    "Shift Start", shiftStartTime ?? DateTime.now()),
                 Container(width: 3, height: 40, color: cardBackgroundColor),
-                _buildTimeColumn("Shift End", shiftEndTime),
+                _buildTimeColumn("Shift End", shiftEndTime ?? DateTime.now()),
               ],
             ),
           ),

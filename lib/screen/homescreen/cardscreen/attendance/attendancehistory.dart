@@ -1,16 +1,16 @@
-import 'dart:ui';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/leaves/dropdown_custom.dart';
 import 'package:hrms_app/screen/leaves/customtextfieldform.dart';
-import 'package:hrms_app/providers/attendance_providers/attendance_provider.dart';
 import 'package:hrms_app/models/attendance%20_models/attendance_details_models.dart';
 import 'package:hrms_app/providers/attendance_providers/attendance_history_provider.dart';
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
 
 class AttendanceDetailsScreen extends StatefulWidget {
+  const AttendanceDetailsScreen({super.key});
+
   @override
   _AttendanceDetailsScreenState createState() =>
       _AttendanceDetailsScreenState();
@@ -143,14 +143,14 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
                                   );
                                   return;
                                 }
+
                                 DateTime? pickedDate = await showDatePicker(
                                   context: context,
-                                  initialDate:
-                                      _startDate!.add(Duration(days: 1)),
-                                  firstDate: _startDate!.add(Duration(days: 1)),
-                                  lastDate: DateTime.now()
-                                      .subtract(Duration(days: 1)),
+                                  initialDate: _startDate!,
+                                  firstDate: _startDate!,
+                                  lastDate: DateTime.now(),
                                 );
+
                                 if (pickedDate != null) {
                                   setState(() {
                                     _endDate = pickedDate;
@@ -286,7 +286,7 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
                                                                   .detailsAttendance[
                                                                       i]
                                                                   .statusColorCode !=
-                                                              null &&
+                                                              true &&
                                                           provider
                                                               .detailsAttendance[
                                                                   i]
@@ -306,6 +306,7 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
                                                               "#", "0xFF")))
                                                       : Colors.black,
                                                 ),
+                                                textAlign: TextAlign.end,
                                               ),
                                             )
                                           ],
