@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hrms_app/storage/securestorage.dart';
-import '../models/profile_models/employee_contract.dart';
+import '../../models/profile_models/employee_contract.dart';
 
 class EmployeeContractProvider with ChangeNotifier {
   List<EmployeeContract> _contracts = [];

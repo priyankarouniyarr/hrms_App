@@ -132,7 +132,7 @@ class LeaveApplication {
       employeeId: json['employeeId'] ?? 0,
       fromDate: json['fromDate'] ?? '',
       fromDateNp: json['fromDateNp'] ?? '',
-      toDate: json['toDate'] ?? '',
+      toDate: json['toDate'] ?? '-',
       toDateNp: json['toDateNp'] ?? '',
       halfDayStatus: json['halfDayStatus'],
       totalLeaveDays: (json['totalLeaveDays'] ?? 0.0).toDouble(),

@@ -2,7 +2,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
-import 'package:hrms_app/providers/notices_provider.dart';
+import 'package:hrms_app/providers/notices_provider/notices_provider.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/notices/noticesdetails_screen.dart';
 import '../../../profile/subcategories/appbar_profilescreen categories/customprofile_appbar.dart';
 

@@ -12,7 +12,7 @@ class WorkScreen extends StatefulWidget {
 }
 
 class _WorkScreenState extends State<WorkScreen> {
-  int _selectedIndex = 0; // For managing selected tab index
+  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {

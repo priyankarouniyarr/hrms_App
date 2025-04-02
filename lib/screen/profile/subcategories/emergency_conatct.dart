@@ -96,29 +96,3 @@ class _EmergencyContactState extends State<EmergencyContact> {
     );
   }
 }
-
-Widget _buildInfoRow({required String title, required String content}) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8.0),
-    child: Row(
-      children: [
-        Text(
-          "$title:",
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.blueAccent,
-          ),
-        ),
-        SizedBox(width: 10),
-        Expanded(
-          child: Text(
-            content,
-            style: TextStyle(fontSize: 16, color: Colors.black87),
-            overflow: TextOverflow.ellipsis, // Prevents overflow issues
-          ),
-        ),
-      ],
-    ),
-  );
-}

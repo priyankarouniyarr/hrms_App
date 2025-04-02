@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/login%20screen.dart';
-import 'package:hrms_app/providers/hosptial_code_provider.dart';
+import 'package:hrms_app/providers/hosptial_code_provider/hosptial_code_provider.dart';
 
 class HospitalCodeScreen extends StatefulWidget {
   @override

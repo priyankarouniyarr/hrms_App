@@ -42,15 +42,17 @@ dependencies:
   flutter_launcher_icons: ^0.14.3
   flutter_bs_ad_calendar: ^1.0.4
   nepali_date_picker: # For date conversion
-  table_calendar: ^3.0.9
+  dio: ^5.8.0+1
+  flutter_html: ^3.0.0
+ 
       
   
 
   
-flutter_icons:
-  android: true
-  ios: true
-  image_path: "assets/logo/logo.jpeg"
+# flutter_icons:
+#   android: "launcher_icon"
+#   ios: "launcher_icon"
+#   image_path: "assets/logo/logo.jpeg"
 
 flutter_native_splash:
   android: true

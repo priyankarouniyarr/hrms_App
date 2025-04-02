@@ -13,7 +13,7 @@ class TicketProvider with ChangeNotifier {
   String? _fiscalYear;
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
-  Future<void> createTicket(TicketCreationRequest request) async {
+  Future<bool> createTicket(TicketCreationRequest request) async {
     _isLoading = true;
     notifyListeners();
 
@@ -28,8 +28,10 @@ class TicketProvider with ChangeNotifier {
         _errorMessage = 'Missing required credentials';
         _isLoading = false;
         notifyListeners();
-        return;
+        return false;
       }
+      final requestBody = json.encode(request.toJson());
+      print('Sending request with body: $requestBody');
 
       // Make the GET request
       final response = await http.post(
@@ -41,16 +43,38 @@ class TicketProvider with ChangeNotifier {
             'Content-Type': 'application/json',
           },
           body: jsonEncode([request.toJson()]));
+      print('Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
       if (response.statusCode == 200) {
-        // Success
-        _errorMessage = '';
-        print('Ticket created successfully');
-        notifyListeners();
+        if (response.body.toLowerCase() == 'true') {
+          _errorMessage = '';
+          return true;
+        } else if (response.body.toLowerCase() == 'false') {
+          _errorMessage = 'Server rejected the creation of ticket';
+          return false;
+        } else {
+          // Try to parse as JSON
+          try {
+            final responseData = json.decode(response.body);
+            if (responseData['success'] == true) {
+              return true;
+            } else {
+              _errorMessage =
+                  responseData['message'] ?? 'Ticket creation failed';
+              return false;
+            }
+          } catch (e) {
+            _errorMessage = 'Unexpected response format: ${response.body}';
+            return false;
+          }
+        }
       } else {
-        _errorMessage = 'Failed to create ticket: ${response.body}';
+        _errorMessage = 'Request failed with status ${response.statusCode}';
+        return false;
       }
     } catch (error) {
-      _errorMessage = "Error fetching : $error";
+      _errorMessage = "Error creating ticket  $error";
+      return false;
     } finally {
       _isLoading = false;
       notifyListeners();

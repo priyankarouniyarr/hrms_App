@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:hrms_app/models/hospital_code.dart';
+import 'package:hrms_app/models/hosptial_code_models/hospital_code.dart';
 
 class HospitalCodeProvider with ChangeNotifier {
   String _baseUrl = '';

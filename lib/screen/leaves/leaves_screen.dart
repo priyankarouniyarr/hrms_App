@@ -186,8 +186,8 @@ class _LeavesScreenState extends State<LeavesScreen> {
                                         DateFormat('yyyy-MM-dd').format(
                                               DateTime.parse(
                                                   leave.toDate.toString()),
-                                            ) ??
-                                            '-',
+                                            ) ,
+                                           
                                         style: TextStyle(fontSize: 14.0),
                                       ),
                                     ],

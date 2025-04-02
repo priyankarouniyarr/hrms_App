@@ -17,11 +17,9 @@ class LeaveApplicationRequest {
   String? extendedToDateNp;
   int? extendedLeaveTypeId;
   int? substituteEmployeeId;
-  int? extendedTotalLeaveDays;
   bool? isHalfDay;
 
   LeaveApplicationRequest({
-    this.extendedTotalLeaveDays,
     this.leaveTypeId,
     this.fromDate,
     this.fromDateNp,

@@ -2,8 +2,8 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
-import 'package:hrms_app/providers/check_in_provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hrms_app/providers/check-in_provider/check_in_provider.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/check-in/subcategories/sharedlive%20location.dart';
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
 

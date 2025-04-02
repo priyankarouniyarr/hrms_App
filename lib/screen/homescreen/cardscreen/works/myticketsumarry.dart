@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/works/workflow_view.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/works/custom_summary_card.dart';
-import 'package:hrms_app/providers/works_Summary_provider/my_ticket_get_summary_provider.dart';
+import 'package:hrms_app/providers/works_Summary_provider/summary_details/my_ticket_get_summary_provider.dart';
 
 class Myticketsumarry extends StatefulWidget {
   const Myticketsumarry({super.key});

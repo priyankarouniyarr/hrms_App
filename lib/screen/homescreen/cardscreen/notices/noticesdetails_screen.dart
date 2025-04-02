@@ -1,7 +1,7 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:hrms_app/constants/colors.dart';
-import 'package:hrms_app/models/notices_models.dart';
+import 'package:hrms_app/models/notices_models/notices_models.dart';
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
 
 class NoticeDetailScreen extends StatelessWidget {

@@ -3,17 +3,17 @@ import 'package:provider/provider.dart';
 import 'subcategories/emergency_conatct.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/hospitalcode.dart';
-import 'package:hrms_app/models/hospital_code.dart';
 import 'package:hrms_app/screen/custom_appbar.dart';
 import 'package:hrms_app/screen/login%20screen.dart';
 import 'package:hrms_app/screen/profile/profilemenuitem.dart';
 import 'package:hrms_app/screen/profile/subcategories/documents.dart';
+import 'package:hrms_app/models/hosptial_code_models/hospital_code.dart';
 import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
 import 'package:hrms_app/screen/profile/subcategories/insurance.details.dart';
 import 'package:hrms_app/screen/profile/subcategories/employement_contracts.dart';
-import 'package:hrms_app/providers/auth_provider.dart'; // Import the AuthProvider
 import 'package:hrms_app/screen/profile/subcategories/personal_information%20.dart';
 import 'package:hrms_app/screen/profile/subcategories/work%20and%20shift%20information.dart';
+import 'package:hrms_app/providers/login_screen_provider/auth_provider.dart'; // Import the AuthProvider
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});

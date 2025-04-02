@@ -4,20 +4,19 @@ import 'package:http/http.dart' as http;
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/works_models/getMyTicketSummary.model.dart';
 
-class MyTicketGetSummaryProvider with ChangeNotifier {
+class AssignByMeTicketProvider with ChangeNotifier {
   final SecureStorageService _secureStorageService = SecureStorageService();
   String _errorMessage = '';
   bool _isLoading = false;
-  TaskData? _myTicketSummary; // Add this to hold the TaskData result
+  TaskData? _assignByMeSummary; // Add this to hold the TaskData result
 
   // Getters
   String get errorMessage => _errorMessage;
   bool get isLoading => _isLoading;
-  TaskData? get myTicketSummary =>
-      _myTicketSummary; // Getter for myTicketSummary
+  TaskData? get assignByMeSummary =>
+      _assignByMeSummary; // Getter for myTicketSummary
 
-  // Fetch Current Month Salary
-  Future<void> fetchMyTicket() async {
+  Future<void> fetchAssignByMeTicket() async {
     _isLoading = true;
     _errorMessage = '';
     notifyListeners();
@@ -36,8 +35,8 @@ class MyTicketGetSummaryProvider with ChangeNotifier {
       }
 
       // Define the API URL
-      final url =
-          Uri.parse('http://45.117.153.90:5004/api/Ticket/GetMyTicketSummary');
+      final url = Uri.parse(
+          'http://45.117.153.90:5004/api/Ticket/GetTicketAssignedToMeSummary');
 
       // Send GET request
       final response = await http.get(
@@ -51,8 +50,7 @@ class MyTicketGetSummaryProvider with ChangeNotifier {
 
       // Check if the request was successful
       if (response.statusCode == 200) {
-        // Parse the response and update the _myTicketSummary variable
-        _myTicketSummary = TaskData.fromJson(json.decode(response.body));
+        _assignByMeSummary = TaskData.fromJson(json.decode(response.body));
         _errorMessage = '';
         notifyListeners();
 

@@ -146,7 +146,7 @@ class _CreateTicketScreenState extends State<CreateTicketScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<NewTicketProvider>(context);
-    final testProvider = Provider.of<TicketProvider>(context);
+
     List<Map<String, dynamic>> assignTo = provider.userList
         .map((assignTo) =>
             {'label': assignTo.text, 'value': int.parse(assignTo.value)})

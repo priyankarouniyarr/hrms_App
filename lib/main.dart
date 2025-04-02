@@ -2,26 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hrms_app/screen/onboardscreen.dart';
-import 'package:hrms_app/providers/auth_provider.dart';
-import 'package:hrms_app/providers/notices_provider.dart';
-import 'package:hrms_app/providers/check_in_provider.dart';
-import 'package:hrms_app/providers/branch_id_provider.dart';
-import 'package:hrms_app/providers/fiscal_year_provider.dart';
-import 'package:hrms_app/providers/hosptial_code_provider.dart';
 import 'package:hrms_app/providers/payroll/payroll_provider.dart';
-import 'package:hrms_app/providers/employee_contract_provider.dart';
+import 'package:hrms_app/providers/notices_provider/notices_provider.dart';
 import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
+import 'package:hrms_app/providers/login_screen_provider/auth_provider.dart';
+import 'package:hrms_app/providers/check-in_provider/check_in_provider.dart';
 import 'package:hrms_app/providers/holidays_provider/holidays_provider.dart';
 import 'package:hrms_app/providers/create_tickets/new_tickets_provider.dart';
 import 'package:hrms_app/providers/create_tickets/ne_tickets_providers.dart';
 import 'package:hrms_app/providers/leaves_provider/leavehistory_provider.dart';
+import 'package:hrms_app/providers/branch_id_providers/branch_id_provider.dart';
+import 'package:hrms_app/providers/works_Summary_provider/ticket_workflow.dart';
 import 'package:hrms_app/providers/leaves_provider/leave_request_provider.dart';
 import 'package:hrms_app/providers/attendance_providers/attendance_provider.dart';
+import 'package:hrms_app/providers/fiscal_year_provider/fiscal_year_provider.dart';
 import 'package:hrms_app/providers/payroll/payroll_monthly_salarayy_provider.dart';
+import 'package:hrms_app/providers/profile_providers/employee_contract_provider.dart';
+import 'package:hrms_app/providers/hosptial_code_provider/hosptial_code_provider.dart';
 import 'package:hrms_app/providers/attendance_providers/attendance_history_provider.dart';
-import 'package:hrms_app/providers/works_Summary_provider/assign_by_me_ticket_provider.dart';
-import 'package:hrms_app/providers/works_Summary_provider/my_ticket_get_summary_provider.dart';
+import 'package:hrms_app/providers/works_Summary_provider/summary_details/assign_by_me_ticket_provider.dart';
 import 'package:hrms_app/providers/leaves_provider/leaves_history%20_contract%20and%20fiscalyear_period.dart';
+import 'package:hrms_app/providers/works_Summary_provider/summary_details/my_ticket_get_summary_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -78,6 +79,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => NewTicketProvider()),
         ChangeNotifierProvider(create: (context) => TicketProvider()),
         ChangeNotifierProvider(create: (context) => LeaveRequestProvider()),
+        ChangeNotifierProvider(create: (context) => TicketWorkFlowProvider()),
       ],
       child:
           //MyApp(isLoggedIn: isLoggedIn),

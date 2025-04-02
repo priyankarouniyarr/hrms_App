@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/leaves/apply_leave.dart';
 import 'package:hrms_app/models/leaves/leave_request_models.dart';
-import 'package:hrms_app/models/leaves/leave_history_models.dart';
 
 class LeaveRequestProvider extends ChangeNotifier {
   List<EmployeeRequest> _leaveTypePrimary = [];
@@ -180,7 +179,6 @@ class LeaveRequestProvider extends ChangeNotifier {
       print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        // Handle both JSON and plain true/false responses
         if (response.body.toLowerCase() == 'true') {
           _errorMessage = '';
           return true;

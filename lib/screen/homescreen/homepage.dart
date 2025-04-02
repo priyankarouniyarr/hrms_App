@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
-import 'package:hrms_app/providers/auth_provider.dart';
 import 'package:hrms_app/screen/homescreen/Shifting.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/works/works.dart';
 import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/notices/notices.dart';
+import 'package:hrms_app/providers/login_screen_provider/auth_provider.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/check-in/check-in.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/new%20ticket/ticket.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/holiday.dart/holiday.dart';

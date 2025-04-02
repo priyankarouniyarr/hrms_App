@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
-import 'package:hrms_app/providers/auth_provider.dart';
+import 'package:hrms_app/providers/login_screen_provider/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   @override

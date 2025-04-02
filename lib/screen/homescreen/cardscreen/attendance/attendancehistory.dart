@@ -34,8 +34,6 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
   Widget build(BuildContext context) {
     final provider = Provider.of<AttendanceDetailsProvider>(context);
     final screenWidth = MediaQuery.of(context).size.width; // Get screen width
-    final screenHeight =
-        MediaQuery.of(context).size.height; // Get screen height
 
     if (provider.isLoading) {
       return Scaffold(
@@ -406,7 +404,7 @@ Widget _buildDetailRow(String label, String value) {
 // Function to build a simple attendance card
 Widget _buildAttendanceCard(attendanceItem, double screenWidth) {
   return Container(
-    width: screenWidth * 0.45, // 45% of screen width
+    width: screenWidth * 0.44, // 45% of screen width
     padding: EdgeInsets.all(12),
     decoration: BoxDecoration(
       color: Colors.white,

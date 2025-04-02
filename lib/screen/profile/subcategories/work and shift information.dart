@@ -118,7 +118,7 @@ class _WorkshiftinformationState extends State<Workshiftinformation> {
                             "Designation", employeeProvider.desgination),
                         _buildInfoRow(
                             "Date of Joining", employeeProvider.dateOfJoining),
-                        if (employeeProvider.phone == null) ...[
+                        if (employeeProvider.phone != null) ...[
                           _buildInfoRow("Phone Number", employeeProvider.phone),
                         ],
                         _buildInfoRow("Email", employeeProvider.email),

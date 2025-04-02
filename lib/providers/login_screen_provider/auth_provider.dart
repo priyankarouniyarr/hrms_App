@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hrms_app/screen/branch_id.dart';
-import 'package:hrms_app/models/loginscreen_models.dart';
+import 'package:hrms_app/models/login_screen_models/loginscreen_models.dart';
 import 'package:hrms_app/storage/token_storage.dart'; // Import the TokenStorage
 
 class AuthProvider with ChangeNotifier {
