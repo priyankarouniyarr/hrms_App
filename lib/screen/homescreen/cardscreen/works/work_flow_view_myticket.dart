@@ -4,9 +4,11 @@ import 'package:provider/provider.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/providers/works_Summary_provider/ticket_workflow.dart';
+import 'package:hrms_app/screen/homescreen/cardscreen/works/details.screen.dart';
 
 class WorkFlowViewMyTicket extends StatefulWidget {
-  const WorkFlowViewMyTicket({super.key});
+  final Function(int) onDetailsViewed;
+  const WorkFlowViewMyTicket({super.key, required this.onDetailsViewed});
 
   @override
   State<WorkFlowViewMyTicket> createState() => _WorkFlowViewMyTicketState();
@@ -170,9 +172,15 @@ class _WorkFlowViewMyTicketState extends State<WorkFlowViewMyTicket> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            // View Button with icon
                             GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                // provider
+                                //     .fetchMyTicketDetaisById(
+                                //         ticketId: ticket.id)
+                                //     .then((_) {
+                                widget.onDetailsViewed(ticket.id);
+                                print(ticket.id);
+                              },
                               child: Container(
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 12, vertical: 6),

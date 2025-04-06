@@ -5,6 +5,7 @@ import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/leaves/dropdown_custom.dart';
 import 'package:hrms_app/screen/leaves/customtextfieldform.dart';
 import 'package:hrms_app/providers/works_Summary_provider/ticket_workflow.dart';
+import 'package:hrms_app/screen/homescreen/cardscreen/works/details.screen.dart';
 import 'package:hrms_app/models/works_models/myticket_and_assignbyme_ticket_model.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/works/work_flow_view_assigned.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/works/work_flow_view_myticket.dart';
@@ -143,11 +144,9 @@ class _WorkflowViewState extends State<WorkflowView> {
                       ],
                     ),
                   ),
-                ],
-              ),
-              SizedBox(height: 10),
-              Row(
-                children: [
+                  SizedBox(
+                    width: 10,
+                  ),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,7 +174,12 @@ class _WorkflowViewState extends State<WorkflowView> {
                       ],
                     ),
                   ),
-                  SizedBox(width: 10),
+                ],
+              ),
+              SizedBox(height: 10),
+
+              Row(
+                children: [
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -203,13 +207,9 @@ class _WorkflowViewState extends State<WorkflowView> {
                       ],
                     ),
                   ),
-                ],
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Row(
-                children: [
+                  SizedBox(
+                    width: 10,
+                  ),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -366,8 +366,30 @@ class _WorkflowViewState extends State<WorkflowView> {
               else
                 Expanded(
                   child: _selectedIndex == 0
-                      ? WorkFlowViewMyTicket()
-                      : WorkFlowViewAssigned(),
+                      ? WorkFlowViewMyTicket(
+                          onDetailsViewed: (ticketID) async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    TicketDetailScreen(ticketId: ticketID),
+                              ),
+                            );
+                            await _initializeData();
+                          },
+                        )
+                      : WorkFlowViewAssigned(
+                          // onDetailsAssignedViewed: (ticketID) async {
+                          //   await Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //       builder: (context) =>
+                          //           TicketDetailScreen(ticketId: ticketID),
+                          //     ),
+                          //   );
+                          //   await _initializeData();
+                          // },
+                          ),
                 ),
             ],
           ),

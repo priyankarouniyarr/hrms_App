@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:hrms_app/splash_scrren.dart';
+import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/onboardscreen.dart';
+import 'package:hrms_app/screen/app_main_screen.dart';
 import 'package:hrms_app/providers/payroll/payroll_provider.dart';
 import 'package:hrms_app/providers/notices_provider/notices_provider.dart';
 import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
@@ -28,30 +31,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await handleLocationPermission();
-
-  //Wait for AuthProvider to load token and refresh if necessary
-  // final authProvider = AuthProvider();
-  // await authProvider.loadToken();
-  // await authProvider.loadUsername();
-  // await authProvider.loadRefreshToken();
-
-  // // Check if the token is expired
-  // bool isLoggedIn;
-
-  // if (authProvider.token == null) {
-  //   print("hello");
-
-  //   isLoggedIn = false;
-  // } else {
-  //   // Token is present, check if it needs refreshing
-  //   bool isTokenExpired = await authProvider.isTokenExpired();
-  //   if (isTokenExpired) {
-  //     await authProvider.refreshAccessToken();
-  //     isLoggedIn = true;
-  //   } else {
-  //     isLoggedIn = true;
-  //   }
-  // }
 
   runApp(
     MultiProvider(
@@ -81,10 +60,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => LeaveRequestProvider()),
         ChangeNotifierProvider(create: (context) => TicketWorkFlowProvider()),
       ],
-      child:
-          //MyApp(isLoggedIn: isLoggedIn),
-          MyApp(),
-      // Pass the login status to MyApp
+      child: MyApp(),
     ),
   );
 }
@@ -134,17 +110,75 @@ Future<void> handleLocationPermission() async {
   }
 }
 
+// class MyApp extends StatefulWidget {
+//   @override
+//   State<MyApp> createState() => _MyAppState();
+// }
+
+// class _MyAppState extends State<MyApp> {
+//   bool isLoggedIn = false;
+//   bool isLoading = true;
+//   loadState(context) async {
+//     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+//     await authProvider.loadToken();
+//     await authProvider.loadUsername();
+//     await authProvider.loadRefreshToken();
+
+//     if (authProvider.token == null) {
+//       // print("hello");
+
+//       isLoggedIn = false;
+//     } else {
+//       bool isTokenExpired = await authProvider.isTokenExpired();
+//       if (isTokenExpired) {
+//         await authProvider.refreshAccessToken();
+//         isLoggedIn = true;
+//       } else {
+//         isLoggedIn = true;
+//       }
+//     }
+//     setState(() {
+//       isLoading = false;
+//     });
+//   }
+
+//   @override
+//   void initState() {
+//     WidgetsBinding.instance.addPostFrameCallback((_) {
+//       loadState(context);
+//     });
+//     super.initState();
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//         debugShowCheckedModeBanner: false,
+//         home: Builder(builder: (context) {
+//           if (isLoading) {
+//             return Scaffold(
+//               backgroundColor: primarySwatch,
+//               body: Center(
+//                 child: CircularProgressIndicator(),
+//               ),
+//             );
+//           }
+//           print(isLoggedIn);
+//           if (!isLoggedIn) {
+//             return OnboardScreen();
+//           }
+
+//           return AppMainScreen();
+//         }));
+//   }
+// }
 class MyApp extends StatelessWidget {
-  // final bool isLoggedIn;
-
-  // MyApp({required this.isLoggedIn});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      // home: isLoggedIn ? AppMainScreen() : OnboardScreen(),
-      home: OnboardScreen(),
+      home: SplashScreen(),
     );
   }
 }

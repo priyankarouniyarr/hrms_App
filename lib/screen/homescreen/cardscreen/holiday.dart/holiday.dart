@@ -20,30 +20,33 @@ class _HolidayScreenState extends State<HolidayScreen> {
 
   DateTime? currentDisplayedMonth;
   @override
+  @override
   void initState() {
     super.initState();
-    currentDisplayedMonth = DateTime.now(); // Initialize with current month
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<HolidayProvider>(context, listen: false).fetchPastHolidays();
-      Provider.of<HolidayProvider>(context, listen: false)
-          .fetchUpcomingHolidays();
-      //_updateMonthHolidays(DateTime.now());
-    });
-  } // Helper method to update holidays for the current month
+    // Initialize with current month
 
-  // void _updateMonthHolidays(DateTime month) {
-  //   final holidaysProvider =
-  //       Provider.of<HolidayProvider>(context, listen: false);
-  //   setState(() {
-  //     currentDisplayedMonth = month;
-  //     selectedMonthHolidays =
-  //         holidaysProvider.allHolidayDatePairs.where((holiday) {
-  //       DateTime holidayDate = holiday['enDate'];
-  //       return holidayDate.year == month.year &&
-  //           holidayDate.month == month.month;
-  //     }).toList();
-  //   });
-  // }
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final holidaysProvider =
+          Provider.of<HolidayProvider>(context, listen: false);
+      await holidaysProvider.fetchPastHolidays();
+      await holidaysProvider.fetchUpcomingHolidays();
+//for month
+      setState(() {});
+      setState(() {
+        selectedDate = DateTime.now().toNepaliDateTime();
+
+        print(selectedDate);
+
+        selectedDateHolidays =
+            holidaysProvider.allHolidayDatePairs.where((holiday) {
+          DateTime holidayDate = holiday['enDate'] as DateTime;
+          return holidayDate.year == selectedDate!.year &&
+              holidayDate.month == selectedDate!.month &&
+              holidayDate.day == selectedDate!.day;
+        }).toList();
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,14 +113,14 @@ class _HolidayScreenState extends State<HolidayScreen> {
           height: 400,
           child: FlutterBSADCalendar(
             weekColor: Colors.green,
-            calendarType: CalendarType.ad,
+            calendarType: CalendarType.bs,
             primaryColor: theme.primaryColor,
             holidays: holidayDates,
             holidayColor: accentColor,
             mondayWeek: false,
             initialDate: DateTime.now(),
-            firstDate: DateTime.now().subtract(const Duration(days: 365)),
-            lastDate: DateTime.now().add(const Duration(days: 365)),
+            firstDate: DateTime(2015),
+            lastDate: DateTime(2040),
             todayDecoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
               color: theme.primaryColor.withOpacity(0.2),
@@ -139,12 +142,14 @@ class _HolidayScreenState extends State<HolidayScreen> {
             ),
             onDateSelected: (date, events) {
               setState(() {
-                selectedDate = date;
+                selectedDate = date.toDateTime();
+
                 selectedDateHolidays =
                     Provider.of<HolidayProvider>(context, listen: false)
                         .allHolidayDatePairs
                         .where((holiday) {
-                  DateTime holidayDate = holiday['enDate'];
+                  DateTime bsHolidayDate = holiday['enDate'];
+                  NepaliDateTime holidayDate = bsHolidayDate.toNepaliDateTime();
                   return holidayDate.year == date.year &&
                       holidayDate.month == date.month &&
                       holidayDate.day == date.day;

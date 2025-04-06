@@ -59,6 +59,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   //   context,
                   //   MaterialPageRoute(builder: (context) => NoticesScreen()),
                   // );
+                  print(Provider.of<AuthProvider>(context, listen: false)
+                      .username);
                 },
                 splashRadius: 24,
               ),
@@ -107,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
               SizedBox(height: 15),
               Container(
-                height: MediaQuery.of(context).size.height / 2.5,
+                height: MediaQuery.of(context).size.height / 2.4,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(

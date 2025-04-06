@@ -220,8 +220,8 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
                             ),
                           )
                         : Wrap(
-                            spacing: 10, // Space between boxes horizontally
-                            runSpacing: 10, // Space between boxes vertically
+                            spacing: 10,
+                            runSpacing: 10,
                             children: provider.summaryAttendance
                                 .map((item) =>
                                     _buildAttendanceCard(item, screenWidth))

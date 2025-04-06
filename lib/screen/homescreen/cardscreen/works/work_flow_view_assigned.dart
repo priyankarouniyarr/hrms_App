@@ -7,7 +7,9 @@ import 'package:hrms_app/providers/works_Summary_provider/ticket_workflow.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/works/details.screen.dart';
 
 class WorkFlowViewAssigned extends StatefulWidget {
-  const WorkFlowViewAssigned({super.key});
+  // final Function(int) onDetailsAssignedViewed;
+  // const WorkFlowViewAssigned(
+  //     {super.key, required this.onDetailsAssignedViewed});
 
   @override
   State<WorkFlowViewAssigned> createState() => _WorkFlowViewAssignedState();
@@ -30,7 +32,7 @@ class _WorkFlowViewAssignedState extends State<WorkFlowViewAssigned> {
           : ListView.builder(
               itemCount: provider.myTicketAssignToMe.length,
               itemBuilder: (context, index) {
-                final ticket = provider.myTicket[index];
+                final ticket = provider.myTicketAssignToMe[index];
                 return Card(
                   color: Colors.white,
                   elevation: 4.0,
@@ -178,7 +180,10 @@ class _WorkFlowViewAssignedState extends State<WorkFlowViewAssigned> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                            TicketDetailScreen()));
+                                            TicketDetailScreen(
+                                              ticketId: ticket.id,
+                                            )));
+                                print(ticket.id);
                               },
                               child: Container(
                                 padding: EdgeInsets.symmetric(

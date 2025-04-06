@@ -84,15 +84,15 @@ class AuthProvider with ChangeNotifier {
   // Load access token securely
   Future<void> loadToken() async {
     _token = await _tokenStorage.getToken();
-    notifyListeners();
+
+    // notifyListeners();
   }
 //
 
   Future<void> loadUsername() async {
     _username = await _tokenStorage.getUsername();
-    print(_username);
-    print("iiiii");
-    notifyListeners();
+
+    // notifyListeners();
   }
 
   // Load refresh token securely

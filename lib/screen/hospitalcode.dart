@@ -1,4 +1,3 @@
-import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -63,11 +62,11 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
     }
   }
 
-  void _onBackspace(int index) {
-    if (controllers[index].text.isEmpty && index > 0) {
-      FocusScope.of(context).requestFocus(focusNodes[index - 1]);
-    }
-  }
+  // void _onBackspace(int index) {
+  //   if (controllers[index].text.isEmpty && index > 0) {
+  //     FocusScope.of(context).requestFocus(focusNodes[index - 1]);
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {

@@ -38,6 +38,16 @@ class CheckInProvider with ChangeNotifier {
     print(_checkInTime);
     _checkOutTime = await _secureStorageService.readData('lastCheckOutTime');
     print(_checkOutTime);
+
+    _latitude = await _secureStorageService.readData('checkinPositionLat');
+    print(_latitude);
+    _longitude = await _secureStorageService.readData('checkinPositionLong');
+    print(_longitude);
+    if (_checkOutTime != null) {
+      _isCheckedIn = false; // Set to false if check-out time is available
+    } else {
+      _isCheckedIn = true; // Set to true if only check-in time is available
+    }
     notifyListeners();
   }
 
@@ -80,6 +90,9 @@ class CheckInProvider with ChangeNotifier {
 
       _latitude = position.latitude.toString();
       _longitude = position.longitude.toString();
+      await _secureStorageService.writeData('checkinPositionLat', _latitude!);
+      await _secureStorageService.writeData('checkinPositionLong', _longitude!);
+
       List<Placemark> address =
           await placemarkFromCoordinates(position.latitude, position.longitude);
       if (address.isNotEmpty) {

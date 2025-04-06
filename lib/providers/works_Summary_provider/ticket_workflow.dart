@@ -21,6 +21,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
   String? get errormessage => _errormessage;
   List<TicketDetailsWithId> _myticketdetailsbyId = [];
   List<TicketDetailsWithId> get myticketdetails => _myticketdetailsbyId;
+  // Add this variable to store the ticket ID from POST response
 
   List<String> _status = ["Open", "Closed"];
   List<String> get status => _status;
@@ -39,7 +40,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
       _token = await _secureStorageService.readData('auth_token');
       _fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
-      print(_branchId);
+      // print(_branchId);
       if (_token == null || _branchId == null || _fiscalYear == null) {
         _errormessage = 'Missing required credentials';
         _isLoading = false;
@@ -49,7 +50,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
 
       const String url = 'http://45.117.153.90:5004/api/Ticket/MyTickets';
       final requestBody = jsonEncode(requestticket.toJson());
-      print('Sending request with body: $requestBody');
+      //  print('Sending request with body: $requestBody');
 
       final response = await http.post(Uri.parse(url),
           headers: {
@@ -59,8 +60,8 @@ class TicketWorkFlowProvider with ChangeNotifier {
             'workingFinancialId': _fiscalYear!,
           },
           body: jsonEncode(requestticket.toJson()));
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      // print('Status Code: ${response.statusCode}');
+      // print('Response Body: ${response.body}');
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
         // print("sucessfully");
@@ -101,8 +102,6 @@ class TicketWorkFlowProvider with ChangeNotifier {
 
       const String url =
           'http://45.117.153.90:5004/api/Ticket/TicketsAssignedToMe';
-      final requestBody = jsonEncode(requestticket.toJson());
-      print('Sending request with body: $requestBody');
 
       final response = await http.post(Uri.parse(url),
           headers: {
@@ -112,8 +111,8 @@ class TicketWorkFlowProvider with ChangeNotifier {
             'workingFinancialId': _fiscalYear!,
           },
           body: jsonEncode(requestticket.toJson()));
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+      // print('Status Code: ${response.statusCode}');
+      // print('Response Body: ${response.body}');
       if (response.statusCode == 200) {
         final List<dynamic> responseAssignToMe = json.decode(response.body);
 
@@ -136,7 +135,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
   }
 
 //getdetails by id
-  Future<void> fetchMyTicketDetaisById({required int ticketId}) async {
+  Future<void> fetchMyTicketDetaisById({required int ticket}) async {
     _isLoading = true;
     _errormessage = '';
     notifyListeners();
@@ -147,16 +146,15 @@ class TicketWorkFlowProvider with ChangeNotifier {
           await _secureStorageService.readData('workingBranchId');
       String? fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
-
+      print(branchId);
       if (token == null || branchId == null || fiscalYear == null) {
         throw Exception("Missing authentication data.");
       }
+      print("hello");
 
-      // Define the API URL
       final url = Uri.parse(
-          'http://45.117.153.90:5004/api/Ticket/GetTicketDetailById/$ticketId');
+          'http://45.117.153.90:5004/api/Ticket/GetTicketDetailById/$ticket');
 
-      // Send GET request
       final response = await http.get(
         url,
         headers: {
@@ -165,26 +163,29 @@ class TicketWorkFlowProvider with ChangeNotifier {
           'workingFinancialId': fiscalYear,
         },
       );
-
+      print('Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+      print("hello");
       if (response.statusCode == 200) {
-        List<dynamic> responseDetails = json.decode(response.body);
-        _myticketdetailsbyId = responseDetails
-            .map((e) => TicketDetailsWithId.fromJson(e))
-            .toList();
+        Map<String, dynamic> responseDetails = json.decode(response.body);
+
+        _myticketdetailsbyId = [
+          TicketDetailsWithId.fromJson(responseDetails),
+        ];
+        print(_myticketdetailsbyId);
         notifyListeners();
 
-        ;
         _errormessage = '';
         notifyListeners();
       } else {
         _errormessage = 'Failed to load ticket summary';
       }
     } catch (e) {
-      _errormessage =
-          'An error occurred: ${e.toString()}'; // Improved error message handling
+      _errormessage = 'An error occurred: ${e.toString()}';
+      print(_errormessage);
     } finally {
       _isLoading = false;
-      notifyListeners(); // Notify listeners about the changes
+      notifyListeners();
     }
   }
 }

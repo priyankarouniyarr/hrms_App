@@ -13,13 +13,47 @@ class CheckInScreen extends StatefulWidget {
 }
 
 class _CheckInScreenState extends State<CheckInScreen> {
-  late GoogleMapController mapController;
+  GoogleMapController? mapController;
+  LatLng userLocation = LatLng(0.0, 0.0);
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final checkInProvider =
+          Provider.of<CheckInProvider>(context, listen: false);
+      checkInProvider.loadCheckInData().then((e) {
+        userLocation = LatLng(double.parse(checkInProvider.latitude!),
+            double.parse(checkInProvider.longitude!));
+        //check if mapController initialized
+        if (mapController != null) {
+          mapController!.animateCamera(
+            CameraUpdate.newCameraPosition(
+              CameraPosition(
+                target: userLocation,
+                zoom: 15.0, // Adjust zoom level
+              ),
+            ),
+          );
+        }
+
+        setState(() {});
+      });
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    mapController?.dispose();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final checkInProvider = Provider.of<CheckInProvider>(context);
 
-    LatLng? userLocation =
+    userLocation =
         (checkInProvider.latitude != null && checkInProvider.longitude != null)
             ? LatLng(double.parse(checkInProvider.latitude!),
                 double.parse(checkInProvider.longitude!))
@@ -38,17 +72,18 @@ class _CheckInScreenState extends State<CheckInScreen> {
                   Expanded(
                     child: GestureDetector(
                       onTap: () async {
-                        await checkInProvider.punchPost();
-                        _showDialog(checkInProvider);
+                        // await checkInProvider.punchPost();
+                        // _showDialog(checkInProvider);
 
-                        mapController.animateCamera(
-                          CameraUpdate.newCameraPosition(
-                            CameraPosition(
-                              target: userLocation,
-                              zoom: 15.0, // Adjust zoom level
-                            ),
-                          ),
-                        );
+                        // mapController!.animateCamera(
+                        //   CameraUpdate.newCameraPosition(
+                        //     CameraPosition(
+                        //       target: userLocation,
+                        //       zoom: 15.0, // Adjust zoom level
+                        //     ),
+                        //   ),
+                        // );
+                        print(checkInProvider.isCheckedIn);
                       },
                       child: _buildCheckInButton(checkInProvider),
                     ),
@@ -131,6 +166,16 @@ class _CheckInScreenState extends State<CheckInScreen> {
                     },
                     onMapCreated: (GoogleMapController controller) {
                       mapController = controller;
+                      print("Map created");
+                      print(userLocation);
+                      mapController!.animateCamera(
+                        CameraUpdate.newCameraPosition(
+                          CameraPosition(
+                            target: userLocation,
+                            zoom: 15,
+                          ),
+                        ),
+                      );
                     },
                   ),
                 ),

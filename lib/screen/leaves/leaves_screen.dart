@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/custom_appbar.dart';
 import 'package:hrms_app/screen/leaves/leavehistorypage.dart';
-import 'package:hrms_app/models/leaves/leave_history_models.dart';
 import 'package:hrms_app/screen/leaves/leaves_requestscreen.dart';
 import 'package:hrms_app/providers/leaves_provider/leavehistory_provider.dart';
 
@@ -184,10 +183,9 @@ class _LeavesScreenState extends State<LeavesScreen> {
                                       ),
                                       Text(
                                         DateFormat('yyyy-MM-dd').format(
-                                              DateTime.parse(
-                                                  leave.toDate.toString()),
-                                            ) ,
-                                           
+                                          DateTime.parse(
+                                              leave.toDate.toString()),
+                                        ),
                                         style: TextStyle(fontSize: 14.0),
                                       ),
                                     ],

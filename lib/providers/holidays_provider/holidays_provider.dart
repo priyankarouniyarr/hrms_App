@@ -21,13 +21,12 @@ class HolidayProvider with ChangeNotifier {
     for (var holiday in _pastHolidays) {
       for (var holidayDate in holiday.holidayDates) {
         dates.add({
-          'npDate': holiday.fromDateNp, // Nepali date from Holidays
-          'enDate': holidayDate.holidayDate, // English date from HolidayDate
+          'npDate': holiday.fromDateNp,
+          'enDate': holidayDate.holidayDate,
           'description': holidayDate.description,
           'weekDay': holidayDate.isWeekOff,
           'color': holiday.color,
         });
-        //  print(dates);
       }
     }
 
