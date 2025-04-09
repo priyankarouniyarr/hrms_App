@@ -6,7 +6,11 @@ import 'package:hrms_app/providers/works_Summary_provider/ticket_workflow.dart';
 
 class WorkFlowViewMyTicket extends StatefulWidget {
   final Function(int) onDetailsViewed;
-  const WorkFlowViewMyTicket({super.key, required this.onDetailsViewed});
+  final Function(int) onTicketClosedOrReopened;
+  const WorkFlowViewMyTicket(
+      {super.key,
+      required this.onDetailsViewed,
+      required this.onTicketClosedOrReopened});
 
   @override
   State<WorkFlowViewMyTicket> createState() => _WorkFlowViewMyTicketState();
@@ -28,6 +32,7 @@ class _WorkFlowViewMyTicketState extends State<WorkFlowViewMyTicket> {
               itemBuilder: (context, index) {
                 final ticket = provider.myTicket[index];
                 return Card(
+                  key: ValueKey(ticket.id),
                   color: Colors.white,
                   elevation: 4.0,
                   shape: RoundedRectangleBorder(
@@ -177,7 +182,7 @@ class _WorkFlowViewMyTicketState extends State<WorkFlowViewMyTicket> {
                             ),
                           ],
                         ),
-                        SizedBox(height: 8.0),
+                        SizedBox(height: 25.0),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -209,17 +214,48 @@ class _WorkFlowViewMyTicketState extends State<WorkFlowViewMyTicket> {
                               ),
                             ),
                             SizedBox(width: 10),
-
-                            // Close Button with icon
                             GestureDetector(
-                              onTap: () {
-                                if (ticket.status == "Open") {
-                                  provider.closedTicketById(
-                                      ticketId: ticket.id);
-                                  print(ticket.id);
-                                } else
-                                  provider.reopenTicketById(
-                                      ticketId: ticket.id);
+                              onTap: () async {
+                                bool? confirm = await showDialog<bool>(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: Text('Are you sure?'),
+                                    content: Text(ticket.status == "Open"
+                                        ? 'Do you want to close this ticket?'
+                                        : 'Do you want to reopen this ticket?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, false),
+                                        child: Text('Cancel'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, true),
+                                        child: Text('Confirm'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+
+                                if (confirm == true) {
+                                  widget.onTicketClosedOrReopened(ticket.id);
+
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                          ticket.status == "Open"
+                                              ? 'Successfully closed the ticket'
+                                              : 'Successfully reopened the ticket',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w400,
+                                            color: Colors.green,
+                                          )),
+                                      backgroundColor: Colors.white,
+                                    ),
+                                  );
+                                }
                               },
                               child: Container(
                                 padding: EdgeInsets.symmetric(
@@ -235,8 +271,7 @@ class _WorkFlowViewMyTicketState extends State<WorkFlowViewMyTicket> {
                                     Icon(
                                       ticket.status == "Open"
                                           ? Icons.close
-                                          : Icons
-                                              .refresh, // Different icon for reopen
+                                          : Icons.refresh,
                                       color: Colors.white,
                                       size: 16,
                                     ),
@@ -244,7 +279,7 @@ class _WorkFlowViewMyTicketState extends State<WorkFlowViewMyTicket> {
                                     Text(
                                       ticket.status == "Open"
                                           ? 'Close'
-                                          : 'Reopen', // Different text based on status
+                                          : 'Reopen',
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,

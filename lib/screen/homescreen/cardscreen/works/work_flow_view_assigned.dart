@@ -6,8 +6,12 @@ import 'package:hrms_app/providers/works_Summary_provider/ticket_workflow.dart';
 
 class WorkFlowViewAssigned extends StatefulWidget {
   final Function(int) onDetailsAssignedViewed;
+  final Function(int) onTicketAssignedClosedOrReopened;
+
   const WorkFlowViewAssigned(
-      {super.key, required this.onDetailsAssignedViewed});
+      {super.key,
+      required this.onDetailsAssignedViewed,
+      required this.onTicketAssignedClosedOrReopened});
 
   @override
   State<WorkFlowViewAssigned> createState() => _WorkFlowViewAssignedState();
@@ -167,11 +171,10 @@ class _WorkFlowViewAssignedState extends State<WorkFlowViewAssigned> {
                             ),
                           ],
                         ),
-                        SizedBox(height: 8.0),
+                        SizedBox(height: 25.0),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            // View Button with icon
                             GestureDetector(
                               onTap: () {
                                 widget.onDetailsAssignedViewed(ticket.id);
@@ -203,7 +206,49 @@ class _WorkFlowViewAssignedState extends State<WorkFlowViewAssigned> {
 
                             // Close Button with icon
                             GestureDetector(
-                              onTap: () {},
+                              onTap: () async {
+                                bool? confirm = await showDialog<bool>(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: Text('Are you sure?'),
+                                    content: Text(ticket.status == "Open"
+                                        ? 'Do you want to close this ticket?'
+                                        : 'Do you want to reopen this ticket?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, false),
+                                        child: Text('Cancel'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, true),
+                                        child: Text('Confirm'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+
+                                if (confirm == true) {
+                                  widget.onTicketAssignedClosedOrReopened(
+                                      ticket.id);
+
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                          ticket.status == "Open"
+                                              ? 'Successfully closed the ticket'
+                                              : 'Successfully reopened the ticket',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w400,
+                                            color: Colors.green,
+                                          )),
+                                      backgroundColor: Colors.white,
+                                    ),
+                                  );
+                                }
+                              },
                               child: Container(
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 12, vertical: 6),
@@ -218,8 +263,7 @@ class _WorkFlowViewAssignedState extends State<WorkFlowViewAssigned> {
                                     Icon(
                                       ticket.status == "Open"
                                           ? Icons.close
-                                          : Icons
-                                              .refresh, // Different icon for reopen
+                                          : Icons.refresh,
                                       color: Colors.white,
                                       size: 16,
                                     ),
@@ -227,7 +271,7 @@ class _WorkFlowViewAssignedState extends State<WorkFlowViewAssigned> {
                                     Text(
                                       ticket.status == "Open"
                                           ? 'Close'
-                                          : 'Reopen', // Different text based on status
+                                          : 'Reopen',
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,

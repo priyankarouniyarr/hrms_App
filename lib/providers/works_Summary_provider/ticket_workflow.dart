@@ -199,7 +199,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
       if (token == null || branchId == null || fiscalYear == null) {
         throw Exception("Missing authentication data.");
       }
-      print(branchId);
+
       final url = Uri.parse(
           'http://45.117.153.90:5004/api/Ticket/CloseTicket/$ticketId');
       print(ticketId);

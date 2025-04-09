@@ -293,6 +293,23 @@ class _WorkflowViewState extends State<WorkflowView> {
                           height: MediaQuery.of(context).size.height * 0.6,
                           child: _selectedIndex == 0
                               ? WorkFlowViewMyTicket(
+                                  onTicketClosedOrReopened: (ticketID) async {
+                                    try {
+                                      final ticket = provider.myTicket
+                                          .firstWhere((t) => t.id == ticketID);
+
+                                      ticket.status == "Open"
+                                          ? await provider.closedTicketById(
+                                              ticketId: ticketID)
+                                          : await provider.reopenTicketById(
+                                              ticketId: ticketID);
+                                      //   print(ticket.status);
+                                      await _initializeData();
+                                    } catch (e) {
+                                      print(
+                                          "Error: Ticket with ID $ticketID not found or action failed: $e");
+                                    }
+                                  },
                                   onDetailsViewed: (ticketID) async {
                                     await Navigator.push(
                                       context,
@@ -306,6 +323,24 @@ class _WorkflowViewState extends State<WorkflowView> {
                                   },
                                 )
                               : WorkFlowViewAssigned(
+                                  onTicketAssignedClosedOrReopened:
+                                      (ticketID) async {
+                                    try {
+                                      final ticket = provider.myTicketAssignToMe
+                                          .firstWhere((t) => t.id == ticketID);
+
+                                      ticket.status == "Open"
+                                          ? await provider.closedTicketById(
+                                              ticketId: ticketID)
+                                          : await provider.reopenTicketById(
+                                              ticketId: ticketID);
+                                      //   print(ticket.status);
+                                      await _initializeData();
+                                    } catch (e) {
+                                      print(
+                                          "Error: Ticket with ID $ticketID not found or action failed: $e");
+                                    }
+                                  },
                                   onDetailsAssignedViewed: (ticketID) async {
                                     await Navigator.push(
                                       context,
