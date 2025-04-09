@@ -1,15 +1,13 @@
-import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/providers/works_Summary_provider/ticket_workflow.dart';
-import 'package:hrms_app/screen/homescreen/cardscreen/works/details.screen.dart';
 
 class WorkFlowViewAssigned extends StatefulWidget {
-  // final Function(int) onDetailsAssignedViewed;
-  // const WorkFlowViewAssigned(
-  //     {super.key, required this.onDetailsAssignedViewed});
+  final Function(int) onDetailsAssignedViewed;
+  const WorkFlowViewAssigned(
+      {super.key, required this.onDetailsAssignedViewed});
 
   @override
   State<WorkFlowViewAssigned> createState() => _WorkFlowViewAssignedState();
@@ -176,14 +174,7 @@ class _WorkFlowViewAssignedState extends State<WorkFlowViewAssigned> {
                             // View Button with icon
                             GestureDetector(
                               onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            TicketDetailScreen(
-                                              ticketId: ticket.id,
-                                            )));
-                                print(ticket.id);
+                                widget.onDetailsAssignedViewed(ticket.id);
                               },
                               child: Container(
                                 padding: EdgeInsets.symmetric(
@@ -212,9 +203,7 @@ class _WorkFlowViewAssignedState extends State<WorkFlowViewAssigned> {
 
                             // Close Button with icon
                             GestureDetector(
-                              onTap: () {
-                                // Handle close/reopen logic here
-                              },
+                              onTap: () {},
                               child: Container(
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 12, vertical: 6),

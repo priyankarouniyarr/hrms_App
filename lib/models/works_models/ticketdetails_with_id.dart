@@ -3,24 +3,26 @@ class TicketDetailsWithId {
   Ticket ticket;
   List<TicketActivity> ticketActivity;
   bool isTicketUser;
-  String baseUrl;
+  String? baseUrl;
 
   TicketDetailsWithId({
     required this.id,
     required this.ticket,
     required this.ticketActivity,
     required this.isTicketUser,
-    required this.baseUrl,
+    this.baseUrl,
   });
 
   factory TicketDetailsWithId.fromJson(Map<String, dynamic> json) =>
       TicketDetailsWithId(
-        id: json["id"],
-        ticket: Ticket.fromJson(json["ticket"]),
-        ticketActivity: List<TicketActivity>.from(
-            json["ticketActivity"].map((x) => TicketActivity.fromJson(x))),
-        isTicketUser: json["isTicketUser"],
-        baseUrl: json["baseUrl"],
+        id: json["id"] ?? 0, // Provide default if null
+        ticket: Ticket.fromJson(json["ticket"] ?? {}), // Handle null ticket
+        ticketActivity: json["ticketActivity"] != null
+            ? List<TicketActivity>.from(json["ticketActivity"]
+                .map((x) => TicketActivity.fromJson(x ?? {})))
+            : <TicketActivity>[], // Default empty list
+        isTicketUser: json["isTicketUser"] ?? false, // Default false
+        baseUrl: json["baseUrl"], // Already nullable
       );
 
   Map<String, dynamic> toJson() => {
@@ -68,7 +70,7 @@ class Ticket {
   String insertUser;
   DateTime insertTime;
   String updateUser;
-  DateTime updateTime;
+  DateTime? updateTime;
 
   Ticket({
     required this.id,
@@ -105,47 +107,50 @@ class Ticket {
     required this.insertUser,
     required this.insertTime,
     required this.updateUser,
-    required this.updateTime,
+    this.updateTime,
   });
 
   factory Ticket.fromJson(Map<String, dynamic> json) => Ticket(
-        id: json["id"],
-        ticketNo: json["ticketNo"],
-        ticketNoSequence: json["ticketNoSequence"],
-        ticketYearSequence: json["ticketYearSequence"],
-        ticketMonthlySequence: json["ticketMonthlySequence"],
-        ticketDailySequence: json["ticketDailySequence"],
-        ticketMonthlyNpSequence: json["ticketMonthlyNpSequence"],
-        ticketYearlyNpSequence: json["ticketYearlyNpSequence"],
-        ticketFySequence: json["ticketFySequence"],
-        ticketYearlySequenceByCategory: json["ticketYearlySequenceByCategory"],
+        id: json["id"] ?? 0,
+        ticketNo: json["ticketNo"] ?? "",
+        ticketNoSequence: json["ticketNoSequence"] ?? 0,
+        ticketYearSequence: json["ticketYearSequence"] ?? 0,
+        ticketMonthlySequence: json["ticketMonthlySequence"] ?? 0,
+        ticketDailySequence: json["ticketDailySequence"] ?? 0,
+        ticketMonthlyNpSequence: json["ticketMonthlyNpSequence"] ?? 0,
+        ticketYearlyNpSequence: json["ticketYearlyNpSequence"] ?? 0,
+        ticketFySequence: json["ticketFySequence"] ?? 0,
+        ticketYearlySequenceByCategory:
+            json["ticketYearlySequenceByCategory"] ?? 0,
         ticketMonthlySequenceByCategory:
-            json["ticketMonthlySequenceByCategory"],
-        ticketDailySequenceByCategory: json["ticketDailySequenceByCategory"],
-        ticketNo2: json["ticketNo2"],
-        applicationUserId: json["applicationUserId"],
-        title: json["title"],
-        description: json["description"],
-        ticketDate: DateTime.parse(json["ticketDate"]),
-        status: json["status"],
-        severity: json["severity"],
-        priority: json["priority"],
-        ticketCategoryId: json["ticketCategoryId"],
-        ticketCategoryName: json["ticketCategoryName"],
-        assignToEmployeeId: json["assignToEmployeeId"],
-        assignedTo: json["assignedTo"],
-        assignedOn: DateTime.parse(json["assignedOn"]),
+            json["ticketMonthlySequenceByCategory"] ?? 0,
+        ticketDailySequenceByCategory:
+            json["ticketDailySequenceByCategory"] ?? 0,
+        ticketNo2: json["ticketNo2"] ?? "",
+        applicationUserId: json["applicationUserId"] ?? "",
+        title: json["title"] ?? "",
+        description: json["description"] ?? "",
+        ticketDate: _parseDate(json["ticketDate"]),
+        status: json["status"] ?? "Open",
+        severity: json["severity"] ?? "Medium",
+        priority: json["priority"] ?? "Medium",
+        ticketCategoryId: json["ticketCategoryId"] ?? 0,
+        ticketCategoryName: json["ticketCategoryName"] ?? "",
+        assignToEmployeeId: json["assignToEmployeeId"] ?? 0,
+        assignedTo: json["assignedTo"] ?? "",
+        assignedOn: _parseDate(json["assignedOn"]),
         issueByEmployeeId: json["issueByEmployeeId"],
-        issueBy: json["issueBy"],
-        issueOn: DateTime.parse(json["issueOn"]),
+        issueBy: json["issueBy"] ?? "",
+        issueOn: _parseDate(json["issueOn"]),
         sessionTag: json["sessionTag"],
         attachmentFiles: json["attachmentFiles"],
-        attachedDocuments:
-            List<String>.from(json["attachedDocuments"].map((x) => x)),
-        insertUser: json["insertUser"],
-        insertTime: DateTime.parse(json["insertTime"]),
-        updateUser: json["updateUser"],
-        updateTime: DateTime.parse(json["updateTime"]),
+        attachedDocuments: json["attachedDocuments"] != null
+            ? List<String>.from(json["attachedDocuments"].map((x) => x ?? ""))
+            : <String>[],
+        insertUser: json["insertUser"] ?? "",
+        insertTime: _parseDate(json["insertTime"]),
+        updateUser: json["updateUser"] ?? "",
+        updateTime: _parseNullableDate(json["updateTime"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -184,8 +189,32 @@ class Ticket {
         "insertUser": insertUser,
         "insertTime": insertTime.toIso8601String(),
         "updateUser": updateUser,
-        "updateTime": updateTime.toIso8601String(),
+        "updateTime": updateTime?.toIso8601String(),
       };
+
+  /// Safely parse a DateTime or fallback to DateTime.now()
+  static DateTime _parseDate(dynamic value) {
+    if (value != null && value.toString().isNotEmpty) {
+      try {
+        return DateTime.parse(value);
+      } catch (e) {
+        print("⚠️ Invalid date format: $value");
+      }
+    }
+    return DateTime.now();
+  }
+
+  /// Safely parse a nullable DateTime
+  static DateTime? _parseNullableDate(dynamic value) {
+    if (value != null && value.toString().isNotEmpty) {
+      try {
+        return DateTime.parse(value);
+      } catch (e) {
+        print("⚠️ Invalid nullable date format: $value");
+      }
+    }
+    return null;
+  }
 }
 
 class TicketActivity {
@@ -228,26 +257,32 @@ class TicketActivity {
   });
 
   factory TicketActivity.fromJson(Map<String, dynamic> json) => TicketActivity(
-        id: json["id"],
-        ticketId: json["ticketId"],
-        activity: json["activity"],
-        comment: json["comment"],
-        ticketAction: json["ticketAction"],
-        commentDate: DateTime.parse(json["commentDate"]),
-        replyBy: json["replyBy"],
-        replyOn: DateTime.parse(json["replyOn"]),
-        userType: json["userType"],
-        applicationUserId: json["applicationUserId"],
-        isActive: json["isActive"],
+        id: json["id"] ?? 0,
+        ticketId: json["ticketId"] ?? 0,
+        activity: json["activity"] ?? "",
+        comment: json["comment"], // Already dynamic/nullable
+        ticketAction: json["ticketAction"] ?? "",
+        commentDate: json["commentDate"] != null
+            ? DateTime.parse(json["commentDate"])
+            : DateTime.now(),
+        replyBy: json["replyBy"] ?? "",
+        replyOn: json["replyOn"] != null
+            ? DateTime.parse(json["replyOn"])
+            : DateTime.now(),
+        userType: json["userType"] ?? "",
+        applicationUserId: json["applicationUserId"] ?? "",
+        isActive: json["isActive"] ?? false,
         attachmentFiles: json["attachmentFiles"],
-        attachedDocuments:
-            List<dynamic>.from(json["attachedDocuments"].map((x) => x)),
-        insertUser: json["insertUser"],
-        insertTime: DateTime.parse(json["insertTime"]),
+        attachedDocuments: json["attachedDocuments"] != null
+            ? List<dynamic>.from(json["attachedDocuments"].map((x) => x))
+            : <dynamic>[],
+        insertUser: json["insertUser"] ?? "",
+        insertTime: json["insertTime"] != null
+            ? DateTime.parse(json["insertTime"])
+            : DateTime.now(),
         updateUser: json["updateUser"],
         updateTime: json["updateTime"],
       );
-
   Map<String, dynamic> toJson() => {
         "id": id,
         "ticketId": ticketId,

@@ -19,381 +19,383 @@ class WorkflowView extends StatefulWidget {
 class _WorkflowViewState extends State<WorkflowView> {
   int _selectedIndex = 0;
   bool _isInitialized = false;
-  String? _selectedStatus;
+  bool _isLoading = false;
+  String? _selectedStatus = "Open";
   String? _selectedServity;
   String? _selectedPriority;
-  String? _selectedWorkflowType;
+  String? _selectedWorkflowType = "Oldest";
+
   final TextEditingController _primarystartcontroller = TextEditingController();
   final TextEditingController _primaryenddatecontroller =
       TextEditingController();
+
   DateTime? _startDate;
   DateTime? _endDate;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _initializeData();
-    });
+    final DateTime now = DateTime.now();
+    final DateTime twoMonthsAgo = DateTime(now.year, now.month - 2, now.day);
+    _startDate = twoMonthsAgo;
+    _endDate = now;
+    _primarystartcontroller.text =
+        DateFormat('yyyy-MM-dd').format(twoMonthsAgo);
+    _primaryenddatecontroller.text = DateFormat('yyyy-MM-dd').format(now);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _initializeData());
+  }
+
+  @override
+  void dispose() {
+    _primarystartcontroller.dispose();
+    _primaryenddatecontroller.dispose();
+    super.dispose();
   }
 
   Future<void> _initializeData() async {
-    final DateTime now = DateTime.now();
-    final DateTime fourMonthsAgo = DateTime(
-      now.month > 4 ? now.year : now.year - 1,
-      now.month > 4 ? now.month - 4 : now.month + 8,
-      now.day,
-    );
-
-    final String fromdate =
-        "${fourMonthsAgo.year}-${fourMonthsAgo.month.toString().padLeft(2, '0')}-${fourMonthsAgo.day.toString().padLeft(2, '0')}";
-    final String todate =
-        "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
-
+    setState(() => _isLoading = true);
     final requestTicket = MyticketPost(
       CategoryId: 0,
-      status: "",
-      priority: "",
-      severity: "",
+      status: _selectedStatus ?? "",
+      priority: _selectedPriority ?? "",
+      severity: _selectedServity ?? "",
       assignTo: "",
-      fromdate: fromdate,
-      todate: todate,
-      orderby: 'Oldest',
+      fromdate: _primarystartcontroller.text,
+      todate: _primaryenddatecontroller.text,
+      orderby: _selectedWorkflowType ?? "",
     );
-    final provider =
-        Provider.of<TicketWorkFlowProvider>(context, listen: false);
-    await provider.fetchTickets(requestTicket);
-    await provider.fetchAssigntoMeTickets(requestTicket);
-
-    if (mounted) {
-      setState(() {
-        _isInitialized = true;
-      });
+    try {
+      if (_selectedIndex == 0) {
+        await Provider.of<TicketWorkFlowProvider>(context, listen: false)
+            .fetchTickets(requestTicket);
+      } else {
+        await Provider.of<TicketWorkFlowProvider>(context, listen: false)
+            .fetchAssigntoMeTickets(requestTicket);
+      }
+    } catch (_) {
+      // Handle error if needed
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _isInitialized = true;
+        });
+      }
     }
+  }
+
+  void _applyFilters() {
+    setState(() => _isInitialized = false);
+    _initializeData();
+  }
+
+  void _clearFilters() {
+    final now = DateTime.now();
+    final twoMonthsAgo = DateTime(now.year, now.month - 2, now.day);
+    setState(() {
+      _selectedStatus = "Open";
+      _selectedServity = null;
+      _selectedPriority = null;
+      _selectedWorkflowType = "Oldest";
+      _startDate = twoMonthsAgo;
+      _endDate = now;
+      _primarystartcontroller.text =
+          DateFormat('yyyy-MM-dd').format(twoMonthsAgo);
+      _primaryenddatecontroller.text = DateFormat('yyyy-MM-dd').format(now);
+    });
+    _applyFilters();
   }
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<TicketWorkFlowProvider>(context, listen: true);
+    final provider = Provider.of<TicketWorkFlowProvider>(context);
 
     return Scaffold(
       backgroundColor: cardBackgroundColor,
       appBar: CustomAppBarProfile(title: "All WorkFlows"),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  // First Dropdown (Status)
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          ' Status',
-                          style: TextStyle(
-                              color: primarySwatch,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        CustomDropdown(
-                          value: _selectedStatus,
-                          items: provider.status,
-                          hintText: "",
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedStatus = value;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  SizedBox(width: 10), // Spacing between dropdowns
-
-                  // Second Dropdown (Severity)
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Servity',
-                          style: TextStyle(
-                              color: primarySwatch,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        CustomDropdown(
-                          value: _selectedServity,
-                          items: provider.servity,
-                          hintText: "",
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedServity = value;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Priority',
-                          style: TextStyle(
-                              color: primarySwatch,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        CustomDropdown(
-                          value: _selectedPriority,
-                          items: provider.priority,
-                          hintText: "",
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedPriority = value;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Type',
-                          style: TextStyle(
-                              color: primarySwatch,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        CustomDropdown(
-                          value: _selectedWorkflowType,
-                          items: provider.workflowType,
-                          hintText: "",
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedWorkflowType = value;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Start Date",
-                            style: TextStyle(
-                                fontSize: 16,
-                                color: primarySwatch,
-                                fontWeight: FontWeight.bold)),
-                        SizedBox(height: 5),
-                        CustomTextFormField(
-                          controller: _primarystartcontroller,
-                          hintText: "Start date",
-                          readOnly: true,
-                          validator: (value) => _startDate == null
-                              ? 'Start date is required'
-                              : null,
-                          onTap: () async {
-                            DateTime? pickedDate = await showDatePicker(
-                              context: context,
-                              initialDate:
-                                  DateTime.now().add(Duration(days: 1)),
-                              firstDate: DateTime.now(),
-                              lastDate: DateTime(2100),
-                            );
-                            if (pickedDate != null) {
-                              setState(() {
-                                _startDate = pickedDate;
-                                _primarystartcontroller.text =
-                                    DateFormat('yyyy-MM-dd').format(pickedDate);
-                                // Clear end date if new start date is after current end date
-                                if (_endDate != null &&
-                                    _endDate!.isBefore(pickedDate)) {
-                                  _endDate = null;
-                                  _primaryenddatecontroller.clear();
-                                }
-                              });
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: 15),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("End Date",
-                            style: TextStyle(
-                                fontSize: 16,
-                                color: primarySwatch,
-                                fontWeight: FontWeight.bold)),
-                        SizedBox(height: 5),
-                        CustomTextFormField(
-                          controller: _primaryenddatecontroller,
-                          hintText: "End date",
-                          readOnly: true,
-                          validator: (value) => _endDate == null
-                              ? 'End date is required'
-                              : (_startDate != null &&
-                                      _endDate!.isBefore(_startDate!))
-                                  ? 'End date must be after start date'
-                                  : null,
-                          onTap: () async {
-                            //   _formKey.currentState?.validate();
-                            if (_startDate == null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    "Please select start date first",
-                                    style: TextStyle(color: accentColor),
-                                  ),
-                                  backgroundColor: cardBackgroundColor,
+      body: !_isInitialized
+          ? Center(child: CircularProgressIndicator())
+          : SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      /// Filter Form
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                _buildDropdown(
+                                    "Status",
+                                    _selectedStatus,
+                                    provider.status,
+                                    (value) => setState(
+                                        () => _selectedStatus = value)),
+                                SizedBox(width: 10),
+                                _buildDropdown(
+                                    "Servity",
+                                    _selectedServity,
+                                    provider.servity,
+                                    (value) => setState(
+                                        () => _selectedServity = value)),
+                              ],
+                            ),
+                            SizedBox(height: 10),
+                            Row(
+                              children: [
+                                _buildDropdown(
+                                    "Priority",
+                                    _selectedPriority,
+                                    provider.priority,
+                                    (value) => setState(
+                                        () => _selectedPriority = value)),
+                                SizedBox(width: 10),
+                                _buildDropdown(
+                                    "Type",
+                                    _selectedWorkflowType,
+                                    provider.workflowType,
+                                    (value) => setState(
+                                        () => _selectedWorkflowType = value)),
+                              ],
+                            ),
+                            SizedBox(height: 10),
+                            Row(
+                              children: [
+                                _buildDateField(
+                                    "Start Date",
+                                    _primarystartcontroller,
+                                    _startDate, (picked) {
+                                  setState(() {
+                                    _startDate = picked;
+                                    _primarystartcontroller.text =
+                                        DateFormat('yyyy-MM-dd').format(picked);
+                                    if (_endDate != null &&
+                                        _endDate!.isBefore(picked)) {
+                                      _endDate = null;
+                                      _primaryenddatecontroller.clear();
+                                    }
+                                  });
+                                }),
+                                SizedBox(width: 10),
+                                _buildDateField(
+                                    "End Date",
+                                    _primaryenddatecontroller,
+                                    _endDate, (picked) {
+                                  setState(() {
+                                    _endDate = picked;
+                                    _primaryenddatecontroller.text =
+                                        DateFormat('yyyy-MM-dd').format(picked);
+                                  });
+                                }, startDate: _startDate),
+                              ],
+                            ),
+                            SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                TextButton.icon(
+                                  onPressed: _clearFilters,
+                                  icon:
+                                      Icon(Icons.refresh, color: primarySwatch),
+                                  label: Text('Clear Filters',
+                                      style: TextStyle(color: primarySwatch)),
                                 ),
-                              );
-                              return;
-                            }
-                            DateTime? pickedDate = await showDatePicker(
-                              context: context,
-                              initialDate: _startDate!.add(Duration(days: 1)),
-                              firstDate: _startDate!,
-                              lastDate: DateTime(2100),
-                            );
-                            if (pickedDate != null) {
-                              setState(() {
-                                _endDate = pickedDate;
-                                _primaryenddatecontroller.text =
-                                    DateFormat('yyyy-MM-dd').format(pickedDate);
-                              });
-                            }
-                          },
+                                ElevatedButton.icon(
+                                  onPressed: _applyFilters,
+                                  icon: Icon(Icons.filter_alt),
+                                  label: Text("Apply"),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: cardBackgroundColor,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      side: BorderSide(color: primarySwatch),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                      ),
 
-              SizedBox(height: 10),
-              Divider(color: primarySwatch),
-              SizedBox(height: 15),
-              Container(
-                height: 60,
-                decoration: BoxDecoration(
-                  color: backgroundColor,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: lightColor),
-                ),
-                child: ToggleButtons(
-                  isSelected: [_selectedIndex == 0, _selectedIndex == 1],
-                  onPressed: (index) {
-                    setState(() {
-                      _selectedIndex = index;
-                    });
-                  },
-                  color: primaryTextColor,
-                  selectedColor: backgroundColor,
-                  fillColor: primarySwatch[900],
-                  borderRadius: BorderRadius.circular(10),
-                  borderColor: lightColor,
-                  selectedBorderColor: primarySwatch[900],
-                  textStyle: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
-                  children: const [
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 50),
-                      child: Text('My Ticket', style: TextStyle(fontSize: 18)),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 30),
-                      child: Text('Assigned By Me',
-                          style: TextStyle(fontSize: 18)),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
+                      SizedBox(height: 16),
 
-              // Show loading/error/content based on state
-              if (!_isInitialized || provider.isLoading)
-                Expanded(
-                  child: Center(child: CircularProgressIndicator()),
-                )
-              else if (provider.errormessage != null)
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      provider.errormessage!,
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ),
-                )
-              else
-                Expanded(
-                  child: _selectedIndex == 0
-                      ? WorkFlowViewMyTicket(
-                          onDetailsViewed: (ticketID) async {
-                            await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    TicketDetailScreen(ticketId: ticketID),
-                              ),
-                            );
-                            await _initializeData();
+                      /// Toggle My Ticket / Assigned By Me
+                      Container(
+                        height: 55,
+                        decoration: BoxDecoration(
+                          color: backgroundColor,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: lightColor),
+                        ),
+                        child: ToggleButtons(
+                          isSelected: [
+                            _selectedIndex == 0,
+                            _selectedIndex == 1
+                          ],
+                          onPressed: (index) {
+                            setState(() => _selectedIndex = index);
+                            _applyFilters();
                           },
-                        )
-                      : WorkFlowViewAssigned(
-                          // onDetailsAssignedViewed: (ticketID) async {
-                          //   await Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //       builder: (context) =>
-                          //           TicketDetailScreen(ticketId: ticketID),
-                          //     ),
-                          //   );
-                          //   await _initializeData();
-                          // },
+                          color: primaryTextColor,
+                          selectedColor: Colors.white,
+                          fillColor: primarySwatch[700],
+                          borderRadius: BorderRadius.circular(10),
+                          borderColor: lightColor,
+                          selectedBorderColor: primarySwatch[900],
+                          textStyle: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                          children: const [
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 30),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.assignment_ind),
+                                  SizedBox(width: 6),
+                                  Text('My Ticket'),
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 20),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.assignment_turned_in),
+                                  SizedBox(width: 6),
+                                  Text('Assigned By Me'),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      SizedBox(height: 16),
+
+                      /// Data Section
+                      if (_isLoading)
+                        SizedBox(
+                            height: 300,
+                            child: Center(child: CircularProgressIndicator()))
+                      else if (provider.errormessage != null)
+                        SizedBox(
+                          height: 300,
+                          child: Center(
+                            child: Text(provider.errormessage!,
+                                style: TextStyle(color: Colors.red)),
                           ),
+                        )
+                      else
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.6,
+                          child: _selectedIndex == 0
+                              ? WorkFlowViewMyTicket(
+                                  onDetailsViewed: (ticketID) async {
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            TicketDetailScreen(
+                                                ticketId: ticketID),
+                                      ),
+                                    );
+                                    await _initializeData();
+                                  },
+                                )
+                              : WorkFlowViewAssigned(
+                                  onDetailsAssignedViewed: (ticketID) async {
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            TicketDetailScreen(
+                                                ticketId: ticketID),
+                                      ),
+                                    );
+                                    await _initializeData();
+                                  },
+                                ),
+                        ),
+                    ],
+                  ),
                 ),
-            ],
+              ),
+            ),
+    );
+  }
+
+  Expanded _buildDropdown(String title, String? value, List<String> items,
+      ValueChanged<String?> onChanged) {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title,
+              style: TextStyle(
+                  color: primarySwatch,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600)),
+          SizedBox(height: 5),
+          CustomDropdown(
+            value: value,
+            items: items,
+            hintText: "",
+            onChanged: (val) {
+              onChanged(val);
+              _applyFilters();
+            },
           ),
-        ),
+        ],
+      ),
+    );
+  }
+
+  Expanded _buildDateField(String label, TextEditingController controller,
+      DateTime? selectedDate, ValueChanged<DateTime> onPicked,
+      {DateTime? startDate}) {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label,
+              style: TextStyle(
+                  color: primarySwatch,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600)),
+          SizedBox(height: 5),
+          CustomTextFormField(
+            controller: controller,
+            readOnly: true,
+            hintText: label,
+            suffixIcon:
+                Icon(Icons.calendar_today, size: 12, color: primarySwatch),
+            validator: (value) {
+              if (selectedDate == null) return '$label is required';
+              if (label == "End Date" &&
+                  startDate != null &&
+                  selectedDate.isBefore(startDate)) {
+                return 'End date must be after start date';
+              }
+              return null;
+            },
+            onTap: () async {
+              DateTime? picked = await showDatePicker(
+                context: context,
+                initialDate: selectedDate ?? DateTime.now(),
+                firstDate:
+                    startDate ?? DateTime.now().subtract(Duration(days: 365)),
+                lastDate: DateTime.now(),
+              );
+              if (picked != null) {
+                onPicked(picked);
+                _applyFilters();
+              }
+            },
+          ),
+        ],
       ),
     );
   }

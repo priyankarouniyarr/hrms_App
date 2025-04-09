@@ -41,16 +41,6 @@ class HolidayProvider with ChangeNotifier {
         });
       }
     }
-    // for (var holiday in _allHolidays) {
-    //   for (var holidayDate in holiday.holidayDates) {
-    //     dates.add({
-    //       'npDate': holiday.fromDateNp,
-    //       'enDate': holidayDate.holidayDate,
-    //       'description': holidayDate.description,
-    //       'color': holiday.color,
-    //     });
-    //   }
-    // }
 
     return dates;
   }

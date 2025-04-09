@@ -1,10 +1,8 @@
-import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/providers/works_Summary_provider/ticket_workflow.dart';
-import 'package:hrms_app/screen/homescreen/cardscreen/works/details.screen.dart';
 
 class WorkFlowViewMyTicket extends StatefulWidget {
   final Function(int) onDetailsViewed;
@@ -23,10 +21,7 @@ class _WorkFlowViewMyTicketState extends State<WorkFlowViewMyTicket> {
       padding: EdgeInsets.symmetric(horizontal: 16.0),
       child: provider.myTicket.isEmpty
           ? Center(
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Text('No tickets found.'),
-              ),
+              child: Text('No tickets found.'),
             )
           : ListView.builder(
               itemCount: provider.myTicket.length,
@@ -92,6 +87,20 @@ class _WorkFlowViewMyTicketState extends State<WorkFlowViewMyTicket> {
                         SizedBox(
                           height: 8.0,
                         ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "id",
+                              style: TextStyle(fontSize: 14.0),
+                            ),
+                            Text(
+                              ticket.id.toString(),
+                              style: TextStyle(fontSize: 14.0),
+                            )
+                          ],
+                        ),
+                        SizedBox(height: 8.0),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -174,12 +183,7 @@ class _WorkFlowViewMyTicketState extends State<WorkFlowViewMyTicket> {
                           children: [
                             GestureDetector(
                               onTap: () {
-                                // provider
-                                //     .fetchMyTicketDetaisById(
-                                //         ticketId: ticket.id)
-                                //     .then((_) {
                                 widget.onDetailsViewed(ticket.id);
-                                print(ticket.id);
                               },
                               child: Container(
                                 padding: EdgeInsets.symmetric(
@@ -209,17 +213,21 @@ class _WorkFlowViewMyTicketState extends State<WorkFlowViewMyTicket> {
                             // Close Button with icon
                             GestureDetector(
                               onTap: () {
-                                // Handle close/reopen logic here
+                                if (ticket.status == "Open") {
+                                  provider.closedTicketById(
+                                      ticketId: ticket.id);
+                                  print(ticket.id);
+                                } else
+                                  provider.reopenTicketById(
+                                      ticketId: ticket.id);
                               },
                               child: Container(
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 12, vertical: 6),
                                 decoration: BoxDecoration(
                                   color: ticket.status == "Open"
-                                      ? Colors
-                                          .red // Red for "Close" button when ticket is open
-                                      : const Color.fromARGB(255, 222, 85,
-                                          0), // Amber/Yellow for "Reopen" button when ticket is closed
+                                      ? Colors.red
+                                      : const Color.fromARGB(255, 222, 85, 0),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Row(

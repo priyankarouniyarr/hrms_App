@@ -16,6 +16,7 @@ class HolidayScreen extends StatefulWidget {
 class _HolidayScreenState extends State<HolidayScreen> {
   DateTime? selectedDate;
   List<Map<String, dynamic>> selectedDateHolidays = [];
+  List<Map<String, dynamic>> holidays = [];
   List<Map<String, dynamic>> selectedMonthHolidays = [];
 
   DateTime? currentDisplayedMonth;

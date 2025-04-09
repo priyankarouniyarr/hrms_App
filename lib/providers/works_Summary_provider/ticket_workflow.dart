@@ -21,8 +21,9 @@ class TicketWorkFlowProvider with ChangeNotifier {
   String? get errormessage => _errormessage;
   List<TicketDetailsWithId> _myticketdetailsbyId = [];
   List<TicketDetailsWithId> get myticketdetails => _myticketdetailsbyId;
-  // Add this variable to store the ticket ID from POST response
-
+  List<TicketDetailsWithId> _myticketdetailsActivity = [];
+  List<TicketDetailsWithId> get myticketdetailsActivity =>
+      _myticketdetailsActivity;
   List<String> _status = ["Open", "Closed"];
   List<String> get status => _status;
   List<String> _servity = ["Low", "Medium", "High"];
@@ -31,6 +32,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
   List<String> get priority => _priority;
   List<String> _workflowType = ["Oldest", "Newest"];
   List<String> get workflowType => _workflowType;
+
   Future<void> fetchTickets(MyticketPost requestticket) async {
     _isLoading = true;
     notifyListeners();
@@ -40,7 +42,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
       _token = await _secureStorageService.readData('auth_token');
       _fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
-      // print(_branchId);
+
       if (_token == null || _branchId == null || _fiscalYear == null) {
         _errormessage = 'Missing required credentials';
         _isLoading = false;
@@ -49,8 +51,6 @@ class TicketWorkFlowProvider with ChangeNotifier {
       }
 
       const String url = 'http://45.117.153.90:5004/api/Ticket/MyTickets';
-      final requestBody = jsonEncode(requestticket.toJson());
-      //  print('Sending request with body: $requestBody');
 
       final response = await http.post(Uri.parse(url),
           headers: {
@@ -60,11 +60,10 @@ class TicketWorkFlowProvider with ChangeNotifier {
             'workingFinancialId': _fiscalYear!,
           },
           body: jsonEncode(requestticket.toJson()));
-      // print('Status Code: ${response.statusCode}');
-      // print('Response Body: ${response.body}');
+
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
-        // print("sucessfully");
+        ;
         _myTicket =
             responseData.map((e) => TicketMeAndAssignToMe.fromJson(e)).toList();
 
@@ -75,7 +74,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
         _errormessage = 'Failed to load tickets: ${response.statusCode}';
       }
     } catch (e) {
-      _errormessage = 'Error fetching tickets: $e';
+      _errormessage = 'Error fetching tickets : $e';
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -111,8 +110,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
             'workingFinancialId': _fiscalYear!,
           },
           body: jsonEncode(requestticket.toJson()));
-      // print('Status Code: ${response.statusCode}');
-      // print('Response Body: ${response.body}');
+
       if (response.statusCode == 200) {
         final List<dynamic> responseAssignToMe = json.decode(response.body);
 
@@ -127,7 +125,8 @@ class TicketWorkFlowProvider with ChangeNotifier {
         _errormessage = 'Failed to load tickets: ${response.statusCode}';
       }
     } catch (e) {
-      _errormessage = 'Error fetching tickets: $e';
+      _errormessage = 'Error fetching tickets : $e';
+      print(_errormessage);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -146,11 +145,11 @@ class TicketWorkFlowProvider with ChangeNotifier {
           await _secureStorageService.readData('workingBranchId');
       String? fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
-      print(branchId);
+      //  print(branchId);
       if (token == null || branchId == null || fiscalYear == null) {
         throw Exception("Missing authentication data.");
       }
-      print("hello");
+      //print("hello");
 
       final url = Uri.parse(
           'http://45.117.153.90:5004/api/Ticket/GetTicketDetailById/$ticket');
@@ -163,19 +162,14 @@ class TicketWorkFlowProvider with ChangeNotifier {
           'workingFinancialId': fiscalYear,
         },
       );
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
-      print("hello");
+
       if (response.statusCode == 200) {
         Map<String, dynamic> responseDetails = json.decode(response.body);
 
         _myticketdetailsbyId = [
           TicketDetailsWithId.fromJson(responseDetails),
         ];
-        print(_myticketdetailsbyId);
-        notifyListeners();
 
-        _errormessage = '';
         notifyListeners();
       } else {
         _errormessage = 'Failed to load ticket summary';
@@ -183,6 +177,115 @@ class TicketWorkFlowProvider with ChangeNotifier {
     } catch (e) {
       _errormessage = 'An error occurred: ${e.toString()}';
       print(_errormessage);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+//closed the ticket
+  Future<bool> closedTicketById({required int ticketId}) async {
+    _isLoading = true;
+    _errormessage = '';
+    notifyListeners();
+
+    try {
+      String? token = await _secureStorageService.readData('auth_token');
+      String? branchId =
+          await _secureStorageService.readData('workingBranchId');
+      String? fiscalYear =
+          await _secureStorageService.readData('selected_fiscal_year');
+
+      if (token == null || branchId == null || fiscalYear == null) {
+        throw Exception("Missing authentication data.");
+      }
+      print(branchId);
+      final url = Uri.parse(
+          'http://45.117.153.90:5004/api/Ticket/CloseTicket/$ticketId');
+      print(ticketId);
+      final response = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'workingBranchId': branchId,
+          'workingFinancialId': fiscalYear,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // Parse the response body as a boolean
+        final responseBody = json.decode(response.body);
+        if (responseBody is bool) {
+          print(responseBody);
+          print("sucess");
+          return responseBody; // Return the boolean value directly
+        } else {
+          throw Exception("Unexpected response format");
+        }
+      } else {
+        _errormessage =
+            'Failed to reopen ticket. Status code: ${response.statusCode}';
+        print(_errormessage);
+        return false;
+      }
+    } catch (e) {
+      _errormessage = 'An error occurred: ${e.toString()}';
+      print(_errormessage);
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+//reopen the ticket
+  Future<bool> reopenTicketById({required int ticketId}) async {
+    _isLoading = true;
+    _errormessage = '';
+    notifyListeners();
+
+    try {
+      String? token = await _secureStorageService.readData('auth_token');
+      String? branchId =
+          await _secureStorageService.readData('workingBranchId');
+      String? fiscalYear =
+          await _secureStorageService.readData('selected_fiscal_year');
+
+      if (token == null || branchId == null || fiscalYear == null) {
+        throw Exception("Missing authentication data.");
+      }
+
+      final url = Uri.parse(
+          'http://45.117.153.90:5004/api/Ticket/ReopenTicket/$ticketId');
+      final response = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'workingBranchId': branchId,
+          'workingFinancialId': fiscalYear,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // Parse the response body as a boolean
+        final responseBody = json.decode(response.body);
+        if (responseBody is bool) {
+          print(responseBody);
+          print("sucess");
+          return responseBody; // Return the boolean value directly
+        } else {
+          throw Exception("Unexpected response format");
+        }
+      } else {
+        _errormessage =
+            'Failed to reopen ticket. Status code: ${response.statusCode}';
+        print(_errormessage);
+        return false;
+      }
+    } catch (e) {
+      _errormessage = 'An error occurred: ${e.toString()}';
+      print(_errormessage);
+      return false;
     } finally {
       _isLoading = false;
       notifyListeners();

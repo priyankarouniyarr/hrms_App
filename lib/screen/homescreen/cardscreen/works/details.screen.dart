@@ -18,7 +18,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
   @override
   void initState() {
     super.initState();
-    print(widget.ticketId);
+
     Future.microtask(() {
       Provider.of<TicketWorkFlowProvider>(context, listen: false)
           .fetchMyTicketDetaisById(ticket: widget.ticketId);
@@ -46,6 +46,11 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                     itemCount: provider.myticketdetails.length,
                     itemBuilder: (context, index) {
                       final ticket = provider.myticketdetails[index];
+                      final formattedTime = ticket.ticket.updateTime != null
+                          ? DateFormat('dd MMM yyyy ,HH:mm')
+                              .format(ticket.ticket.updateTime!)
+                          : 'null';
+
                       return Card(
                           color: Colors.white,
                           elevation: 4.0,
@@ -170,14 +175,13 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
+                                      const Text("Created On",
+                                          style: TextStyle(fontSize: 14.0)),
                                       Text(
-                                        "Created On",
-                                        style: TextStyle(fontSize: 14.0),
+                                        DateFormat('dd MMM, yyyy').format(
+                                            ticket.ticket.ticketDate.toLocal()),
+                                        style: const TextStyle(fontSize: 14.0),
                                       ),
-                                      Text(
-                                        ticket.ticket.ticketDate.toString(),
-                                        style: TextStyle(fontSize: 14.0),
-                                      )
                                     ],
                                   ),
                                   SizedBox(height: 8.0),
@@ -255,13 +259,14 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                                         style: TextStyle(fontSize: 14.0),
                                       ),
                                       Text(
-                                        ticket.ticket.assignedOn.toString(),
+                                        DateFormat('dd MMM, yyyy').format(
+                                            ticket.ticket.assignedOn.toLocal()),
                                         style: TextStyle(fontSize: 14.0),
                                       ),
                                     ],
                                   ),
                                   SizedBox(height: 8.0),
-                                  SizedBox(height: 8.0),
+
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
@@ -271,28 +276,37 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                                         style: TextStyle(fontSize: 14.0),
                                       ),
                                       Text(
-                                        ticket.ticket.updateTime.toString(),
+                                        formattedTime,
                                         style: TextStyle(fontSize: 14.0),
                                       ),
                                     ],
                                   ),
                                   SizedBox(height: 8.0),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        //image portion
+                                  ticket.ticket.attachedDocuments.isEmpty
+                                      ? SizedBox.shrink()
+                                      : Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              " Attachment Document ",
+                                              style: TextStyle(fontSize: 14.0),
+                                            ),
+                                            InkWell(
+                                              onTap: () {
+                                                _showImageDialog(
+                                                    context,
+                                                    ticket.ticket
+                                                        .attachedDocuments);
+                                              },
+                                              child: Icon(
+                                                Icons.attach_file_rounded,
+                                                color: primarySwatch,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
 
-                                        " Attachment Document ",
-                                        style: TextStyle(fontSize: 14.0),
-                                      ),
-                                      Text(
-                                        ticket.ticket.assignedOn.toString(),
-                                        style: TextStyle(fontSize: 14.0),
-                                      ),
-                                    ],
-                                  ),
                                   SizedBox(height: 15.0),
                                   DottedLine(
                                     dashLength: 2,
@@ -306,17 +320,285 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                                         fontWeight: FontWeight.w600),
                                   ),
                                   SizedBox(height: 8.0),
-                                  // ListView(
-                                  //   padding: const EdgeInsets.all(16.0),
-                                  //   children: const [
-                                  //     TimelineItem(
-                                  //       date: '21st Feb, 2025 10:35',
-                                  //       action: 'closed the ticket',
-                                  //       user: 'priyanka',
-                                  //       isFirst: true,
-                                  //     ),
-                                  //   ],
-                                  // ),
+
+                                  ticket.ticketActivity.isEmpty
+                                      ? Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 8.0),
+                                          child: Text(
+                                            'No activities yet',
+                                            style:
+                                                TextStyle(color: Colors.grey),
+                                          ),
+                                        )
+                                      : Column(
+                                          children: ticket.ticketActivity
+                                              .map((activity) {
+                                            return Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 0.0),
+                                              child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        CircleAvatar(
+                                                          radius: 15,
+                                                          backgroundColor:
+                                                              activity.comment !=
+                                                                      null
+                                                                  ? primarySwatch
+                                                                  : Colors
+                                                                      .amber,
+                                                          child: activity
+                                                                      .comment !=
+                                                                  null
+                                                              ? Icon(
+                                                                  Icons.email,
+                                                                  size: 18,
+                                                                  color: Colors
+                                                                      .white,
+                                                                )
+                                                              : Icon(
+                                                                  Icons.person,
+                                                                  size: 18,
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                        ),
+                                                        SizedBox(width: 10),
+                                                        Expanded(
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              Text(
+                                                                activity.comment !=
+                                                                        null
+                                                                    ? '${DateFormat('dd MMM, yyyy HH:mm').format(activity.commentDate)}'
+                                                                    : '${DateFormat('dd MMM, yyyy HH:mm').format(activity.replyOn)}',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize: 14,
+                                                                  color: Colors
+                                                                      .black54,
+                                                                ),
+                                                              ),
+                                                              activity.comment !=
+                                                                      null
+                                                                  ? Row(
+                                                                      children: [
+                                                                        Text.rich(
+                                                                          TextSpan(
+                                                                            children: [
+                                                                              TextSpan(
+                                                                                text: '${activity.replyBy} ',
+                                                                                style: TextStyle(
+                                                                                  fontSize: 14,
+                                                                                  color: primarySwatch,
+                                                                                  fontWeight: FontWeight.bold,
+                                                                                ),
+                                                                              ),
+                                                                              TextSpan(
+                                                                                text: '${activity.comment}',
+                                                                                style: TextStyle(
+                                                                                  fontSize: 14,
+                                                                                  color: Colors.black87,
+                                                                                  fontWeight: FontWeight.w500,
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                        SizedBox(
+                                                                            width:
+                                                                                15),
+                                                                        activity.attachedDocuments.isEmpty
+                                                                            ? SizedBox.shrink()
+                                                                            : InkWell(
+                                                                                onTap: () {
+                                                                                  _showImageDialog(context, activity.attachedDocuments);
+                                                                                },
+                                                                                child: Icon(
+                                                                                  Icons.attach_file_rounded,
+                                                                                  size: 18,
+                                                                                  color: primarySwatch,
+                                                                                ),
+                                                                              ),
+                                                                      ],
+                                                                    )
+                                                                  : Row(
+                                                                      children: [
+                                                                        Text.rich(
+                                                                          TextSpan(
+                                                                            children: [
+                                                                              TextSpan(
+                                                                                text: '${activity.replyBy} ',
+                                                                                style: TextStyle(
+                                                                                  fontSize: 14,
+                                                                                  color: primarySwatch,
+                                                                                  fontWeight: FontWeight.bold,
+                                                                                ),
+                                                                              ),
+                                                                              TextSpan(
+                                                                                text: '${activity.ticketAction}',
+                                                                                style: TextStyle(
+                                                                                  fontSize: 14,
+                                                                                  color: Colors.black87,
+                                                                                  fontWeight: FontWeight.w500,
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                        SizedBox(
+                                                                            width:
+                                                                                5),
+                                                                        activity.attachedDocuments.isEmpty
+                                                                            ? SizedBox.shrink()
+                                                                            : InkWell(
+                                                                                onTap: () {
+                                                                                  _showImageDialog(context, activity.attachedDocuments);
+                                                                                },
+                                                                                child: Icon(
+                                                                                  Icons.attach_file_rounded,
+                                                                                  size: 18,
+                                                                                  color: primarySwatch,
+                                                                                ),
+                                                                              ),
+                                                                      ],
+                                                                    ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    if (activity !=
+                                                        ticket.ticketActivity
+                                                            .last)
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(
+                                                                left: 15.0,
+                                                                top: 2.0,
+                                                                bottom: 2.0),
+                                                        child: Container(
+                                                          width: 2,
+                                                          height: 30,
+                                                          color: primarySwatch,
+                                                        ),
+                                                      ),
+                                                  ]),
+                                            );
+                                          }).toList(),
+                                        ),
+
+                                  SizedBox(height: 15.0),
+                                  DottedLine(
+                                    dashLength: 2,
+                                    dashColor: primarySwatch,
+                                  ),
+                                  SizedBox(height: 15.0),
+
+                                  ticket.ticket.status == 'Open'
+                                      ? Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            GestureDetector(
+                                              onTap: () {
+                                                print("Comment tapped");
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: 12,
+                                                    horizontal: 20),
+                                                decoration: BoxDecoration(
+                                                  color: primarySwatch,
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    Icon(Icons.comment,
+                                                        color: Colors.white),
+                                                    SizedBox(width: 8),
+                                                    Text('Comment',
+                                                        style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold)),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            GestureDetector(
+                                              onTap: () {
+                                                print("Close Ticket tapped");
+                                              },
+                                              child: Container(
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: 12,
+                                                    horizontal: 20),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.red,
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    Icon(Icons.close,
+                                                        color: Colors.white),
+                                                    SizedBox(width: 8),
+                                                    Text('Close Ticket',
+                                                        style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold)),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      : Center(
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              // Handle reopen ticket logic here
+                                              print("Reopen tapped");
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 12, horizontal: 20),
+                                              decoration: BoxDecoration(
+                                                color: primarySwatch,
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Icon(Icons.refresh,
+                                                      color: Colors.white),
+                                                  SizedBox(width: 8),
+                                                  Text('Reopen Ticket',
+                                                      style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        )
                                 ]),
                           ));
                     },
@@ -326,104 +608,69 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
   }
 }
 
-class TimelineItem extends StatelessWidget {
-  final String date;
-  final String action;
-  final String user;
-  final bool isFirst;
-  final bool isLast;
-
-  const TimelineItem({
-    super.key,
-    required this.date,
-    required this.action,
-    required this.user,
-    this.isFirst = false,
-    this.isLast = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Timeline line and dot
-          Column(
-            children: [
-              // Top line (only if not first item)
-              if (!isFirst)
-                Container(
-                  width: 2,
-                  height: 20,
-                  color: Colors.grey[400],
-                ),
-              // Dot
-              Container(
-                width: 12,
-                height: 12,
-                decoration: BoxDecoration(
-                  color: _getActionColor(action),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.grey[400]!,
-                    width: 2,
-                  ),
-                ),
-              ),
-              // Bottom line (only if not last item)
-              if (!isLast)
-                Expanded(
-                  child: Container(
-                    width: 2,
-                    color: Colors.grey[400],
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(width: 16),
-          // Content
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    date,
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  RichText(
-                    text: TextSpan(
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.black,
-                      ),
-                      children: [
-                        TextSpan(
-                          text: user,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
+// Method to show the image dialog
+void _showImageDialog(BuildContext context, List<dynamic> attachedDocuments) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Attachment Documents'),
+        content: SizedBox(
+          height: 300,
+          width: 300,
+          child: PageView.builder(
+            itemCount: attachedDocuments.length,
+            itemBuilder: (context, index) {
+              String imageUrl =
+                  'http://45.117.153.90:5001/uploads/tickets/${attachedDocuments[index]}';
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.contain,
+                  loadingBuilder: (BuildContext context, Widget child,
+                      ImageChunkEvent? loadingProgress) {
+                    if (loadingProgress == null) {
+                      return child;
+                    } else {
+                      return Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                  (loadingProgress.expectedTotalBytes ?? 1)
+                              : null,
                         ),
-                        TextSpan(text: ' $action'),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                      );
+                    }
+                  },
+                  errorBuilder: (BuildContext context, Object error,
+                      StackTrace? stackTrace) {
+                    return Center(child: Icon(Icons.error, color: Colors.red));
+                  },
+                ),
+              );
+            },
           ),
+        ),
+        actions: [
+          if (attachedDocuments.length > 1)
+            TextButton(
+              onPressed: () {},
+              child: const Text('Previous'),
+            ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Close'),
+          ),
+          if (attachedDocuments.length > 1)
+            TextButton(
+              onPressed: () {},
+              child: const Text('Next'),
+            ),
         ],
-      ),
-    );
-  }
-
-  Color _getActionColor(String action) {
-    return action.contains('closed') ? Colors.red : Colors.green;
-  }
+      );
+    },
+  );
 }

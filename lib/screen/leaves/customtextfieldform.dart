@@ -4,6 +4,7 @@ import 'package:hrms_app/constants/colors.dart';
 class CustomTextFormField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
+  final Widget? suffixIcon;
   final bool readOnly;
   final VoidCallback? onTap;
   final String? Function(String?)? validator;
@@ -15,6 +16,7 @@ class CustomTextFormField extends StatelessWidget {
     required this.hintText,
     this.readOnly = false,
     this.onTap,
+    this.suffixIcon,
     this.validator,
   }) : super(key: key);
 

@@ -123,7 +123,7 @@ class AuthProvider with ChangeNotifier {
           _token = newToken;
           notifyListeners();
         } else {
-          _setErrorMessage("Failed to refresh token");
+          _setErrorMessage("");
         }
       }
     }
