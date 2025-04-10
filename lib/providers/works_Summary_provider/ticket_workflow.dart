@@ -216,9 +216,16 @@ class TicketWorkFlowProvider with ChangeNotifier {
         // Parse the response body as a boolean
         final responseBody = json.decode(response.body);
         if (responseBody is bool) {
+          _myTicket.removeWhere((ticket) => ticket.id == ticketId);
+          _myTicketAssignToMe.removeWhere((ticket) => ticket.id == ticketId);
+
+          // Also remove from details if it's there
+          _myticketdetailsbyId.removeWhere((ticket) => ticket.id == ticketId);
+          notifyListeners();
           print(responseBody);
           print("sucess");
-          return responseBody; // Return the boolean value directly
+
+          return responseBody;
         } else {
           throw Exception("Unexpected response format");
         }
@@ -267,12 +274,191 @@ class TicketWorkFlowProvider with ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
-        // Parse the response body as a boolean
         final responseBody = json.decode(response.body);
         if (responseBody is bool) {
+          //clearing the data
+
+          _myTicket.removeWhere((ticket) => ticket.id == ticketId);
+          _myTicketAssignToMe.removeWhere((ticket) => ticket.id == ticketId);
+
+          _myticketdetailsbyId.removeWhere((ticket) => ticket.id == ticketId);
+          notifyListeners();
+          print(ticketId);
           print(responseBody);
           print("sucess");
-          return responseBody; // Return the boolean value directly
+
+          return responseBody;
+        } else {
+          throw Exception("Unexpected response format");
+        }
+      } else {
+        _errormessage =
+            'Failed to reopen ticket. Status code: ${response.statusCode}';
+        print(_errormessage);
+        return false;
+      }
+    } catch (e) {
+      _errormessage = 'An error occurred: ${e.toString()}';
+      print(_errormessage);
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+//edit servity
+  Future<bool> editServityTicketById() async {
+    _isLoading = true;
+    _errormessage = '';
+    notifyListeners();
+
+    try {
+      String? token = await _secureStorageService.readData('auth_token');
+      String? branchId =
+          await _secureStorageService.readData('workingBranchId');
+      String? fiscalYear =
+          await _secureStorageService.readData('selected_fiscal_year');
+
+      if (token == null || branchId == null || fiscalYear == null) {
+        throw Exception("Missing authentication data.");
+      }
+
+      final url =
+          Uri.parse('http://45.117.153.90:5004/api/Ticket/EditPriority');
+      final response = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'workingBranchId': branchId,
+          'workingFinancialId': fiscalYear,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        if (responseBody is bool) {
+          //clearing the data
+
+          print(responseBody);
+          print("sucess");
+
+          return responseBody;
+        } else {
+          throw Exception("Unexpected response format");
+        }
+      } else {
+        _errormessage =
+            'Failed to reopen ticket. Status code: ${response.statusCode}';
+        print(_errormessage);
+        return false;
+      }
+    } catch (e) {
+      _errormessage = 'An error occurred: ${e.toString()}';
+      print(_errormessage);
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+//edit priority
+  Future<bool> editPriorityTicketById() async {
+    _isLoading = true;
+    _errormessage = '';
+    notifyListeners();
+
+    try {
+      String? token = await _secureStorageService.readData('auth_token');
+      String? branchId =
+          await _secureStorageService.readData('workingBranchId');
+      String? fiscalYear =
+          await _secureStorageService.readData('selected_fiscal_year');
+
+      if (token == null || branchId == null || fiscalYear == null) {
+        throw Exception("Missing authentication data.");
+      }
+
+      final url =
+          Uri.parse('http://45.117.153.90:5004/api/Ticket/EditPriority');
+      final response = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'workingBranchId': branchId,
+          'workingFinancialId': fiscalYear,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        if (responseBody is bool) {
+          //clearing the data
+
+          print(responseBody);
+          print("sucess");
+
+          return responseBody;
+        } else {
+          throw Exception("Unexpected response format");
+        }
+      } else {
+        _errormessage =
+            'Failed to reopen ticket. Status code: ${response.statusCode}';
+        print(_errormessage);
+        return false;
+      }
+    } catch (e) {
+      _errormessage = 'An error occurred: ${e.toString()}';
+      print(_errormessage);
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+//edit assign to
+  Future<bool> editAssignToTicketById(int ticketId, int userId) async {
+    _isLoading = true;
+    _errormessage = '';
+    notifyListeners();
+
+    try {
+      String? token = await _secureStorageService.readData('auth_token');
+      String? branchId =
+          await _secureStorageService.readData('workingBranchId');
+      String? fiscalYear =
+          await _secureStorageService.readData('selected_fiscal_year');
+
+      if (token == null || branchId == null || fiscalYear == null) {
+        throw Exception("Missing authentication data.");
+      }
+
+      final url = Uri.parse('http://45.117.153.90:5004/api/EditAssignedTo');
+      final response = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'workingBranchId': branchId,
+          'workingFinancialId': fiscalYear,
+        },
+        body: jsonEncode({
+          "Id": ticketId,
+          "AssignToId": userId,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        if (responseBody is bool) {
+          //clearing the data
+
+          print(responseBody);
+          print("sucess");
+
+          return responseBody;
         } else {
           throw Exception("Unexpected response format");
         }
