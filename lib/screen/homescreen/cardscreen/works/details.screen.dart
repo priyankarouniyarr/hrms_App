@@ -6,7 +6,6 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:hrms_app/constants/colors.dart';
-import 'package:hrms_app/screen/leaves/dropdown_custom.dart';
 import 'package:hrms_app/providers/create_tickets/ne_tickets_providers.dart';
 import 'package:hrms_app/providers/works_Summary_provider/ticket_workflow.dart';
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
@@ -45,7 +44,6 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
           _selectedServity = ticket.severity;
           _selectedPriority = ticket.priority;
           _selectedassigntoType = ticket.assignToEmployeeId;
-          // For assignee, we need to find the matching value in the user list
         });
       }
     });
@@ -866,6 +864,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
         ));
   }
 }
+//reopen portion of the code
 
 Widget _buildDropdown(
   String title,
