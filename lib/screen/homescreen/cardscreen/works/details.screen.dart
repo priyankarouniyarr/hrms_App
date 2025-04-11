@@ -25,15 +25,29 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
   int? _selectedassigntoType;
   String? _selectedServity;
   String? _selectedPriority;
+  late TicketWorkFlowProvider _ticketProvider;
+  @override
   @override
   void initState() {
     super.initState();
+    _ticketProvider =
+        Provider.of<TicketWorkFlowProvider>(context, listen: false);
 
-    Future.microtask(() {
-      Provider.of<NewTicketProvider>(context, listen: false)
+    Future.microtask(() async {
+      await _ticketProvider.fetchMyTicketDetaisById(ticket: widget.ticketId);
+      await Provider.of<NewTicketProvider>(context, listen: false)
           .fetchTicketCategories();
-      Provider.of<TicketWorkFlowProvider>(context, listen: false)
-          .fetchMyTicketDetaisById(ticket: widget.ticketId);
+
+      // Set default values after data is loaded
+      if (_ticketProvider.myticketdetails.isNotEmpty) {
+        final ticket = _ticketProvider.myticketdetails.first.ticket;
+        setState(() {
+          _selectedServity = ticket.severity;
+          _selectedPriority = ticket.priority;
+          _selectedassigntoType = ticket.assignToEmployeeId;
+          // For assignee, we need to find the matching value in the user list
+        });
+      }
     });
   }
 
@@ -124,7 +138,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                                   ),
                                   SizedBox(
                                     height: 8.0,
-                                  ), // Ticket ID
+                                  ),
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
@@ -706,39 +720,51 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                                                                       (value) =>
                                                                           setState(() =>
                                                                               _selectedPriority = value)),
-                                                                  const SizedBox(
-                                                                      height:
-                                                                          5),
-                                                                  const Text(
-                                                                    "Assign To",
-                                                                    style: TextStyle(
-                                                                        fontSize:
-                                                                            16,
-                                                                        fontWeight:
-                                                                            FontWeight
-                                                                                .w500,
-                                                                        color:
-                                                                            primarySwatch),
-                                                                  ),
-                                                                  const SizedBox(
-                                                                      height:
-                                                                          5),
-                                                                  // CustomDropdown2(
-                                                                  //   value:
-                                                                  //       _selectedassigntoType,
-                                                                  //   items: assignTo,
-                                                                  //   hintText: '',
-                                                                  //   onChanged:
-                                                                  //       (value) {
-                                                                  //     setState(() {
-                                                                  //       _selectedassigntoType =
-                                                                  //           value;
-                                                                  //     });
-                                                                  //   },
+                                                                  // const SizedBox(
+                                                                  //     height:
+                                                                  //         5),
+                                                                  // const Text(
+                                                                  //   "Assign To",
+                                                                  //   style: TextStyle(
+                                                                  //       fontSize:
+                                                                  //           16,
+                                                                  //       fontWeight:
+                                                                  //           FontWeight
+                                                                  //               .w500,
+                                                                  //       color:
+                                                                  //           primarySwatch),
                                                                   // ),
                                                                   const SizedBox(
                                                                       height:
                                                                           5),
+                                                                  _buildDropdown(
+                                                                    "Assign To",
+                                                                    _selectedassigntoType
+                                                                        ?.toString(),
+                                                                    assignTo,
+                                                                    (String?
+                                                                        newValue) {
+                                                                      if (newValue !=
+                                                                          null) {
+                                                                        setState(
+                                                                            () {
+                                                                          _selectedassigntoType =
+                                                                              int.tryParse(newValue);
+                                                                        });
+                                                                      }
+                                                                      // print(
+                                                                      //     newValue);
+                                                                      print(
+                                                                          "hello");
+                                                                      print(
+                                                                          _selectedassigntoType);
+                                                                    },
+                                                                  ),
+
+                                                                  const SizedBox(
+                                                                      height:
+                                                                          5),
+
                                                                   Row(
                                                                     mainAxisAlignment:
                                                                         MainAxisAlignment
@@ -840,24 +866,70 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
         ));
   }
 }
-// dropdown
 
-_buildDropdown(String title, String? value, List<String> items,
-    ValueChanged<String?> onChanged) {
+Widget _buildDropdown(
+  String title,
+  String? value,
+  dynamic items,
+  ValueChanged<String?> onChanged,
+) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(title,
-          style: TextStyle(
-              color: primarySwatch, fontSize: 16, fontWeight: FontWeight.w600)),
+      Text(
+        title,
+        style: TextStyle(
+          color: primarySwatch,
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
       SizedBox(height: 5),
-      CustomDropdown(
-        value: value,
-        items: items,
-        hintText: "",
-        onChanged: (val) {
-          onChanged(val);
-        },
+      ConstrainedBox(
+        constraints: BoxConstraints(
+          minWidth: 200,
+          maxWidth: 300,
+        ),
+        child: items is List<Map<String, dynamic>>
+            ? DropdownButtonFormField<String>(
+                isExpanded: true,
+                value: value,
+                items: items.map<DropdownMenuItem<String>>((map) {
+                  return DropdownMenuItem<String>(
+                    value: map['value'].toString(), // Ensure string output
+                    child: Text(
+                      map['label'].toString(),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  );
+                }).toList(),
+                onChanged: onChanged,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                ),
+              )
+            : DropdownButtonFormField<String>(
+                isExpanded: true,
+                value: value,
+                items: (items as List<String>)
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(
+                      value,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  );
+                }).toList(),
+                onChanged: onChanged,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                ),
+              ),
       ),
     ],
   );

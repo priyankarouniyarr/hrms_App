@@ -308,7 +308,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
   }
 
 //edit servity
-  Future<bool> editServityTicketById() async {
+  Future<bool> editServityTicketById(int ticketId, String servityStatus) async {
     _isLoading = true;
     _errormessage = '';
     notifyListeners();
@@ -364,7 +364,8 @@ class TicketWorkFlowProvider with ChangeNotifier {
   }
 
 //edit priority
-  Future<bool> editPriorityTicketById() async {
+  Future<bool> editPriorityTicketById(
+      int ticketId, String priorityStatus) async {
     _isLoading = true;
     _errormessage = '';
     notifyListeners();
