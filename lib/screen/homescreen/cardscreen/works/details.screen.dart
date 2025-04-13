@@ -6,6 +6,8 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:hrms_app/constants/colors.dart';
+import 'package:hrms_app/screen/leaves/dropdown_custom.dart';
+import 'package:hrms_app/models/works_models/reopen%20_ticket_models.dart';
 import 'package:hrms_app/providers/create_tickets/ne_tickets_providers.dart';
 import 'package:hrms_app/providers/works_Summary_provider/ticket_workflow.dart';
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
@@ -25,7 +27,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
   String? _selectedServity;
   String? _selectedPriority;
   late TicketWorkFlowProvider _ticketProvider;
-  @override
+
   @override
   void initState() {
     super.initState();
@@ -34,10 +36,11 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
 
     Future.microtask(() async {
       await _ticketProvider.fetchMyTicketDetaisById(ticket: widget.ticketId);
-      await Provider.of<NewTicketProvider>(context, listen: false)
-          .fetchTicketCategories();
+      // await Provider.of<NewTicketProvider>(context, listen: false)
+      //     .fetchTicketCategories();
+      _ticketProvider =
+          Provider.of<TicketWorkFlowProvider>(context, listen: false);
 
-      // Set default values after data is loaded
       if (_ticketProvider.myticketdetails.isNotEmpty) {
         final ticket = _ticketProvider.myticketdetails.first.ticket;
         setState(() {
@@ -47,6 +50,24 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
         });
       }
     });
+  }
+
+  void _onSubmit() async {
+    final priorityTicket = PriorityTicket(
+      ticketId: widget.ticketId,
+      priorityStatus: _selectedPriority!,
+    );
+    // final assignToTicket = AssignToTicket(
+    //   ticketId: widget.ticketId,
+    //   userId: _selectedassigntoType!,
+    // );
+    final severityTicket = ServityTicket(
+      ticketId: widget.ticketId,
+      servityStatus: _selectedServity!,
+    );
+
+    await _ticketProvider.editServityTicketById(severityTicket);
+    await _ticketProvider.editPriorityTicketById(priorityTicket);
   }
 
   @override
@@ -653,10 +674,10 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                                         )
 
                                       //reopen
+
                                       : Center(
                                           child: GestureDetector(
                                             onTap: () async {
-                                              // Ensure user list is loaded before showing dialog
                                               await Provider.of<
                                                           NewTicketProvider>(
                                                       context,
@@ -684,136 +705,131 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                                                           .toList();
 
                                                   return AlertDialog(
-                                                      title:
-                                                          Text('Reopen Ticket'),
-                                                      content: provider1
-                                                              .isLoading
-                                                          ? Center(
-                                                              child:
-                                                                  CircularProgressIndicator())
-                                                          : Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .min,
-                                                              children: [
-                                                                  _buildDropdown(
-                                                                      "Servity",
-                                                                      _selectedServity,
-                                                                      provider
-                                                                          .servity,
-                                                                      (value) =>
-                                                                          setState(() =>
-                                                                              _selectedServity = value)),
-                                                                  const SizedBox(
-                                                                      height:
-                                                                          5),
-                                                                  _buildDropdown(
-                                                                      "Priority",
-                                                                      _selectedPriority,
-                                                                      provider
-                                                                          .priority,
-                                                                      (value) =>
-                                                                          setState(() =>
-                                                                              _selectedPriority = value)),
-                                                                  // const SizedBox(
-                                                                  //     height:
-                                                                  //         5),
-                                                                  // const Text(
-                                                                  //   "Assign To",
-                                                                  //   style: TextStyle(
-                                                                  //       fontSize:
-                                                                  //           16,
-                                                                  //       fontWeight:
-                                                                  //           FontWeight
-                                                                  //               .w500,
-                                                                  //       color:
-                                                                  //           primarySwatch),
-                                                                  // ),
-                                                                  const SizedBox(
-                                                                      height:
-                                                                          5),
-                                                                  _buildDropdown(
-                                                                    "Assign To",
-                                                                    _selectedassigntoType
-                                                                        ?.toString(),
-                                                                    assignTo,
-                                                                    (String?
-                                                                        newValue) {
-                                                                      if (newValue !=
-                                                                          null) {
-                                                                        setState(
-                                                                            () {
-                                                                          _selectedassigntoType =
-                                                                              int.tryParse(newValue);
-                                                                        });
-                                                                      }
-                                                                      // print(
-                                                                      //     newValue);
-                                                                      print(
-                                                                          "hello");
-                                                                      print(
-                                                                          _selectedassigntoType);
-                                                                    },
+                                                    title:
+                                                        Text('Reopen Ticket'),
+                                                    content: provider1.isLoading
+                                                        ? Center(
+                                                            child:
+                                                                CircularProgressIndicator())
+                                                        : Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                            children: [
+                                                              _buildDropdown(
+                                                                "Servity",
+                                                                _selectedServity,
+                                                                provider
+                                                                    .servity,
+                                                                (value) => setState(() =>
+                                                                    _selectedServity =
+                                                                        value),
+                                                              ),
+                                                              const SizedBox(
+                                                                  height: 5),
+                                                              _buildDropdown(
+                                                                "Priority",
+                                                                _selectedPriority,
+                                                                provider
+                                                                    .priority,
+                                                                (value) => setState(() =>
+                                                                    _selectedPriority =
+                                                                        value),
+                                                              ),
+                                                              const SizedBox(
+                                                                  height: 5),
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .end,
+                                                                children: [
+                                                                  ElevatedButton(
+                                                                    onPressed: () =>
+                                                                        Navigator.pop(
+                                                                            context,
+                                                                            false),
+                                                                    style: ElevatedButton
+                                                                        .styleFrom(
+                                                                      backgroundColor:
+                                                                          accentColor,
+                                                                      foregroundColor:
+                                                                          Colors
+                                                                              .white,
+                                                                    ),
+                                                                    child: Text(
+                                                                        'Cancel'),
                                                                   ),
-
-                                                                  const SizedBox(
-                                                                      height:
-                                                                          5),
-
-                                                                  Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .end,
-                                                                    children: [
-                                                                      ElevatedButton(
-                                                                          onPressed: () => Navigator.pop(
-                                                                              context,
-                                                                              false),
-                                                                          style: ElevatedButton
-                                                                              .styleFrom(
-                                                                            backgroundColor:
-                                                                                accentColor,
-                                                                            foregroundColor:
-                                                                                Colors.white,
-                                                                          ),
-                                                                          child:
-                                                                              Text('Cancel')),
-                                                                      SizedBox(
-                                                                          width:
-                                                                              10),
-                                                                      ElevatedButton(
-                                                                        onPressed:
-                                                                            () {
-                                                                          Navigator.pop(
-                                                                              context,
-                                                                              true);
-                                                                        },
-                                                                        style: ElevatedButton
-                                                                            .styleFrom(
-                                                                          backgroundColor:
-                                                                              primarySwatch,
-                                                                          foregroundColor:
-                                                                              Colors.white,
+                                                                  SizedBox(
+                                                                      width:
+                                                                          10),
+                                                                  ElevatedButton(
+                                                                    onPressed:
+                                                                        () async {
+                                                                      final shouldProceed =
+                                                                          await showDialog<
+                                                                              bool>(
+                                                                        context:
+                                                                            context,
+                                                                        builder:
+                                                                            (context) =>
+                                                                                AlertDialog(
+                                                                          title:
+                                                                              Text('Confirm Reopen'),
+                                                                          content:
+                                                                              Text('Are you sure you want to reopen this ticket?'),
+                                                                          actions: [
+                                                                            TextButton(
+                                                                              onPressed: () => Navigator.pop(context, false),
+                                                                              child: Text('No'),
+                                                                            ),
+                                                                            TextButton(
+                                                                              onPressed: () => Navigator.pop(context, true),
+                                                                              child: Text('Yes'),
+                                                                            ),
+                                                                          ],
                                                                         ),
-                                                                        child: Text(
-                                                                            'Done'),
-                                                                      ),
-                                                                    ],
+                                                                      );
+
+                                                                      if (shouldProceed ??
+                                                                          false) {
+                                                                        _onSubmit();
+                                                                        Navigator.pop(
+                                                                            context,
+                                                                            true);
+                                                                      }
+                                                                    },
+                                                                    style: ElevatedButton
+                                                                        .styleFrom(
+                                                                      backgroundColor:
+                                                                          primarySwatch,
+                                                                      foregroundColor:
+                                                                          Colors
+                                                                              .white,
+                                                                    ),
+                                                                    child: Text(
+                                                                        'Done'),
                                                                   ),
-                                                                ]));
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                  );
                                                 },
                                               );
 
                                               if (confirm == true) {
                                                 if (ticket.ticket.status ==
                                                     "Closed") {
-                                                  provider.reopenTicketById(
-                                                      ticketId: ticket.id);
+                                                  await provider
+                                                      .reopenTicketById(
+                                                          ticketId: ticket.id);
                                                 }
+
                                                 Navigator.pop(context);
+
                                                 ScaffoldMessenger.of(context)
                                                     .showSnackBar(
                                                   SnackBar(
@@ -864,77 +880,30 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
         ));
   }
 }
-//reopen portion of the code
 
-Widget _buildDropdown(
-  String title,
-  String? value,
-  dynamic items,
-  ValueChanged<String?> onChanged,
-) {
+//reopen portion of the code
+_buildDropdown(String title, String? value, List<String> items,
+    ValueChanged<String?> onChanged) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(
-        title,
-        style: TextStyle(
-          color: primarySwatch,
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
+      Text(title,
+          style: TextStyle(
+              color: primarySwatch, fontSize: 16, fontWeight: FontWeight.w600)),
       SizedBox(height: 5),
-      ConstrainedBox(
-        constraints: BoxConstraints(
-          minWidth: 200,
-          maxWidth: 300,
-        ),
-        child: items is List<Map<String, dynamic>>
-            ? DropdownButtonFormField<String>(
-                isExpanded: true,
-                value: value,
-                items: items.map<DropdownMenuItem<String>>((map) {
-                  return DropdownMenuItem<String>(
-                    value: map['value'].toString(), // Ensure string output
-                    child: Text(
-                      map['label'].toString(),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  );
-                }).toList(),
-                onChanged: onChanged,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                ),
-              )
-            : DropdownButtonFormField<String>(
-                isExpanded: true,
-                value: value,
-                items: (items as List<String>)
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(
-                      value,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  );
-                }).toList(),
-                onChanged: onChanged,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                ),
-              ),
+      CustomDropdown(
+        value: value,
+        items: items,
+        hintText: "",
+        onChanged: (val) {
+          onChanged(val);
+          ;
+        },
       ),
     ],
   );
 }
 
-//comment portion
 void _showCommentDialog(BuildContext context) {
   final TextEditingController _commentController = TextEditingController();
   List<String> attachments = [];

@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/works_models/ticketdetails_with_id.dart';
+import 'package:hrms_app/models/works_models/reopen%20_ticket_models.dart';
 import 'package:hrms_app/models/works_models/myticket_and_assignbyme_ticket_model.dart';
 
 class TicketWorkFlowProvider with ChangeNotifier {
@@ -206,6 +207,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
       final response = await http.post(
         url,
         headers: {
+          'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
           'workingBranchId': branchId,
           'workingFinancialId': fiscalYear,
@@ -267,6 +269,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
       final response = await http.post(
         url,
         headers: {
+          'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
           'workingBranchId': branchId,
           'workingFinancialId': fiscalYear,
@@ -308,7 +311,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
   }
 
 //edit servity
-  Future<bool> editServityTicketById(int ticketId, String servityStatus) async {
+  Future<bool> editServityTicketById(ServityTicket request) async {
     _isLoading = true;
     _errormessage = '';
     notifyListeners();
@@ -325,21 +328,27 @@ class TicketWorkFlowProvider with ChangeNotifier {
       }
 
       final url =
-          Uri.parse('http://45.117.153.90:5004/api/Ticket/EditPriority');
+          Uri.parse('http://45.117.153.90:5004/api/Ticket/EditSeverity');
       final response = await http.post(
         url,
         headers: {
+          'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
           'workingBranchId': branchId,
           'workingFinancialId': fiscalYear,
         },
+        body: jsonEncode(request.toJson()), // Use the request object
       );
+
+      print(request.ticketId);
+      print(request.servityStatus);
+      print(response.statusCode);
+      print("this is servity");
 
       if (response.statusCode == 200) {
         final responseBody = json.decode(response.body);
         if (responseBody is bool) {
-          //clearing the data
-
+          notifyListeners();
           print(responseBody);
           print("sucess");
 
@@ -365,7 +374,8 @@ class TicketWorkFlowProvider with ChangeNotifier {
 
 //edit priority
   Future<bool> editPriorityTicketById(
-      int ticketId, String priorityStatus) async {
+    PriorityTicket request1,
+  ) async {
     _isLoading = true;
     _errormessage = '';
     notifyListeners();
@@ -386,18 +396,23 @@ class TicketWorkFlowProvider with ChangeNotifier {
       final response = await http.post(
         url,
         headers: {
+          'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
           'workingBranchId': branchId,
           'workingFinancialId': fiscalYear,
         },
+        body: jsonEncode(request1.toJson()),
       );
 
+      print(request1.ticketId);
+      print(request1.priorityStatus);
+      print(response.statusCode);
       if (response.statusCode == 200) {
         final responseBody = json.decode(response.body);
-        if (responseBody is bool) {
-          //clearing the data
 
+        if (responseBody is bool) {
           print(responseBody);
+          notifyListeners();
           print("sucess");
 
           return responseBody;
@@ -421,7 +436,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
   }
 
 //edit assign to
-  Future<bool> editAssignToTicketById(int ticketId, int userId) async {
+  Future<bool> editAssignToTicketById(AssignToTicket request2) async {
     _isLoading = true;
     _errormessage = '';
     notifyListeners();
@@ -441,16 +456,16 @@ class TicketWorkFlowProvider with ChangeNotifier {
       final response = await http.post(
         url,
         headers: {
+          'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
           'workingBranchId': branchId,
           'workingFinancialId': fiscalYear,
         },
-        body: jsonEncode({
-          "Id": ticketId,
-          "AssignToId": userId,
-        }),
+        body: jsonEncode(request2.toJson()), // Use the request object
       );
 
+      print(request2.ticketId);
+      print(request2.userId);
       if (response.statusCode == 200) {
         final responseBody = json.decode(response.body);
         if (responseBody is bool) {
