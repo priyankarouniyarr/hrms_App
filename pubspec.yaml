@@ -41,10 +41,12 @@ dependencies:
   image_picker: ^1.1.2
   flutter_launcher_icons: ^0.14.3
   flutter_bs_ad_calendar: ^1.0.4
-  nepali_date_picker: # For date conversion
+  nepali_date_picker:
   dio: ^5.8.0+1
   flutter_html: ^3.0.0
+  http_parser: ^4.1.2
  
+  
       
   
 

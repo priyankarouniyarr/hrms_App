@@ -1,12 +1,11 @@
 import 'dart:io';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/leaves/dropdown_custom.dart';
-import 'package:hrms_app/providers/create_tickets/new_tickets_provider.dart';
 import 'package:hrms_app/providers/create_tickets/ne_tickets_providers.dart';
+import 'package:hrms_app/providers/create_tickets/new_tickets_provider.dart';
 import 'package:hrms_app/models/createtickets/new_tickets_creation_model.dart';
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
 
@@ -21,8 +20,6 @@ class _CreateTicketScreenState extends State<CreateTicketScreen> {
   int? _selectedassigntoType;
   String? _selectedServerityType;
   File? selectedImage;
-  String base64Image = "";
-  String? selectedFileName;
   final TextEditingController _messageController = TextEditingController();
   final TextEditingController _subjectController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -30,7 +27,6 @@ class _CreateTicketScreenState extends State<CreateTicketScreen> {
   @override
   void initState() {
     super.initState();
-
     Future.microtask(() {
       Provider.of<NewTicketProvider>(context, listen: false)
           .fetchTicketCategories();
@@ -46,20 +42,16 @@ class _CreateTicketScreenState extends State<CreateTicketScreen> {
     if (image != null) {
       setState(() {
         selectedImage = File(image.path);
-        base64Image = base64Encode(selectedImage!.readAsBytesSync());
-        selectedFileName = image.path.split('/').last;
       });
     }
   }
 
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      // Check if all fields are filled
       if (_selectedCategoriesType == null ||
           _selectedpriorityType == null ||
           _selectedassigntoType == null ||
-          _selectedServerityType == null ||
-          selectedImage == null) {
+          _selectedServerityType == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
@@ -72,62 +64,74 @@ class _CreateTicketScreenState extends State<CreateTicketScreen> {
         return;
       }
 
-      // Create the ticket request
-      final ticketRequest = TicketCreationRequest(
-        ticketCategoryId: _selectedCategoriesType!.toString(),
-        priority: _selectedpriorityType!,
-        assignToEmployeeId: _selectedassigntoType!.toString(),
-        severity: _selectedServerityType!,
-        title: _subjectController.text,
-        description: _messageController.text,
-        attachmentFiles: base64Image,
-      );
-      print(ticketRequest.assignToEmployeeId);
-
-      final ticketProvider =
-          Provider.of<TicketProvider>(context, listen: false);
-      await ticketProvider.createTicket(ticketRequest);
-
+      // Show loading indicator
       showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Confirm Ticket Creation'),
-          content: const Text(' Are you sure you want to create this ticket?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                _resetForm();
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Ticket created successfully!',
-                      style: TextStyle(color: Colors.green),
-                    ),
-                    backgroundColor: cardBackgroundColor,
-                  ),
-                );
-                _resetForm();
-              },
-              child: const Text('Confirm'),
-            ),
-          ],
-        ),
+        barrierDismissible: false,
+        builder: (context) => const Center(child: CircularProgressIndicator()),
       );
 
-      // Optionally, you can reset the form after submission
-      _resetForm();
+      try {
+        // Create the ticket request
+        final ticketRequest = TicketCreationRequest(
+          ticketCategoryId: _selectedCategoriesType!,
+          priority: _selectedpriorityType!,
+          assignToEmployeeId: _selectedassigntoType!,
+          severity: _selectedServerityType!,
+          title: _subjectController.text,
+          description: _messageController.text,
+          attachmentPaths: selectedImage != null ? [selectedImage!.path] : [],
+        );
+
+        final ticketProvider =
+            Provider.of<TicketProvider>(context, listen: false);
+        final success = await ticketProvider.createTicket(ticketRequest);
+        //  print("success ${success}");
+
+        // Hide loading indicator
+        Navigator.of(context).pop();
+
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Ticket created successfully!',
+                style: TextStyle(color: Colors.green, fontSize: 18),
+              ),
+              backgroundColor: cardBackgroundColor,
+            ),
+          );
+          _resetForm();
+        } else {
+          print(ticketProvider.errorMessage);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                ticketProvider.errorMessage,
+                style: const TextStyle(color: Colors.red),
+              ),
+              backgroundColor: cardBackgroundColor,
+            ),
+          );
+        }
+      } catch (e) {
+        // Hide loading indicator
+        Navigator.of(context).pop();
+        print(e);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Error creating ticket: $e',
+              style: const TextStyle(color: Colors.red),
+            ),
+            backgroundColor: cardBackgroundColor,
+          ),
+        );
+      }
     }
   }
 
-//reset form
   void _resetForm() {
     _formKey.currentState!.reset();
     setState(() {
@@ -136,8 +140,6 @@ class _CreateTicketScreenState extends State<CreateTicketScreen> {
       _selectedassigntoType = null;
       _selectedServerityType = null;
       selectedImage = null;
-      base64Image = "";
-      selectedFileName = null;
       _messageController.clear();
       _subjectController.clear();
     });
@@ -310,10 +312,10 @@ class _CreateTicketScreenState extends State<CreateTicketScreen> {
                       )
                     ],
                   ),
-                  if (selectedFileName != null) ...[
+                  if (selectedImage != null) ...[
                     const SizedBox(height: 10),
                     Text(
-                      " $selectedFileName",
+                      selectedImage!.path.split('/').last,
                       style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,

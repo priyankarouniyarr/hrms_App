@@ -927,69 +927,18 @@ void _showCommentDialog(BuildContext context) {
                 minLines: 3,
               ),
               SizedBox(height: 16),
-              // if (attachments.isNotEmpty)
-              //   Column(
-              //     children: [
-              //       Text("Attachments:"),
-              //       ...attachments.map((file) => ListTile(
-              //             leading: Icon(Icons.attach_file),
-              //             title: Text(file.split('/').last),
-              //             trailing: IconButton(
-              //               icon: Icon(Icons.close),
-              //               onPressed: () {
-              //                 attachments.remove(file);
-              //                 Navigator.of(context).pop();
-              //                 _showCommentDialog(context);
-              //               },
-              //             ),
-              //           )),
-              //       SizedBox(height: 16),
-              //     ],
-              //   ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.camera_alt),
-                    onPressed: () async {
-                      // Implement camera functionality
-                      final pickedFile = await ImagePicker()
-                          .pickImage(source: ImageSource.camera);
-                      if (pickedFile != null) {
-                        attachments.add(pickedFile.path);
-                        Navigator.of(context).pop();
-                        _showCommentDialog(context);
-                      }
-                    },
+                    icon: Icon(Icons.camera_alt, color: primarySwatch),
+                    onPressed: () async {},
                     tooltip: "Take a Photo",
                   ),
                   IconButton(
-                    icon: Icon(Icons.photo_library),
-                    onPressed: () async {
-                      // Implement gallery selection
-                      final pickedFile = await ImagePicker()
-                          .pickImage(source: ImageSource.gallery);
-                      if (pickedFile != null) {
-                        attachments.add(pickedFile.path);
-                        Navigator.of(context).pop();
-                        _showCommentDialog(context);
-                      }
-                    },
+                    icon: Icon(Icons.photo_library, color: primarySwatch),
+                    onPressed: () async {},
                     tooltip: "Choose from Gallery",
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.attach_file),
-                    onPressed: () async {
-                      // Implement file selection
-                      FilePickerResult? result =
-                          await FilePicker.platform.pickFiles();
-                      if (result != null) {
-                        attachments.add(result.files.single.path!);
-                        Navigator.of(context).pop();
-                        _showCommentDialog(context);
-                      }
-                    },
-                    tooltip: "Attach File",
                   ),
                 ],
               ),
@@ -997,20 +946,23 @@ void _showCommentDialog(BuildContext context) {
           ),
         ),
         actions: [
-          TextButton(
-            child: Text("Cancel"),
+          ElevatedButton(
+            child: Text(
+              "Cancel",
+              style: TextStyle(color: Colors.white),
+            ),
+            style: ElevatedButton.styleFrom(backgroundColor: accentColor),
             onPressed: () {
               Navigator.of(context).pop();
             },
           ),
           ElevatedButton(
-            child: Text("Post"),
-            onPressed: () {
-              // Handle post action
-
-              Navigator.of(context).pop();
-              // Add your logic to save the comment and attachments
-            },
+            child: Text(
+              "Post",
+              style: TextStyle(color: Colors.white),
+            ),
+            style: ElevatedButton.styleFrom(backgroundColor: primarySwatch),
+            onPressed: () {},
           ),
         ],
       );

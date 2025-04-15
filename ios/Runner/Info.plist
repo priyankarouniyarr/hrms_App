@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
+ 
     <dict>
+        <key>NSPhotoLibraryUsageDescription</key>
+        <string>Need access to photo library for compressing and uploading files</string>
+        <key>NSCameraUsageDescription</key>
+            <string>Need access to camera for uploading files</string>
+
         <key>CFBundleDevelopmentRegion</key>
         <string>$(DEVELOPMENT_LANGUAGE)</string>
         <key>CFBundleDisplayName</key>

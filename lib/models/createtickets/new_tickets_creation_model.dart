@@ -1,11 +1,11 @@
 class TicketCreationRequest {
-  final String ticketCategoryId;
+  final int ticketCategoryId;
   final String title;
   final String description;
   final String severity;
   final String priority;
-  final String assignToEmployeeId;
-  final String attachmentFiles;
+  final int assignToEmployeeId;
+  final List<String>? attachmentPaths;
 
   TicketCreationRequest({
     required this.ticketCategoryId,
@@ -14,7 +14,7 @@ class TicketCreationRequest {
     required this.severity,
     required this.priority,
     required this.assignToEmployeeId,
-    required this.attachmentFiles,
+    this.attachmentPaths,
   });
 
   Map<String, dynamic> toJson() {
@@ -25,7 +25,7 @@ class TicketCreationRequest {
       "Severity": severity,
       "Priority": priority,
       "AssignToEmployeeId": assignToEmployeeId,
-      "AttachmentFiles": attachmentFiles,
+      // AttachmentFiles is handled separately in multipart request
     };
   }
 }
