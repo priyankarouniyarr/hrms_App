@@ -111,81 +111,65 @@ class TicketMeAndAssignToMe {
   });
 
   factory TicketMeAndAssignToMe.fromJson(Map<String, dynamic> json) {
+    int parseInt(dynamic value) {
+      if (value is int) return value;
+      if (value is String) return int.tryParse(value) ?? 0;
+      return 0;
+    }
+
     return TicketMeAndAssignToMe(
-      id: json['id'] ?? '', // Default value if 'id' is missing
-      ticketNo:
-          json['ticketNo'] ?? '', // Default value if 'ticketNo' is missing
-      ticketNoSequence: json['ticketNoSequence'] ??
-          0, // Default value if 'ticketNoSequence' is missing
-      ticketYearSequence: json['ticketYearSequence'] ??
-          0, // Default value if 'ticketYearSequence' is missing
-      ticketMonthlySequence: json['ticketMonthlySequence'] ??
-          0, // Default value if 'ticketMonthlySequence' is missing
-      ticketDailySequence: json['ticketDailySequence'] ??
-          0, // Default value if 'ticketDailySequence' is missing
-      ticketMonthlyNpSequence: json['ticketMonthlyNpSequence'] ??
-          0, // Default value if 'ticketMonthlyNpSequence' is missing
-      ticketYearlyNpSequence: json['ticketYearlyNpSequence'] ??
-          0, // Default value if 'ticketYearlyNpSequence' is missing
-      ticketFySequence: json['ticketFySequence'] ??
-          0, // Default value if 'ticketFySequence' is missing
-      ticketYearlySequenceByCategory: json['ticketYearlySequenceByCategory'] ??
-          0, // Default value if 'ticketYearlySequenceByCategory' is missing
-      ticketMonthlySequenceByCategory: json[
-              'ticketMonthlySequenceByCategory'] ??
-          0, // Default value if 'ticketMonthlySequenceByCategory' is missing
-      ticketDailySequenceByCategory: json['ticketDailySequenceByCategory'] ??
-          0, // Default value if 'ticketDailySequenceByCategory' is missing
-      ticketNo2:
-          json['ticketNo2'] ?? '', // Default value if 'ticketNo2' is missing
-      applicationUserId: json['applicationUserId'] ??
-          '', // Default value if 'applicationUserId' is missing
-      title: json['title'] ?? '', // Default value if 'title' is missing
-      description: json['description'] ??
-          '', // Default value if 'description' is missing
+      id: parseInt(json['id']),
+      ticketNo: json['ticketNo'] ?? '',
+      ticketNoSequence: parseInt(json['ticketNoSequence']),
+      ticketYearSequence: parseInt(json['ticketYearSequence']),
+      ticketMonthlySequence: parseInt(json['ticketMonthlySequence']),
+      ticketDailySequence: parseInt(json['ticketDailySequence']),
+      ticketMonthlyNpSequence: parseInt(json['ticketMonthlyNpSequence']),
+      ticketYearlyNpSequence: parseInt(json['ticketYearlyNpSequence']),
+      ticketFySequence: parseInt(json['ticketFySequence']),
+      ticketYearlySequenceByCategory:
+          parseInt(json['ticketYearlySequenceByCategory']),
+      ticketMonthlySequenceByCategory:
+          parseInt(json['ticketMonthlySequenceByCategory']),
+      ticketDailySequenceByCategory:
+          parseInt(json['ticketDailySequenceByCategory']),
+      ticketNo2: json['ticketNo2'] ?? '',
+      applicationUserId: json['applicationUserId'] ?? '',
+      title: json['title'] ?? '',
+      description: json['description'] ?? '',
       ticketDate: json['ticketDate'] != null
-          ? DateTime.parse(json['ticketDate'])
-          : DateTime.now(), // Handle invalid date
-      status: json['status'] ?? '', // Default value if 'status' is missing
-      severity:
-          json['severity'] ?? '', // Default value if 'severity' is missing
-      priority:
-          json['priority'] ?? '', // Default value if 'priority' is missing
-      ticketCategoryId: json['ticketCategoryId'] ??
-          '', // Default value if 'ticketCategoryId' is missing
-      ticketCategoryName: json['ticketCategoryName'] ??
-          '', // Default value if 'ticketCategoryName' is missing
-      assignToEmployeeId: json['assignToEmployeeId'] ??
-          '', // Default value if 'assignToEmployeeId' is missing
-      assignedTo:
-          json['assignedTo'] ?? '', // Default value if 'assignedTo' is missing
+          ? DateTime.tryParse(json['ticketDate']) ?? DateTime.now()
+          : DateTime.now(),
+      status: json['status'] ?? '',
+      severity: json['severity'] ?? '',
+      priority: json['priority'] ?? '',
+      ticketCategoryId: parseInt(json['ticketCategoryId']),
+      ticketCategoryName: json['ticketCategoryName'],
+      assignToEmployeeId: parseInt(json['assignToEmployeeId']),
+      assignedTo: json['assignedTo'] ?? '',
       assignedOn: json['assignedOn'] != null
-          ? DateTime.parse(json['assignedOn'])
-          : DateTime.now(), // Handle invalid date
-      issueByEmployeeId: json['issueByEmployeeId'] ??
-          '', // Default value if 'issueByEmployeeId' is missing
-      issueBy: json['issueBy'] ?? '', // Default value if 'issueBy' is missing
+          ? DateTime.tryParse(json['assignedOn']) ?? DateTime.now()
+          : DateTime.now(),
+      issueByEmployeeId: json['issueByEmployeeId'],
+      issueBy: json['issueBy'] ?? '',
       issueOn: json['issueOn'] != null
-          ? DateTime.parse(json['issueOn'])
-          : DateTime.now(), // Handle invalid date
-      sessionTag:
-          json['sessionTag'] ?? '', // Default value if 'sessionTag' is missing
+          ? DateTime.tryParse(json['issueOn']) ?? DateTime.now()
+          : DateTime.now(),
+      sessionTag: json['sessionTag'],
       attachmentFiles: json['attachmentFiles'] is List
           ? List.from(json['attachmentFiles'])
-          : [], // Ensure it's a List
+          : [],
       attachedDocuments: json['attachedDocuments'] is List
           ? List.from(json['attachedDocuments'])
-          : [], // Ensure it's a List
-      insertUser:
-          json['insertUser'] ?? '', // Default value if 'insertUser' is missing
+          : [],
+      insertUser: json['insertUser'] ?? '',
       insertTime: json['insertTime'] != null
-          ? DateTime.parse(json['insertTime'])
-          : DateTime.now(), // Handle invalid date
-      updateUser:
-          json['updateUser'] ?? '', // Default value if 'updateUser' is missing
+          ? DateTime.tryParse(json['insertTime']) ?? DateTime.now()
+          : DateTime.now(),
+      updateUser: json['updateUser'] ?? '',
       updateTime: json['updateTime'] != null
-          ? DateTime.parse(json['updateTime'])
-          : DateTime.now(), // Handle invalid date
+          ? DateTime.tryParse(json['updateTime']) ?? DateTime.now()
+          : DateTime.now(),
     );
   }
 

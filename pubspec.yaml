@@ -45,6 +45,7 @@ dependencies:
   dio: ^5.8.0+1
   flutter_html: ^3.0.0
   http_parser: ^4.1.2
+
  
   
       

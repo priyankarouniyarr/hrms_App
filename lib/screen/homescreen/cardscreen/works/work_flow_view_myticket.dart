@@ -31,6 +31,7 @@ class _WorkFlowViewMyTicketState extends State<WorkFlowViewMyTicket> {
               itemCount: provider.myTicket.length,
               itemBuilder: (context, index) {
                 final ticket = provider.myTicket[index];
+
                 return Card(
                   key: ValueKey(ticket.id),
                   color: Colors.white,
@@ -39,13 +40,12 @@ class _WorkFlowViewMyTicketState extends State<WorkFlowViewMyTicket> {
                     borderRadius: BorderRadius.circular(10),
                     side: const BorderSide(color: primarySwatch, width: 1),
                   ),
-                  margin: const EdgeInsets.symmetric(vertical: 15.0),
+                  margin: const EdgeInsets.symmetric(vertical: 12.0),
                   child: Padding(
                     padding: EdgeInsets.all(16.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Ticket Title and Status
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -70,8 +70,7 @@ class _WorkFlowViewMyTicketState extends State<WorkFlowViewMyTicket> {
                                   style: const TextStyle(
                                     fontSize: 14.0,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors
-                                        .white, // White text for better contrast
+                                    color: Colors.white,
                                   ),
                                 ),
                               ),
@@ -85,13 +84,11 @@ class _WorkFlowViewMyTicketState extends State<WorkFlowViewMyTicket> {
                             "body": Style(
                               fontSize: FontSize(14.0),
                               color: Colors.black54,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w700,
                             ),
                           },
                         ),
-                        SizedBox(
-                          height: 8.0,
-                        ),
+
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -100,7 +97,7 @@ class _WorkFlowViewMyTicketState extends State<WorkFlowViewMyTicket> {
                               style: TextStyle(fontSize: 14.0),
                             ),
                             Text(
-                              ticket.id.toString(),
+                              "${ticket.id}",
                               style: TextStyle(fontSize: 14.0),
                             )
                           ],
@@ -173,7 +170,7 @@ class _WorkFlowViewMyTicketState extends State<WorkFlowViewMyTicket> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              " Issued By",
+                              "Issued By",
                               style: TextStyle(fontSize: 14.0),
                             ),
                             Text(

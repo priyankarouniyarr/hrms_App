@@ -63,7 +63,6 @@ void main() async {
 }
 
 Future<void> handleLocationPermission() async {
-  // Check if location services are enabled
   bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
 
   if (!isLocationServiceEnabled) {
@@ -73,12 +72,10 @@ Future<void> handleLocationPermission() async {
     print("Location service is ON");
   }
 
-  // Check location permission
   LocationPermission permission = await Geolocator.checkPermission();
   print("Initial permission: $permission");
 
   if (permission == LocationPermission.denied) {
-    // Request permission if not granted
     permission = await Geolocator.requestPermission();
     print("Permission after request: $permission");
 
@@ -107,69 +104,6 @@ Future<void> handleLocationPermission() async {
   }
 }
 
-// class MyApp extends StatefulWidget {
-//   @override
-//   State<MyApp> createState() => _MyAppState();
-// }
-
-// class _MyAppState extends State<MyApp> {
-//   bool isLoggedIn = false;
-//   bool isLoading = true;
-//   loadState(context) async {
-//     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-//     await authProvider.loadToken();
-//     await authProvider.loadUsername();
-//     await authProvider.loadRefreshToken();
-
-//     if (authProvider.token == null) {
-//       // print("hello");
-
-//       isLoggedIn = false;
-//     } else {
-//       bool isTokenExpired = await authProvider.isTokenExpired();
-//       if (isTokenExpired) {
-//         await authProvider.refreshAccessToken();
-//         isLoggedIn = true;
-//       } else {
-//         isLoggedIn = true;
-//       }
-//     }
-//     setState(() {
-//       isLoading = false;
-//     });
-//   }
-
-//   @override
-//   void initState() {
-//     WidgetsBinding.instance.addPostFrameCallback((_) {
-//       loadState(context);
-//     });
-//     super.initState();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//         debugShowCheckedModeBanner: false,
-//         home: Builder(builder: (context) {
-//           if (isLoading) {
-//             return Scaffold(
-//               backgroundColor: primarySwatch,
-//               body: Center(
-//                 child: CircularProgressIndicator(),
-//               ),
-//             );
-//           }
-//           print(isLoggedIn);
-//           if (!isLoggedIn) {
-//             return OnboardScreen();
-//           }
-
-//           return AppMainScreen();
-//         }));
-//   }
-// }
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

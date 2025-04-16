@@ -109,7 +109,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
               SizedBox(height: 15),
               Container(
-                height: MediaQuery.of(context).size.height / 2.4,
+                height: MediaQuery.of(context).size.height *
+                    0.8, // Adjust based on need
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
@@ -119,20 +120,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 padding: EdgeInsets.all(16),
                 child: GridView.builder(
-                  shrinkWrap: true,
+                  itemCount: menuItems.length,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
                     childAspectRatio: 0.9,
                   ),
-                  itemCount: menuItems.length,
                   itemBuilder: (context, index) {
                     final item = menuItems[index];
                     return _buildMenuItem(context, item);
                   },
                 ),
-              ),
+              )
             ],
           ),
         ),

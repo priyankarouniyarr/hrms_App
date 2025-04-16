@@ -1,15 +1,14 @@
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:dotted_line/dotted_line.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/leaves/dropdown_custom.dart';
 import 'package:hrms_app/models/works_models/reopen%20_ticket_models.dart';
 import 'package:hrms_app/providers/create_tickets/ne_tickets_providers.dart';
 import 'package:hrms_app/providers/works_Summary_provider/ticket_workflow.dart';
+import 'package:hrms_app/screen/homescreen/cardscreen/works/details_screen/comment_dailog.dart';
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
 
 class TicketDetailScreen extends StatefulWidget {
@@ -36,8 +35,9 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
 
     Future.microtask(() async {
       await _ticketProvider.fetchMyTicketDetaisById(ticket: widget.ticketId);
-      // await Provider.of<NewTicketProvider>(context, listen: false)
-      //     .fetchTicketCategories();
+
+      await Provider.of<NewTicketProvider>(context, listen: false)
+          .fetchTicketCategories();
       _ticketProvider =
           Provider.of<TicketWorkFlowProvider>(context, listen: false);
 
@@ -57,10 +57,10 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
       ticketId: widget.ticketId,
       priorityStatus: _selectedPriority!,
     );
-    // final assignToTicket = AssignToTicket(
-    //   ticketId: widget.ticketId,
-    //   userId: _selectedassigntoType!,
-    // );
+    final assignToTicket = AssignToTicket(
+      ticketId: widget.ticketId,
+      userId: _selectedassigntoType!,
+    );
     final severityTicket = ServityTicket(
       ticketId: widget.ticketId,
       servityStatus: _selectedServity!,
@@ -558,8 +558,12 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                                           children: [
                                             GestureDetector(
                                               onTap: () {
-                                                _showCommentDialog(context);
-                                                print("Comment tapped");
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (context) =>
+                                                      CommentDialog(
+                                                          ticketId: ticket.id),
+                                                );
                                               },
                                               child: Container(
                                                 padding: EdgeInsets.symmetric(
@@ -741,6 +745,11 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                                                               ),
                                                               const SizedBox(
                                                                   height: 5),
+
+                                                              //assign to
+
+                                                              const SizedBox(
+                                                                  height: 5),
                                                               Row(
                                                                 mainAxisAlignment:
                                                                     MainAxisAlignment
@@ -901,72 +910,6 @@ _buildDropdown(String title, String? value, List<String> items,
         },
       ),
     ],
-  );
-}
-
-void _showCommentDialog(BuildContext context) {
-  final TextEditingController _commentController = TextEditingController();
-  List<String> attachments = [];
-
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text("Add Comment"),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: _commentController,
-                decoration: InputDecoration(
-                  hintText: "Write your comment here...",
-                  border: OutlineInputBorder(),
-                ),
-                maxLines: 5,
-                minLines: 3,
-              ),
-              SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.camera_alt, color: primarySwatch),
-                    onPressed: () async {},
-                    tooltip: "Take a Photo",
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.photo_library, color: primarySwatch),
-                    onPressed: () async {},
-                    tooltip: "Choose from Gallery",
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          ElevatedButton(
-            child: Text(
-              "Cancel",
-              style: TextStyle(color: Colors.white),
-            ),
-            style: ElevatedButton.styleFrom(backgroundColor: accentColor),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          ElevatedButton(
-            child: Text(
-              "Post",
-              style: TextStyle(color: Colors.white),
-            ),
-            style: ElevatedButton.styleFrom(backgroundColor: primarySwatch),
-            onPressed: () {},
-          ),
-        ],
-      );
-    },
   );
 }
 

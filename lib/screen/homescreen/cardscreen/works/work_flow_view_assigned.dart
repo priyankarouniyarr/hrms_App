@@ -24,7 +24,7 @@ class _WorkFlowViewAssignedState extends State<WorkFlowViewAssigned> {
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.0),
-      child: provider.myTicket.isEmpty
+      child: provider.myTicketAssignToMe.isEmpty
           ? Center(
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
@@ -36,6 +36,7 @@ class _WorkFlowViewAssignedState extends State<WorkFlowViewAssigned> {
               itemBuilder: (context, index) {
                 final ticket = provider.myTicketAssignToMe[index];
                 return Card(
+                  key: ValueKey(ticket.id),
                   color: Colors.white,
                   elevation: 4.0,
                   shape: RoundedRectangleBorder(
@@ -81,20 +82,32 @@ class _WorkFlowViewAssignedState extends State<WorkFlowViewAssigned> {
                             )
                           ],
                         ),
-
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "id",
+                              style: TextStyle(fontSize: 14.0),
+                            ),
+                            Text(
+                              "${ticket.id}",
+                              style: TextStyle(fontSize: 14.0),
+                            )
+                          ],
+                        ),
                         Html(
                           data: ticket.description,
                           style: {
                             "body": Style(
                               fontSize: FontSize(14.0),
                               color: Colors.black54,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w700,
                             ),
                           },
                         ),
                         SizedBox(
                           height: 8.0,
-                        ), // Ticket ID
+                        ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -162,7 +175,7 @@ class _WorkFlowViewAssignedState extends State<WorkFlowViewAssigned> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              " Issued By",
+                              "Issued By",
                               style: TextStyle(fontSize: 14.0),
                             ),
                             Text(

@@ -11,38 +11,45 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  String? _errorMessage;
+
   @override
   void initState() {
     super.initState();
-
-    Timer(Duration(seconds: 5), () {
+    Timer(Duration(seconds: 2), () {
       _checkLoginState();
     });
   }
 
   Future<void> _checkLoginState() async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    await authProvider.loadToken();
-    await authProvider.loadUsername();
-    await authProvider.loadRefreshToken();
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      await authProvider.loadToken();
+      await authProvider.loadUsername();
+      await authProvider.loadRefreshToken();
 
-    bool isLoggedIn = false;
-    if (authProvider.token != null) {
-      bool isTokenExpired = await authProvider.isTokenExpired();
-      if (isTokenExpired) {
-        await authProvider.refreshAccessToken();
-        isLoggedIn = true;
-      } else {
-        isLoggedIn = true;
+      bool isLoggedIn = false;
+      if (authProvider.token != null) {
+        bool isTokenExpired = await authProvider.isTokenExpired();
+        if (isTokenExpired) {
+          await authProvider.refreshAccessToken();
+          isLoggedIn = true;
+        } else {
+          isLoggedIn = true;
+        }
       }
-    }
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => isLoggedIn ? AppMainScreen() : OnboardScreen(),
-      ),
-    );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => isLoggedIn ? AppMainScreen() : OnboardScreen(),
+        ),
+      );
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+      });
+    }
   }
 
   @override
@@ -52,7 +59,25 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Center(
-          child: Image.asset('assets/logo/logo.jpeg'), // Your logo path
+          child: _errorMessage != null
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error, color: Colors.red, size: 40),
+                    SizedBox(height: 10),
+                    Text(
+                      'Error occurred:',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      _errorMessage!,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ],
+                )
+              : Image.asset('assets/logo/logo.jpeg'), // Your logo path
         ),
       ),
     );

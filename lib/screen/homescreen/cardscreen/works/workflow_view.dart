@@ -5,10 +5,10 @@ import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/leaves/dropdown_custom.dart';
 import 'package:hrms_app/screen/leaves/customtextfieldform.dart';
 import 'package:hrms_app/providers/works_Summary_provider/ticket_workflow.dart';
-import 'package:hrms_app/screen/homescreen/cardscreen/works/details.screen.dart';
 import 'package:hrms_app/models/works_models/myticket_and_assignbyme_ticket_model.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/works/work_flow_view_assigned.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/works/work_flow_view_myticket.dart';
+import 'package:hrms_app/screen/homescreen/cardscreen/works/details_screen/details.screen.dart';
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
 
 class WorkflowView extends StatefulWidget {
@@ -54,12 +54,13 @@ class _WorkflowViewState extends State<WorkflowView> {
 
   Future<void> _initializeData() async {
     setState(() => _isLoading = true);
+
     final requestTicket = MyticketPost(
       CategoryId: 0,
       status: _selectedStatus ?? "",
       priority: _selectedPriority ?? "",
       severity: _selectedServity ?? "",
-      assignTo: "",
+      assignTo: " ",
       fromdate: _primarystartcontroller.text,
       todate: _primaryenddatecontroller.text,
       orderby: _selectedWorkflowType ?? "",
@@ -72,7 +73,9 @@ class _WorkflowViewState extends State<WorkflowView> {
         await Provider.of<TicketWorkFlowProvider>(context, listen: false)
             .fetchAssigntoMeTickets(requestTicket);
       }
-    } catch (_) {
+    } catch (e) {
+      print(e);
+
       // Handle error if needed
     } finally {
       if (mounted) {
@@ -94,8 +97,8 @@ class _WorkflowViewState extends State<WorkflowView> {
     final twoMonthsAgo = DateTime(now.year, now.month - 2, now.day);
     setState(() {
       _selectedStatus = "Open";
-      _selectedServity = null;
-      _selectedPriority = null;
+      _selectedServity = "";
+      _selectedPriority = "";
       _selectedWorkflowType = "Oldest";
       _startDate = twoMonthsAgo;
       _endDate = now;
@@ -117,7 +120,7 @@ class _WorkflowViewState extends State<WorkflowView> {
           ? Center(child: CircularProgressIndicator())
           : SafeArea(
               child: Padding(
-                padding: const EdgeInsets.all(12.0),
+                padding: const EdgeInsets.all(10.0),
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
@@ -221,7 +224,7 @@ class _WorkflowViewState extends State<WorkflowView> {
                         ),
                       ),
 
-                      SizedBox(height: 16),
+                      SizedBox(height: 10),
 
                       /// Toggle My Ticket / Assigned By Me
                       Container(
@@ -265,7 +268,7 @@ class _WorkflowViewState extends State<WorkflowView> {
                                 children: [
                                   Icon(Icons.assignment_turned_in),
                                   SizedBox(width: 6),
-                                  Text('Assigned By Me'),
+                                  Text('Assigned to Me'),
                                 ],
                               ),
                             ),
@@ -303,7 +306,7 @@ class _WorkflowViewState extends State<WorkflowView> {
                                               ticketId: ticketID)
                                           : await provider.reopenTicketById(
                                               ticketId: ticketID);
-                                      //   print(ticket.status);
+
                                       await _initializeData();
                                     } catch (e) {
                                       print(
@@ -334,7 +337,7 @@ class _WorkflowViewState extends State<WorkflowView> {
                                               ticketId: ticketID)
                                           : await provider.reopenTicketById(
                                               ticketId: ticketID);
-                                      //   print(ticket.status);
+
                                       await _initializeData();
                                     } catch (e) {
                                       print(
