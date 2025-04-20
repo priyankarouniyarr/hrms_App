@@ -174,13 +174,15 @@ class TicketWorkFlowProvider with ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
-        Map<String, dynamic> responseDetails = json.decode(response.body);
+        // Map<String, dynamic> responseDetails = json.decode(response.body);
+        // print(responseDetails);
 
         _myticketdetailsbyId = [
-          TicketDetailsWithId.fromJson(responseDetails),
+          TicketDetailsWithId.fromJson(json.decode(response.body)),
         ];
+        //print(_myticketdetailsbyId);
 
-        notifyListeners();
+        //notifyListeners();
       } else {
         _errormessage = 'Failed to load ticket summary';
       }

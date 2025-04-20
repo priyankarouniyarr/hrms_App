@@ -26,8 +26,9 @@ class AuthProvider with ChangeNotifier {
     _setLoading(true);
 
     if (username.isEmpty || password.isEmpty) {
-      _setLoading(false);
       _setErrorMessage("Please enter both username and password");
+      _setLoading(false);
+
       return;
     }
 
@@ -78,26 +79,25 @@ class AuthProvider with ChangeNotifier {
     if (_expirationTime == null) return true;
 
     final currentTime = DateTime.now().millisecondsSinceEpoch / 1000;
+    print(currentTime);
+
     return currentTime > _expirationTime!;
   }
 
   // Load access token securely
   Future<void> loadToken() async {
     _token = await _tokenStorage.getToken();
-
-    // notifyListeners();
   }
 //
 
   Future<void> loadUsername() async {
     _username = await _tokenStorage.getUsername();
-
-    // notifyListeners();
   }
 
   // Load refresh token securely
   Future<void> loadRefreshToken() async {
     String? refreshToken = await _tokenStorage.getRefreshToken();
+
     if (refreshToken != null) {
       print("Loaded Refresh Token: $refreshToken");
     }
@@ -127,6 +127,14 @@ class AuthProvider with ChangeNotifier {
         }
       }
     }
+  }
+
+  Future<String?> getValidAccessToken() async {
+    if (isTokenExpired()) {
+      await refreshAccessToken(); // refreshes _token
+    }
+
+    return _token; // returns valid token after refresh (if needed)
   }
 
   // Logout and remove both access and refresh tokens

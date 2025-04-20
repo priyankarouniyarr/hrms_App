@@ -26,7 +26,8 @@ class _ShiftScreenState extends State<ShiftScreen> {
     final provider = Provider.of<EmployeeProvider>(context);
 
     if (provider.isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+          child: CircularProgressIndicator(color: Colors.white));
     }
 
     final currentshifts = provider.currentShift;

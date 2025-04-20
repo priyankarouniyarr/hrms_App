@@ -26,7 +26,8 @@ class _SplashScreenState extends State<SplashScreen> {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       await authProvider.loadToken();
       await authProvider.loadUsername();
-      await authProvider.loadRefreshToken();
+      // await authProvider.loadRefreshToken();
+      await authProvider.refreshAccessToken();
 
       bool isLoggedIn = false;
       if (authProvider.token != null) {
