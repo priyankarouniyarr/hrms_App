@@ -14,6 +14,7 @@ import 'package:hrms_app/providers/leaves_provider/leavehistory_provider.dart';
 import 'package:hrms_app/providers/branch_id_providers/branch_id_provider.dart';
 import 'package:hrms_app/providers/works_Summary_provider/ticket_workflow.dart';
 import 'package:hrms_app/providers/leaves_provider/leave_request_provider.dart';
+import 'package:hrms_app/providers/check-in_provider/sharelive%20_location.dart';
 import 'package:hrms_app/providers/attendance_providers/attendance_provider.dart';
 import 'package:hrms_app/providers/fiscal_year_provider/fiscal_year_provider.dart';
 import 'package:hrms_app/providers/payroll/payroll_monthly_salarayy_provider.dart';
@@ -26,7 +27,8 @@ import 'package:hrms_app/providers/works_Summary_provider/summary_details/my_tic
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // await FirebaseMsg().initFCM();
   await handleLocationPermission();
 
   runApp(
@@ -56,6 +58,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => TicketProvider()),
         ChangeNotifierProvider(create: (context) => LeaveRequestProvider()),
         ChangeNotifierProvider(create: (context) => TicketWorkFlowProvider()),
+        ChangeNotifierProvider(create: (context) => ShareliveLocation()),
       ],
       child: MyApp(),
     ),

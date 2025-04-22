@@ -96,7 +96,6 @@ class TokenStorage {
     try {
       return await _secureStorage.read(key: 'username');
     } catch (e) {
-      print("Error reading username: $e");
       return null;
     }
   }

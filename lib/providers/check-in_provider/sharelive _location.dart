@@ -4,15 +4,13 @@ import 'package:http/http.dart' as http;
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hrms_app/storage/securestorage.dart';
-import 'package:hrms_app/models/check_in_models/check_in_history%20.dart';
 
-class CheckInProvider with ChangeNotifier {
+class ShareliveLocation with ChangeNotifier {
   bool _loading = false;
   String _errorMessage = '';
   String? _successMessage;
   String? _latitude;
   String? _longitude;
-  List<EmployeePunch> getPunches = [];
   String? _address;
 
   String? get aDDress => _address;
@@ -24,13 +22,12 @@ class CheckInProvider with ChangeNotifier {
   String? get latitude => _latitude;
   String? get longitude => _longitude;
 
-  Future<void> punchPost() async {
+  Future<void> sharelivelocation() async {
     _setLoading(true);
     try {
       String? token = await _secureStorageService.readData('auth_token');
       String? _fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
-
       String? _branchId =
           await _secureStorageService.readData('workingBranchId');
 
@@ -39,8 +36,7 @@ class CheckInProvider with ChangeNotifier {
         return;
       }
 
-//permission checking here
-
+      // Permission checking here
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         await Geolocator.openLocationSettings();
@@ -76,7 +72,8 @@ class CheckInProvider with ChangeNotifier {
       }
 
       final response = await http.post(
-        Uri.parse('http://45.117.153.90:5004/api/Employee/PunchPost'),
+        Uri.parse(
+            'http://45.117.153.90:5004/api/Employee//LiveLocationSharePost'),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
@@ -88,13 +85,15 @@ class CheckInProvider with ChangeNotifier {
           "longitude": _longitude,
         }),
       );
-
       if (response.statusCode == 200) {
-        _setSuccessMessage("Punch  successful  ");
+        _setSuccessMessage("Live Location sharing successfully!");
+        print("Success message: $_successMessage"); // Fixed
       } else {
         _setErrorMessage(
             "Failed to submit: ${response.statusCode}\n ${response.body}");
       }
+
+      print(response.body);
     } catch (e) {
       _setErrorMessage("Error: $e");
     } finally {
@@ -102,56 +101,9 @@ class CheckInProvider with ChangeNotifier {
     }
   }
 
-  Future<void> getpunches() async {
-    _loading = true;
-    notifyListeners();
-
-    try {
-      String? _branchId =
-          await _secureStorageService.readData('workingBranchId');
-      String? _token = await _secureStorageService.readData('auth_token');
-      String? _fiscalYear =
-          await _secureStorageService.readData('selected_fiscal_year');
-
-      if (_token == null || _branchId == null || _fiscalYear == null) {
-        _errorMessage = 'Missing required credentials';
-        _loading = false;
-        notifyListeners();
-        return;
-      }
-
-      final response = await http.get(
-        Uri.parse('http://45.117.153.90:5004/api/Employee/GetTodayPunches'),
-        headers: {
-          'Authorization': 'Bearer $_token',
-          'workingBranchId': _branchId,
-          'workingFinancialId': _fiscalYear,
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonData = json.decode(response.body);
-        getPunches = jsonData.map((e) => EmployeePunch.fromJson(e)).toList();
-
-        // Print all punch times
-        for (var punch in getPunches) {
-          // print('Punch Time: ${punch.systemDtl}');
-        }
-      } else {
-        _errorMessage = "Failed to fetch punch data: ${response.statusCode}";
-      }
-    } catch (error) {
-      _errorMessage = "Error fetching punch data: $error";
-    } finally {
-      _loading = false;
-      notifyListeners();
-    }
-  }
-
-  // // Method to clear check-in data
-
   void _setLoading(bool value) {
     _loading = value;
+    notifyListeners(); // Notify listeners to update UI
   }
 
   void _setErrorMessage(String message) {

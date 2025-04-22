@@ -143,7 +143,7 @@ class _AssignedByMeState extends State<AssignedByMe> {
               children: [
                 SummaryCard(
                   title: "Open",
-                  count: '${provider.assignByMeSummary!.open}',
+                  count: '${provider.assignByMeSummary?.open}',
                   countColor: Colors.red,
                   screenWidth: screenWidth,
                 ),
@@ -152,7 +152,7 @@ class _AssignedByMeState extends State<AssignedByMe> {
                 ),
                 SummaryCard(
                   title: "Closed",
-                  count: '${provider.assignByMeSummary!.closed}',
+                  count: '${provider.assignByMeSummary?.closed}',
                   countColor: Colors.green,
                   screenWidth: screenWidth,
                 ),

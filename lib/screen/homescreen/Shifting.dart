@@ -27,7 +27,9 @@ class _ShiftScreenState extends State<ShiftScreen> {
 
     if (provider.isLoading) {
       return const Center(
-          child: CircularProgressIndicator(color: Colors.white));
+          child: SizedBox(
+              height: 50,
+              child: CircularProgressIndicator(color: Colors.white)));
     }
 
     final currentshifts = provider.currentShift;

@@ -12,6 +12,7 @@ class AuthProvider with ChangeNotifier {
   String? _username;
   int? _expirationTime; // Store expiration time
 
+  DateTime? _tokenExpiryDateTime;
   final TokenStorage _tokenStorage = TokenStorage();
 
   bool get loading => _loading;
@@ -39,7 +40,7 @@ class AuthProvider with ChangeNotifier {
       );
 
       final response = await http.post(
-        Uri.parse('http://45.117.153.90:5004/Account/LoginUser/'),
+        Uri.parse('http://45.117.153.90:5004/Account/LoginUser'),
         headers: {"Content-Type": "application/json"},
         body: json.encode(loginModel.toJson()),
       );
@@ -110,20 +111,24 @@ class AuthProvider with ChangeNotifier {
 
       if (refreshToken != null) {
         final response = await http.post(
-          Uri.parse('http://45.117.153.90:5004/Account/RefreshToken/'),
+          Uri.parse('http://45.117.153.90:5004/Account/RefreshToken'),
           headers: {"Content-Type": "application/json"},
           body: json.encode({"refreshToken": refreshToken}),
         );
-
+        print(response);
         if (response.statusCode == 200) {
           final responseData = json.decode(response.body);
           final newToken = responseData['token'];
+          print(newToken);
 
           await _tokenStorage.storeToken(newToken);
           _token = newToken;
           notifyListeners();
         } else {
-          _setErrorMessage("");
+          _setErrorMessage(" Error refreshing token: ${response.statusCode}");
+          print("hello");
+          print(
+              "Error refreshing token: ${response.statusCode} ${response.body}");
         }
       }
     }
@@ -131,7 +136,8 @@ class AuthProvider with ChangeNotifier {
 
   Future<String?> getValidAccessToken() async {
     if (isTokenExpired()) {
-      await refreshAccessToken(); // refreshes _token
+      await refreshAccessToken();
+      print(isTokenExpired()); // refreshes _token
     }
 
     return _token; // returns valid token after refresh (if needed)

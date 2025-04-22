@@ -796,9 +796,21 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                                                                             .end,
                                                                     children: [
                                                                       ElevatedButton(
-                                                                        onPressed: () => Navigator.pop(
-                                                                            context,
-                                                                            false),
+                                                                        onPressed:
+                                                                            () {
+                                                                          Navigator.pop(
+                                                                              context,
+                                                                              false);
+                                                                          _selectedServity = ticket
+                                                                              .ticket
+                                                                              .severity;
+                                                                          _selectedPriority = ticket
+                                                                              .ticket
+                                                                              .priority;
+                                                                          _selectedassigntoType = ticket
+                                                                              .ticket
+                                                                              .assignToEmployeeId;
+                                                                        },
                                                                         style: ElevatedButton
                                                                             .styleFrom(
                                                                           backgroundColor:
@@ -834,6 +846,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                                                                                     {
                                                                                       if (ticket.ticket.status == "Closed") {
                                                                                         await provider.reopenTicketById(ticketId: ticket.id);
+                                                                                        print(ticket.id);
                                                                                       }
 
                                                                                       Navigator.pop(context);

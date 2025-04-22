@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:hrms_app/providers/check-in_provider/check_in_provider.dart';
-import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
+import 'package:hrms_app/providers/check-in_provider/sharelive%20_location.dart';
+import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen categories/customprofile_appbar.dart';
 
 class ShareLiveLocationScreen extends StatefulWidget {
   @override
@@ -20,6 +20,10 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
+    Future.microtask(() =>
+        Provider.of<ShareliveLocation>(context, listen: false)
+            .sharelivelocation());
   }
 
   @override
@@ -36,11 +40,10 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
     }
   }
 
-  // Function to share location
   void _shareLocation(double latitude, double longitude) {
     String googleMapsUrl =
         "https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude";
-    Share.share(" $googleMapsUrl");
+    Share.share("My current location: $googleMapsUrl");
   }
 
   @override
@@ -48,33 +51,46 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
     return Scaffold(
       appBar: CustomAppBarProfile(title: "Live Location"),
       body: SafeArea(
-        child: Consumer<CheckInProvider>(
-          builder: (context, checkInProvider, child) {
-            LatLng? userLocation = (checkInProvider.latitude != null &&
-                    checkInProvider.longitude != null)
-                ? LatLng(double.parse(checkInProvider.latitude!),
-                    double.parse(checkInProvider.longitude!))
+        child: Consumer<ShareliveLocation>(
+          builder: (context, shareProvider, child) {
+            // Display success message
+            if (shareProvider.successMessage != null) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      shareProvider.successMessage!,
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontSize: 16,
+                      ),
+                    ),
+                    backgroundColor: cardBackgroundColor,
+                  ),
+                );
+                shareProvider.clearSuccessMessage();
+              });
+            }
+
+            LatLng? userLocation = (shareProvider.latitude != null &&
+                    shareProvider.longitude != null)
+                ? LatLng(double.parse(shareProvider.latitude!),
+                    double.parse(shareProvider.longitude!))
                 : null;
+
+            if (shareProvider.loading) {
+              return Center(child: CircularProgressIndicator());
+            }
+
+            if (shareProvider.errorMessage.isNotEmpty) {
+              return Center(child: Text(shareProvider.errorMessage));
+            }
 
             return Column(
               children: [
                 Expanded(
                   child: userLocation == null
-                      ? FutureBuilder(
-                          future: checkInProvider.punchPost(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Center(child: CircularProgressIndicator());
-                            } else if (snapshot.hasError) {
-                              return Center(
-                                  child: Text("Error fetching location"));
-                            } else {
-                              return Center(
-                                  child: Text("No location data available"));
-                            }
-                          },
-                        )
+                      ? Center(child: Text("Location not available"))
                       : GoogleMap(
                           initialCameraPosition: CameraPosition(
                             target: userLocation,
@@ -82,13 +98,12 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
                           ),
                           markers: {
                             Marker(
-                              visible: true,
                               markerId: MarkerId("current_location"),
                               position: userLocation,
                               infoWindow: InfoWindow(
-                                  title: checkInProvider.aDDress ??
-                                      "Your Location"),
-                            )
+                                title: shareProvider.aDDress ?? "Your Location",
+                              ),
+                            ),
                           },
                           onMapCreated: (GoogleMapController controller) {
                             _controller = controller;

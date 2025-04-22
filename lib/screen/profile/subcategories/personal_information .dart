@@ -5,6 +5,8 @@ import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
 
 class PersonalInformationScreen extends StatefulWidget {
+  const PersonalInformationScreen({super.key});
+
   @override
   State<PersonalInformationScreen> createState() =>
       _PersonalInformationScreenState();
@@ -83,7 +85,7 @@ class InfoRow extends StatelessWidget {
   final String title;
   final String value;
 
-  const InfoRow({required this.title, required this.value});
+  const InfoRow({super.key, required this.title, required this.value});
 
   @override
   Widget build(BuildContext context) {

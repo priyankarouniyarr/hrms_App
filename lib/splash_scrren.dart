@@ -6,6 +6,8 @@ import 'package:hrms_app/screen/app_main_screen.dart';
 import 'package:hrms_app/providers/login_screen_provider/auth_provider.dart';
 
 class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
@@ -49,6 +51,7 @@ class _SplashScreenState extends State<SplashScreen> {
     } catch (e) {
       setState(() {
         _errorMessage = e.toString();
+        print("Error: $_errorMessage");
       });
     }
   }

@@ -19,25 +19,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final checkInProvider =
-          Provider.of<CheckInProvider>(context, listen: false);
-      checkInProvider.loadCheckInData().then((e) {
-        userLocation = LatLng(double.parse(checkInProvider.latitude!),
-            double.parse(checkInProvider.longitude!));
-        //check if mapController initialized
-        if (mapController != null) {
-          mapController!.animateCamera(
-            CameraUpdate.newCameraPosition(
-              CameraPosition(
-                target: userLocation,
-                zoom: 15.0, // Adjust zoom level
-              ),
-            ),
-          );
-        }
-
-        setState(() {});
-      });
+      Provider.of<CheckInProvider>(context, listen: false).getpunches();
     });
     super.initState();
   }
@@ -63,127 +45,170 @@ class _CheckInScreenState extends State<CheckInScreen> {
       backgroundColor: cardBackgroundColor,
       appBar: CustomAppBarProfile(title: "Check In Details"),
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () async {
-                        // await checkInProvider.punchPost();
-                        // _showDialog(checkInProvider);
+        child: SingleChildScrollView(
+          physics: AlwaysScrollableScrollPhysics(),
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              // Punch and Share Live Location Buttons
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () async {
+                          await checkInProvider.punchPost();
+                          _showDialog(checkInProvider);
 
-                        // mapController!.animateCamera(
-                        //   CameraUpdate.newCameraPosition(
-                        //     CameraPosition(
-                        //       target: userLocation,
-                        //       zoom: 15.0, // Adjust zoom level
-                        //     ),
-                        //   ),
-                        // );
-                        print(checkInProvider.isCheckedIn);
-                      },
-                      child: _buildCheckInButton(checkInProvider),
+                          mapController!.animateCamera(
+                            CameraUpdate.newCameraPosition(
+                              CameraPosition(
+                                target: userLocation,
+                                zoom: 15.0, // Adjust zoom level
+                              ),
+                            ),
+                          );
+                        },
+                        child: _buildCheckInButton(checkInProvider),
+                      ),
                     ),
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () async {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    ShareLiveLocationScreen()));
-                      },
-                      child: _buildLocationButton(),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () async {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      ShareLiveLocationScreen()));
+                        },
+                        child: _buildLocationButton(),
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 30),
-              _buildStatusCard(checkInProvider),
-              SizedBox(height: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(Icons.access_time_rounded, size: 50),
-                  StreamBuilder(
-                    stream: Stream.periodic(Duration(seconds: 1)),
-                    builder: (context, snapshot) {
-                      return Center(
-                        child: Text(
-                          "  ${DateFormat('hh:mm:ss a').format(DateTime.now())}",
-                          style: TextStyle(
-                              fontSize: 25,
-                              color: primarySwatch,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      );
-                    },
-                  ),
-                  Center(
-                    child: Text(
-                      "  ${DateFormat('d MMM yyyy').format(DateTime.now())}",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-                    ),
-                  ),
-                  Center(
-                    child: Text(
-                      checkInProvider.isCheckedIn
-                          ? ' Last Check-in at: ${checkInProvider.checkInTime ?? '- -'}'
-                          : ' Last Check-out at: ${checkInProvider.checkOutTime ?? '--'}',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-                    ),
-                  ),
-                ],
-              ),
-
-              SizedBox(height: 10),
-              // Google Map
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: GoogleMap(
-                    initialCameraPosition: CameraPosition(
-                      target: userLocation,
-                      zoom: 15,
-                    ),
-                    markers: {
-                      Marker(
-                        visible: true,
-                        markerId: MarkerId("current_location"),
-                        position: userLocation,
-                        infoWindow: InfoWindow(
-                            title: checkInProvider.aDDress,
-                            snippet:
-                                'Lat: ${userLocation.latitude}, Lng: ${userLocation.longitude}'),
-                      )
-                    },
-                    onMapCreated: (GoogleMapController controller) {
-                      mapController = controller;
-                      print("Map created");
-                      print(userLocation);
-                      mapController!.animateCamera(
-                        CameraUpdate.newCameraPosition(
-                          CameraPosition(
-                            target: userLocation,
-                            zoom: 15,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                  ],
                 ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-            ],
+                SizedBox(height: 30),
+                _buildStatusCard(checkInProvider),
+                SizedBox(height: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(Icons.access_time_rounded, size: 50),
+                    StreamBuilder(
+                      stream: Stream.periodic(Duration(seconds: 1)),
+                      builder: (context, snapshot) {
+                        return Center(
+                          child: Text(
+                            "  ${DateFormat('hh:mm:ss a').format(DateTime.now())}",
+                            style: TextStyle(
+                                fontSize: 25,
+                                color: primarySwatch,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        );
+                      },
+                    ),
+                    Center(
+                      child: Text(
+                        "  ${DateFormat('d MMM yyyy').format(DateTime.now())}",
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                    Center(
+                      child: Text(
+                        checkInProvider.getPunches.isNotEmpty
+                            ? 'Last Punch Time: ${DateFormat('hh:mm a').format(checkInProvider.getPunches.first.punchTime)}'
+                            : '--',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.red),
+                      ),
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: 10),
+                // Google Map
+
+                if (checkInProvider.getPunches.isEmpty)
+                  Container(
+                    height: 300,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: GoogleMap(
+                        initialCameraPosition: CameraPosition(
+                          target: userLocation,
+                          zoom: 15,
+                        ),
+                        markers: {
+                          Marker(
+                            visible: true,
+                            markerId: MarkerId("current_location"),
+                            position: userLocation,
+                            infoWindow: InfoWindow(
+                                title: checkInProvider.aDDress,
+                                snippet:
+                                    'Lat: ${userLocation.latitude}, Lng: ${userLocation.longitude}'),
+                          )
+                        },
+                        onMapCreated: (GoogleMapController controller) {
+                          mapController = controller;
+
+                          mapController!.animateCamera(
+                            CameraUpdate.newCameraPosition(
+                              CameraPosition(
+                                target: userLocation,
+                                zoom: 15,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  )
+                else
+                  // If there are punches, show the map and last punch location
+                  Container(
+                    height: 300,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: GoogleMap(
+                        initialCameraPosition: CameraPosition(
+                          target: userLocation,
+                          zoom: 15,
+                        ),
+                        markers: {
+                          Marker(
+                            visible: true,
+                            markerId: MarkerId("current_location"),
+                            position: userLocation,
+                            infoWindow: InfoWindow(
+                                title: checkInProvider.aDDress,
+                                snippet:
+                                    'Lat: ${userLocation.latitude}, Lng: ${userLocation.longitude}'),
+                          ),
+                        },
+                        onMapCreated: (GoogleMapController controller) {
+                          mapController = controller;
+                          mapController!.animateCamera(
+                            CameraUpdate.newCameraPosition(
+                              CameraPosition(
+                                target: userLocation,
+                                zoom: 15,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                SizedBox(
+                  height: 20,
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -210,7 +235,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
           Icon(Icons.fingerprint, color: Colors.blue, size: 30),
           SizedBox(height: 15),
           Text(
-            provider.isCheckedIn ? 'Check Out' : 'Check In',
+            'Punch',
             style: TextStyle(
               color: Colors.blue,
               fontSize: 18,
@@ -255,41 +280,156 @@ class _CheckInScreenState extends State<CheckInScreen> {
   }
 
   Widget _buildStatusCard(CheckInProvider provider) {
-    return Card(
-      elevation: 5,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      child: Padding(
-        padding: EdgeInsets.all(30),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _buildStatusColumn("Check In", provider.checkInTime),
-            Text("/",
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500)),
-            _buildStatusColumn("Check Out", provider.checkOutTime),
-          ],
-        ),
-      ),
-    );
-  }
+    bool showAll = false;
 
-  Widget _buildStatusColumn(String label, String? time) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text(
-          label,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-        ),
-        SizedBox(height: 4),
-        Text(
-          time ?? '--:--',
-          style: TextStyle(
-              fontSize: 20,
-              color: primarySwatch[900],
-              fontWeight: FontWeight.w600),
-        ),
-      ],
+    return StatefulBuilder(
+      builder: (context, setState) {
+        final displayedPunches = showAll
+            ? provider.getPunches
+            : provider.getPunches.take(2).toList();
+
+        return Card(
+          elevation: 5,
+          shadowColor: Colors.grey.withOpacity(0.2),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          child: Padding(
+            padding: EdgeInsets.all(18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Today's Punch Records",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: primarySwatch,
+                      ),
+                    ),
+                    Icon(Icons.fingerprint, color: primarySwatch),
+                  ],
+                ),
+                SizedBox(height: 10),
+                if (provider.getPunches.isEmpty)
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Center(
+                      child: Text(
+                        "No punches recorded yet",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  Column(
+                    children: [
+                      ...displayedPunches.map((punch) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 4),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.check_circle,
+                                    color: Colors.green,
+                                    size: 20,
+                                  ),
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      DateFormat('EEEE, hh:mm:ss a')
+                                          .format(punch.punchTime),
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: primarySwatch,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              "${punch.systemDtl}",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: const Color.fromARGB(255, 30, 146, 0),
+                              ),
+                            ),
+                          ],
+                        );
+                      }).toList(),
+                      if (provider.getPunches.length > 2 && !showAll)
+                        TextButton(
+                          onPressed: () => setState(() => showAll = true),
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: Size(50, 30),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Show all ',
+                                style: TextStyle(
+                                  color: primarySwatch,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              Icon(
+                                Icons.keyboard_arrow_down,
+                                color: primarySwatch,
+                                size: 20,
+                              ),
+                            ],
+                          ),
+                        ),
+                      if (showAll && provider.getPunches.length > 4)
+                        TextButton(
+                          onPressed: () => setState(() => showAll = false),
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: Size(50, 30),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Show less',
+                                style: TextStyle(
+                                  color: primarySwatch,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              Icon(
+                                Icons.keyboard_arrow_up,
+                                color: primarySwatch,
+                                size: 20,
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -305,15 +445,15 @@ class _CheckInScreenState extends State<CheckInScreen> {
               children: [
                 Icon(Icons.check_circle, color: Colors.green, size: 50),
                 SizedBox(height: 10),
-                Text(checkInProvider.isCheckedIn
-                    ? "Check-In Successful"
-                    : "Check-Out Successful"),
+                Text("Punches Successfully"),
               ],
             ),
             actions: [
               TextButton(
-                onPressed: () {
+                onPressed: () async {
                   Navigator.pop(context);
+                  await checkInProvider.getpunches();
+                  setState(() {});
                 },
                 child: Text("OK"),
               ),

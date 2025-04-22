@@ -78,7 +78,6 @@ class HolidayProvider with ChangeNotifier {
       }
     } catch (e) {
       print("Error fetching past holidays: $e");
-      throw e;
     }
   }
 
@@ -115,7 +114,6 @@ class HolidayProvider with ChangeNotifier {
       }
     } catch (e) {
       print("Error fetching upcoming holidays: $e");
-      throw e;
     }
   }
 
