@@ -463,7 +463,8 @@ class TicketWorkFlowProvider with ChangeNotifier {
         throw Exception("Missing authentication data.");
       }
 
-      final url = Uri.parse('http://45.117.153.90:5004/api/EditAssignedTo');
+      final url =
+          Uri.parse('http://45.117.153.90:5004/api/Ticket/EditAssignedTo');
       final response = await http.post(
         url,
         headers: {
@@ -477,6 +478,8 @@ class TicketWorkFlowProvider with ChangeNotifier {
 
       print(request2.ticketId);
       print(request2.userId);
+      print(response.statusCode);
+
       if (response.statusCode == 200) {
         final responseBody = json.decode(response.body);
         if (responseBody is bool) {
@@ -484,7 +487,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
 
           print(responseBody);
           print("sucess");
-
+          notifyListeners();
           return responseBody;
         } else {
           throw Exception("Unexpected response format");

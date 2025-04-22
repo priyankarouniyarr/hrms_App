@@ -22,7 +22,7 @@ class TicketDetailScreen extends StatefulWidget {
 }
 
 class _TicketDetailScreenState extends State<TicketDetailScreen> {
-  int? _selectedassigntoType;
+  String? _selectedassigntoType;
   String? _selectedServity;
   String? _selectedPriority;
   late TicketWorkFlowProvider _ticketProvider;
@@ -46,7 +46,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
         setState(() {
           _selectedServity = ticket.severity;
           _selectedPriority = ticket.priority;
-          _selectedassigntoType = ticket.assignToEmployeeId;
+          _selectedassigntoType = ticket.assignToEmployeeId.toString();
         });
       }
     });
@@ -57,19 +57,24 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
       ticketId: widget.ticketId,
       priorityStatus: _selectedPriority!,
     );
-    // final assignToTicket = AssignToTicket(
-    //   ticketId: widget.ticketId,
-    //   userId: _selectedassigntoType!,
-    // );
+    final assignToTicket = AssignToTicket(
+      ticketId: widget.ticketId,
+      userId: int.parse(_selectedassigntoType!),
+    );
     final severityTicket = ServityTicket(
       ticketId: widget.ticketId,
       servityStatus: _selectedServity!,
     );
 
     await _ticketProvider.editServityTicketById(severityTicket);
-    print(severityTicket);
+    print(severityTicket.servityStatus);
+    print(severityTicket.ticketId);
     await _ticketProvider.editPriorityTicketById(priorityTicket);
-    print(priorityTicket);
+    print(priorityTicket.priorityStatus);
+    print(priorityTicket.ticketId);
+    await _ticketProvider.editAssignToTicketById(assignToTicket);
+    print(assignToTicket.ticketId);
+    print(assignToTicket.userId);
   }
 
   @override
@@ -144,8 +149,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                                                 style: const TextStyle(
                                                   fontSize: 14.0,
                                                   fontWeight: FontWeight.bold,
-                                                  color: Colors
-                                                      .white, // White text for better contrast
+                                                  color: Colors.white,
                                                 ),
                                               ),
                                             ),
@@ -311,7 +315,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            " Assigned On ",
+                                            "Assigned On ",
                                             style: TextStyle(fontSize: 14.0),
                                           ),
                                           Text(
@@ -329,7 +333,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            " LastModified On ",
+                                            "LastModified On ",
                                             style: TextStyle(fontSize: 14.0),
                                           ),
                                           Text(
@@ -347,7 +351,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                                                       .spaceBetween,
                                               children: [
                                                 Text(
-                                                  " Attachment Document ",
+                                                  "Attachment Document ",
                                                   style:
                                                       TextStyle(fontSize: 14.0),
                                                 ),
@@ -548,9 +552,8 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                                                                 const EdgeInsets
                                                                     .only(
                                                                     left: 15.0,
-                                                                    top: 2.0,
                                                                     bottom:
-                                                                        2.0),
+                                                                        0.0),
                                                             child: Container(
                                                               width: 2,
                                                               height: 30,
@@ -731,18 +734,18 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                                                       final provider1 = Provider
                                                           .of<NewTicketProvider>(
                                                               context);
-                                                      // List<Map<String, dynamic>>
-                                                      //     assignTo = provider1
-                                                      //         .userList
-                                                      //         .map((assignTo) => {
-                                                      //               'label':
-                                                      //                   assignTo
-                                                      //                       .text,
-                                                      //               'value':
-                                                      //                   assignTo
-                                                      //                       .value
-                                                      //             })
-                                                      //         .toList();
+                                                      List<Map<String, dynamic>>
+                                                          assignTo = provider1
+                                                              .userList
+                                                              .map(
+                                                                  (assignTo) =>
+                                                                      {
+                                                                        'label':
+                                                                            assignTo.text,
+                                                                        'value':
+                                                                            assignTo.value
+                                                                      })
+                                                              .toList();
 
                                                       return AlertDialog(
                                                         title: Text(
@@ -760,7 +763,8 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                                                                     MainAxisSize
                                                                         .min,
                                                                 children: [
-                                                                  _buildDropdown(
+                                                                  // For Servity
+                                                                  buildDropdown(
                                                                     "Servity",
                                                                     _selectedServity,
                                                                     provider
@@ -769,10 +773,9 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                                                                         _selectedServity =
                                                                             value),
                                                                   ),
-                                                                  const SizedBox(
-                                                                      height:
-                                                                          5),
-                                                                  _buildDropdown(
+
+// For Priority
+                                                                  buildDropdown(
                                                                     "Priority",
                                                                     _selectedPriority,
                                                                     provider
@@ -781,13 +784,20 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                                                                         _selectedPriority =
                                                                             value),
                                                                   ),
-                                                                  const SizedBox(
-                                                                      height:
-                                                                          5),
+
+// For Assign To
+                                                                  buildDropdownMap(
+                                                                    "Assign To",
+                                                                    _selectedassigntoType,
+                                                                    assignTo,
+                                                                    (value) => setState(() =>
+                                                                        _selectedassigntoType =
+                                                                            value),
+                                                                  ),
 
                                                                   //assign to
 
-                                                                  const SizedBox(
+                                                                  SizedBox(
                                                                       height:
                                                                           5),
                                                                   Row(
@@ -809,7 +819,8 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                                                                               .priority;
                                                                           _selectedassigntoType = ticket
                                                                               .ticket
-                                                                              .assignToEmployeeId;
+                                                                              .assignToEmployeeId
+                                                                              .toString();
                                                                         },
                                                                         style: ElevatedButton
                                                                             .styleFrom(
@@ -936,7 +947,9 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
 }
 
 //reopen portion of the code
-_buildDropdown(String title, String? value, List<String> items,
+
+// 1. For Servity and Priority (String list)
+Widget buildDropdown(String title, String? value, List<String> items,
     ValueChanged<String?> onChanged) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -949,10 +962,54 @@ _buildDropdown(String title, String? value, List<String> items,
         value: value,
         items: items,
         hintText: "",
-        onChanged: (val) {
-          onChanged(val);
-          ;
-        },
+        onChanged: (val) => onChanged(val),
+      ),
+    ],
+  );
+}
+
+// 2. For Assign To (List<Map<String, dynamic>>)
+Widget buildDropdownMap(
+  String title,
+  String? selectedValue,
+  List<Map<String, dynamic>> items,
+  ValueChanged<String?> onChanged,
+) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        title,
+        style: TextStyle(
+          color: primarySwatch,
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      SizedBox(height: 5),
+      DropdownButtonFormField<String>(
+        value: selectedValue,
+        decoration: InputDecoration(
+          contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: primarySwatch, width: 1),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: primarySwatch, width: 2),
+          ),
+          filled: true,
+          fillColor: cardBackgroundColor,
+        ),
+        isExpanded: true,
+        items: items
+            .map((item) => DropdownMenuItem<String>(
+                  value: item["value"], // 👈 explicitly cast to int
+                  child: Text(item["label"]),
+                ))
+            .toList(),
+        onChanged: onChanged,
       ),
     ],
   );

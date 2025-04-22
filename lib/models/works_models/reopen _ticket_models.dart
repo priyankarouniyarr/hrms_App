@@ -18,7 +18,6 @@ class PriorityTicket {
 
 class ServityTicket {
   int ticketId;
-
   String servityStatus;
 
   ServityTicket({
