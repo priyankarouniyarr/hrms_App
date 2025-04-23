@@ -134,7 +134,8 @@ class _CheckInScreenState extends State<CheckInScreen> {
 
                 if (checkInProvider.getPunches.isEmpty)
                   Container(
-                    height: 300,
+                    width: double.infinity,
+                    height: 500,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: GoogleMap(

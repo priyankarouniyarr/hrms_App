@@ -109,31 +109,31 @@ class AttendanceDetails {
 
   factory AttendanceDetails.fromJson(Map<String, dynamic> json) {
     return AttendanceDetails(
-      attendanceDate: DateTime.parse(json['attendanceDate']),
-      attendanceDateNp: json['attendanceDateNp'],
-      employeeName: json['employeeName'],
-      departmentName: json['departmentName'],
-      dutyType: json['dutyType'],
-      shiftTitle: json['shiftTitle'],
-      shiftTime: json['shiftTime'],
-      shiftStartTime: DateTime.parse(json['shiftStartTime']),
-      shiftEndTime: DateTime.parse(json['shiftEndTime']),
+      attendanceDate: DateTime.parse(json['attendanceDate'] ?? ''),
+      attendanceDateNp: json['attendanceDateNp'] ?? '',
+      employeeName: json['employeeName'] ?? '',
+      departmentName: json['departmentName'] ?? '',
+      dutyType: json['dutyType'] ?? '',
+      shiftTitle: json['shiftTitle'] ?? '',
+      shiftTime: json['shiftTime'] ?? '',
+      shiftStartTime: DateTime.parse(json['shiftStartTime'] ?? ''),
+      shiftEndTime: DateTime.parse(json['shiftEndTime'] ?? ''),
       checkInTime: json['checkInTime'] != null
-          ? DateTime.parse(json['checkInTime'])
+          ? DateTime.parse(json['checkInTime'] ?? '')
           : null,
       checkOutTime: json['checkOutTime'] != null
-          ? DateTime.parse(json['checkOutTime'])
+          ? DateTime.parse(json['checkOutTime'] ?? '')
           : null,
       breakOutTime: json['breakOutTime'] != null
-          ? DateTime.parse(json['breakOutTime'])
+          ? DateTime.parse(json['breakOutTime'] ?? '')
           : null,
       breakInTime: json['breakInTime'] != null
-          ? DateTime.parse(json['breakInTime'])
+          ? DateTime.parse(json['breakInTime'] ?? '')
           : null,
-      status: json['status'],
-      remarks: json['remarks'],
-      statusFullName: json['statusFullName'],
-      statusColorCode: json['statusColorCode'],
+      status: json['status'] ?? '',
+      remarks: json['remarks'] ?? '',
+      statusFullName: json['statusFullName'] ?? '',
+      statusColorCode: json['statusColorCode'] ?? '',
     );
   }
 }

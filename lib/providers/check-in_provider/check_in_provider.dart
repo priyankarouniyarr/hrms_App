@@ -134,9 +134,9 @@ class CheckInProvider with ChangeNotifier {
         getPunches = jsonData.map((e) => EmployeePunch.fromJson(e)).toList();
 
         // Print all punch times
-        for (var punch in getPunches) {
-          // print('Punch Time: ${punch.systemDtl}');
-        }
+        // for (var punch in getPunches) {
+        //   // print('Punch Time: ${punch.systemDtl}');
+        // }
       } else {
         _errorMessage = "Failed to fetch punch data: ${response.statusCode}";
       }

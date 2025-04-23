@@ -90,7 +90,14 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
               children: [
                 Expanded(
                   child: userLocation == null
-                      ? Center(child: Text("Location not available"))
+                      ? shareProvider.loading
+                          ? Center(child: CircularProgressIndicator())
+                          : Center(
+                              child: Text(
+                                "Location not available",
+                                style: TextStyle(fontSize: 18),
+                              ),
+                            )
                       : GoogleMap(
                           initialCameraPosition: CameraPosition(
                             target: userLocation,
