@@ -70,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          //physics: const NeverScrollableScrollPhysics(),
+          //    physics: const NeverScrollableScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -101,6 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
 
               // Shifting screen
+              // ignore: unnecessary_null_comparison
               provider.currentShift == null
                   ? SizedBox.shrink()
                   : Padding(
@@ -109,8 +110,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
               SizedBox(height: 15),
               Container(
-                height: MediaQuery.of(context).size.height *
-                    0.8, // Adjust based on need
+                height: MediaQuery.of(context).size.height /
+                    1.5, // Adjust based on need
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(

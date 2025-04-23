@@ -12,7 +12,6 @@ class AuthProvider with ChangeNotifier {
   String? _username;
   int? _expirationTime; // Store expiration time
 
-  DateTime? _tokenExpiryDateTime;
   final TokenStorage _tokenStorage = TokenStorage();
 
   bool get loading => _loading;
@@ -49,8 +48,8 @@ class AuthProvider with ChangeNotifier {
         final responseData = json.decode(response.body);
         final token = responseData['token'];
         final refreshToken = responseData['refreshToken'];
-        _expirationTime =
-            responseData['expirationTime']; // Store expiration time
+        _expirationTime = int.tryParse(responseData['expiration'].toString());
+// Store expiration time
 
         _username = username;
 
@@ -70,6 +69,7 @@ class AuthProvider with ChangeNotifier {
       }
     } catch (e) {
       _setErrorMessage("Error: $e");
+      print("Error: $e");
     } finally {
       _setLoading(false);
     }
@@ -111,36 +111,39 @@ class AuthProvider with ChangeNotifier {
 
       if (refreshToken != null) {
         final response = await http.post(
-          Uri.parse('http://45.117.153.90:5004/Account/RefreshToken'),
+          Uri.parse('http://45.117.153.90:5004/Account/RefreshToken/refresh'),
           headers: {"Content-Type": "application/json"},
-          body: json.encode({"refreshToken": refreshToken}),
+          body: json.encode({"RefreshToken": refreshToken}),
         );
-        print(response);
+        // print(response.statusCode);
+        // print(response.body);
+        // print("refreshToken : $refreshToken");
+        // print(response.statusCode);
+        // print("break");
+
         if (response.statusCode == 200) {
           final responseData = json.decode(response.body);
+
           final newToken = responseData['token'];
-          print(newToken);
+          final newRefreshToken = responseData['refreshToken'];
+
+          _expirationTime = int.tryParse(responseData['expiration'].toString());
 
           await _tokenStorage.storeToken(newToken);
+          await _tokenStorage.storeRefreshToken(newRefreshToken);
+
           _token = newToken;
-          notifyListeners();
+          print("brek2");
+          print(
+              "Refresh Token: $newRefreshToken"); // Print the new token for debugging
         } else {
           _setErrorMessage(" Error refreshing token: ${response.statusCode}");
-          print("hello");
+
           print(
               "Error refreshing token: ${response.statusCode} ${response.body}");
         }
       }
     }
-  }
-
-  Future<String?> getValidAccessToken() async {
-    if (isTokenExpired()) {
-      await refreshAccessToken();
-      print(isTokenExpired()); // refreshes _token
-    }
-
-    return _token; // returns valid token after refresh (if needed)
   }
 
   // Logout and remove both access and refresh tokens

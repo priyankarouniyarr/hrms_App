@@ -71,10 +71,10 @@ class _ShiftScreenState extends State<ShiftScreen> {
               return Padding(
                 padding: const EdgeInsets.all(5.0),
                 child: ShiftCard(
-                  dateNp: currentshifts.currentDateNp,
-                  shift: currentShift['shift']!,
-                  shifttime: currentShift['shifttime']!,
-                  shiftend: currentShift['shiftend']!,
+                  dateNp: currentshifts.currentDateNp ?? '',
+                  shift: currentShift['shift'] ?? 'No Shift',
+                  shifttime: currentShift['shifttime'] ?? '',
+                  shiftend: currentShift['shiftend'] ?? '',
                 ),
               );
             },

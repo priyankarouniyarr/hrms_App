@@ -119,7 +119,14 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
                             userLocation.latitude, userLocation.longitude);
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Location is unavailable')),
+                          SnackBar(
+                            content: Text('Location is unavailable',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                )),
+                            backgroundColor: Colors.red,
+                          ),
                         );
                       }
                     },
