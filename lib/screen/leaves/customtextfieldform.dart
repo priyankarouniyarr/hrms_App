@@ -11,14 +11,14 @@ class CustomTextFormField extends StatelessWidget {
   // Corrected validator type
 
   const CustomTextFormField({
-    Key? key,
+    super.key,
     required this.controller,
     required this.hintText,
     this.readOnly = false,
     this.onTap,
     this.suffixIcon,
     this.validator,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

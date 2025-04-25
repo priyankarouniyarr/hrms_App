@@ -13,7 +13,7 @@ class TokenStorage {
     try {
       return await _secureStorage.read(key: 'auth_token');
     } catch (e) {
-      print("Error reading auth token: $e");
+      // print("Error reading auth token: $e");
       return null;
     }
   }
@@ -33,7 +33,7 @@ class TokenStorage {
     try {
       return await _secureStorage.read(key: 'refresh_token');
     } catch (e) {
-      print("Error reading refresh token: $e");
+      // print("Error reading refresh token: $e");
       return null;
     }
   }
@@ -53,6 +53,22 @@ class TokenStorage {
     try {
       return await _secureStorage.read(key: 'username');
     } catch (e) {
+      return null;
+    }
+  }
+
+  Future<void> storeExpiationTime(DateTime time) async {
+    await _secureStorage.write(key: 'expiration_time', value: time.toString());
+  }
+
+  Future<DateTime?> getExpirationtime() async {
+    try {
+      final response = await _secureStorage.read(key: 'expiration_time');
+      if (response != null) {
+        return DateTime.parse(response);
+      }
+    } catch (e) {
+      // print("Error reading auth token: $e");
       return null;
     }
   }

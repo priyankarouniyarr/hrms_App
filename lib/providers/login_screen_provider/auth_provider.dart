@@ -10,7 +10,7 @@ class AuthProvider with ChangeNotifier {
   String _errorMessage = '';
   String? _token;
   String? _username;
-  int? _expirationTime; // Store expiration time
+  DateTime? _expirationTime; // Store expiration time
 
   final TokenStorage _tokenStorage = TokenStorage();
 
@@ -48,7 +48,7 @@ class AuthProvider with ChangeNotifier {
         final responseData = json.decode(response.body);
         final token = responseData['token'];
         final refreshToken = responseData['refreshToken'];
-        _expirationTime = int.tryParse(responseData['expiration'].toString());
+        _expirationTime = DateTime.parse(responseData['expiration'].toString());
 // Store expiration time
 
         _username = username;
@@ -77,12 +77,14 @@ class AuthProvider with ChangeNotifier {
 
   // Check if the token is expired
   bool isTokenExpired() {
+    print(_expirationTime);
     if (_expirationTime == null) return true;
 
-    final currentTime = DateTime.now().millisecondsSinceEpoch / 1000;
+    final currentTime = DateTime.now();
     print(currentTime);
 
-    return currentTime > _expirationTime!;
+    return currentTime.isAfter(_expirationTime!);
+    //23>22
   }
 
   // Load access token securely
@@ -98,7 +100,9 @@ class AuthProvider with ChangeNotifier {
   // Load refresh token securely
   Future<void> loadRefreshToken() async {
     String? refreshToken = await _tokenStorage.getRefreshToken();
-
+    DateTime? expirationtime = await _tokenStorage.getExpirationtime();
+    _expirationTime = expirationtime;
+    print("expirytime loaded :$expirationtime");
     if (refreshToken != null) {
       print("Loaded Refresh Token: $refreshToken");
     }
@@ -127,9 +131,13 @@ class AuthProvider with ChangeNotifier {
           final newToken = responseData['token'];
           final newRefreshToken = responseData['refreshToken'];
 
-          _expirationTime = int.tryParse(responseData['expiration'].toString());
+          _expirationTime =
+              DateTime.parse(responseData['expiration'].toString());
+          print("newexpiration:$_expirationTime");
 
           await _tokenStorage.storeToken(newToken);
+
+          await _tokenStorage.storeExpiationTime(_expirationTime!);
           await _tokenStorage.storeRefreshToken(newRefreshToken);
 
           _token = newToken;

@@ -15,7 +15,7 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
       List.generate(6, (_) => TextEditingController());
   final List<FocusNode> focusNodes = List.generate(6, (_) => FocusNode());
 
-  String enteredCode = ''; // Store entered OTP code
+  String enteredCode = '';
 
   void _validateAndSubmit() async {
     if (enteredCode.length == 6) {
@@ -26,7 +26,7 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => LoginScreen()),
-          (route) => false, // Remove all routes
+          (route) => false,
         );
       }
     }
@@ -61,12 +61,6 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
       FocusScope.of(context).requestFocus(focusNodes[index + 1]);
     }
   }
-
-  // void _onBackspace(int index) {
-  //   if (controllers[index].text.isEmpty && index > 0) {
-  //     FocusScope.of(context).requestFocus(focusNodes[index - 1]);
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {

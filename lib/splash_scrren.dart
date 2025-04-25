@@ -36,7 +36,7 @@ class _SplashScreenState extends State<SplashScreen> {
       if (authProvider.token != null) {
         bool isTokenExpired = await authProvider.isTokenExpired();
         if (isTokenExpired) {
-          // print(isTokenExpired);
+          print(isTokenExpired);
           await authProvider.refreshAccessToken();
           isLoggedIn = true;
         } else {

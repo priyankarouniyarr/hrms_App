@@ -52,7 +52,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
     });
   }
 
-  void _onSubmit() async {
+  Future<void> _onSubmit() async {
     final priorityTicket = PriorityTicket(
       ticketId: widget.ticketId,
       priorityStatus: _selectedPriority!,
@@ -75,6 +75,8 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
     await _ticketProvider.editAssignToTicketById(assignToTicket);
     print(assignToTicket.ticketId);
     print(assignToTicket.userId);
+
+    Navigator.pop(context);
   }
 
   @override
@@ -838,6 +840,9 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                                                                       ElevatedButton(
                                                                         onPressed:
                                                                             () async {
+                                                                          final scaffoldMessenger =
+                                                                              ScaffoldMessenger.of(context);
+
                                                                           final shouldProceed =
                                                                               await showDialog<bool>(
                                                                             context:
@@ -854,30 +859,8 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                                                                                 TextButton(
                                                                                   onPressed: () async {
                                                                                     Navigator.pop(context, true);
-                                                                                    {
-                                                                                      if (ticket.ticket.status == "Closed") {
-                                                                                        await provider.reopenTicketById(ticketId: ticket.id);
-                                                                                        print(ticket.id);
-                                                                                      }
-
-                                                                                      Navigator.pop(context);
-
-                                                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                                                        SnackBar(
-                                                                                          content: Text(
-                                                                                            'Successfully opened the ticket',
-                                                                                            style: TextStyle(
-                                                                                              fontSize: 18,
-                                                                                              fontWeight: FontWeight.w400,
-                                                                                              color: Colors.green,
-                                                                                            ),
-                                                                                          ),
-                                                                                          backgroundColor: Colors.white,
-                                                                                        ),
-                                                                                      );
-                                                                                    }
                                                                                   },
-                                                                                  child: Text('Yes'),
+                                                                                  child: Text("Yes"),
                                                                                 ),
                                                                               ],
                                                                             ),
@@ -885,9 +868,47 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
 
                                                                           if (shouldProceed ??
                                                                               false) {
-                                                                            _onSubmit();
-                                                                            Navigator.pop(context,
-                                                                                true);
+                                                                            try {
+                                                                              if (ticket.ticket.status == "Closed") {
+                                                                                await provider.reopenTicketById(ticketId: ticket.id);
+                                                                                print("hello");
+                                                                                print(ticket.id);
+                                                                                print("are you here");
+                                                                              }
+
+                                                                              await _onSubmit();
+
+                                                                              Navigator.pop(context);
+
+                                                                              scaffoldMessenger.showSnackBar(
+                                                                                SnackBar(
+                                                                                  content: Text(
+                                                                                    ticket.ticket.status == "Closed" ? 'Successfully reopened the ticket' : '',
+                                                                                    style: TextStyle(
+                                                                                      fontSize: 18,
+                                                                                      fontWeight: FontWeight.w400,
+                                                                                      color: Colors.green,
+                                                                                    ),
+                                                                                  ),
+                                                                                  backgroundColor: Colors.white,
+                                                                                ),
+                                                                              );
+                                                                            } catch (e) {
+                                                                              print('Error: $e');
+                                                                              scaffoldMessenger.showSnackBar(
+                                                                                SnackBar(
+                                                                                  content: Text(
+                                                                                    'Failed to reopen the ticket.',
+                                                                                    style: TextStyle(
+                                                                                      fontSize: 18,
+                                                                                      fontWeight: FontWeight.w400,
+                                                                                      color: Colors.red,
+                                                                                    ),
+                                                                                  ),
+                                                                                  backgroundColor: Colors.red,
+                                                                                ),
+                                                                              );
+                                                                            }
                                                                           }
                                                                         },
                                                                         style: ElevatedButton
@@ -945,8 +966,6 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
         ));
   }
 }
-
-//reopen portion of the code
 
 // 1. For Servity and Priority (String list)
 Widget buildDropdown(String title, String? value, List<String> items,
