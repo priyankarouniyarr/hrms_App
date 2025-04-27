@@ -140,7 +140,8 @@ class _CheckInScreenState extends State<CheckInScreen> {
                       borderRadius: BorderRadius.circular(12),
                       child: GoogleMap(
                         initialCameraPosition: CameraPosition(
-                          target: userLocation,
+                          target: splitLatLon(
+                              checkInProvider.getPunches.last.systemDtl),
                           zoom: 15,
                         ),
                         markers: {
@@ -482,4 +483,24 @@ class _CheckInScreenState extends State<CheckInScreen> {
       );
     }
   }
+
+  splitLatLon(String systemDtl) {
+    // Split the string by comma
+    List<String> parts = systemDtl.split(',');
+    print(parts);
+    // Check if the list has at least two elements
+    var lat = parts[0].trim().split(': ')[1].trim();
+    var lon = parts[1].trim().split(': ')[1].trim();
+    print(lat);
+    print(lon);
+    return LatLng(double.parse(lat), double.parse(lon));
+  }
 }
+
+
+
+/**
+ * 1. load punches
+ * 3. get last punched location (check by printing)
+ * 2. Map render (use last puched location for both camera postion and user location)
+ */

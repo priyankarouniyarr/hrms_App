@@ -40,7 +40,7 @@ class ShareliveLocation with ChangeNotifier {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         await Geolocator.openLocationSettings();
-        return;
+        return sharelivelocation();
       }
 
       LocationPermission permission = await Geolocator.checkPermission();
@@ -48,12 +48,12 @@ class ShareliveLocation with ChangeNotifier {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
           _setErrorMessage("Location permission denied.");
-          return;
+          return sharelivelocation();
         }
       }
       if (permission == LocationPermission.deniedForever) {
         _setErrorMessage("Location permission denied forever.");
-        return;
+        return sharelivelocation();
       }
 
       Position position = await Geolocator.getCurrentPosition(

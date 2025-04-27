@@ -309,12 +309,12 @@ class _WorkflowViewState extends State<WorkflowView> {
 
                                       await _initializeData();
                                     } catch (e) {
-                                      print(
-                                          "Error: Ticket with ID $ticketID not found or action failed: $e");
+                                      // print(
+                                      //     "Error: Ticket with ID $ticketID not found or action failed: $e");
                                     }
                                   },
                                   onDetailsViewed: (ticketID) async {
-                                    await Navigator.push(
+                                    bool? resp = await Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) =>
@@ -322,6 +322,44 @@ class _WorkflowViewState extends State<WorkflowView> {
                                                 ticketId: ticketID),
                                       ),
                                     );
+
+                                    if (resp == true) {
+                                      if (_selectedStatus == "Open") {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              "Successfully closed the ticket",
+                                              style: TextStyle(
+                                                color: Colors.green,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                            backgroundColor:
+                                                cardBackgroundColor,
+                                            duration: Duration(seconds: 3),
+                                          ),
+                                        );
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              "Successfully reopened the card",
+                                              style: TextStyle(
+                                                color: Colors.green,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                            backgroundColor:
+                                                cardBackgroundColor,
+                                            duration: Duration(seconds: 3),
+                                          ),
+                                        );
+                                      }
+                                    }
+
+                                    // Call _initializeData after the condition
                                     await _initializeData();
                                   },
                                 )
@@ -345,7 +383,7 @@ class _WorkflowViewState extends State<WorkflowView> {
                                     }
                                   },
                                   onDetailsAssignedViewed: (ticketID) async {
-                                    await Navigator.push(
+                                    bool? resp = await Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) =>
@@ -353,6 +391,49 @@ class _WorkflowViewState extends State<WorkflowView> {
                                                 ticketId: ticketID),
                                       ),
                                     );
+
+                                    if (resp == true) {
+                                      print(
+                                          "Response from TicketDetailScreen: $resp");
+                                      print(
+                                          "Provider status: ${provider.status}");
+
+                                      if (provider.status == "Open") {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              "Successfully closed the ticket",
+                                              style: TextStyle(
+                                                color: Colors.green,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                            backgroundColor:
+                                                cardBackgroundColor,
+                                            duration: Duration(seconds: 3),
+                                          ),
+                                        );
+                                      } else {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              "Successfully reopened the card",
+                                              style: TextStyle(
+                                                color: Colors.green,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                            backgroundColor:
+                                                cardBackgroundColor,
+                                            duration: Duration(seconds: 3),
+                                          ),
+                                        );
+                                      }
+                                    }
+
+                                    // Call _initializeData after the condition
                                     await _initializeData();
                                   },
                                 ),
@@ -377,7 +458,7 @@ class _WorkflowViewState extends State<WorkflowView> {
                   fontSize: 16,
                   fontWeight: FontWeight.w600)),
           SizedBox(height: 5),
-          CustomDropdown(
+          CustomDropdownClearFilters(
             value: value,
             items: items,
             hintText: "",

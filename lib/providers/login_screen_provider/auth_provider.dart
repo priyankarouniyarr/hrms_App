@@ -10,7 +10,7 @@ class AuthProvider with ChangeNotifier {
   String _errorMessage = '';
   String? _token;
   String? _username;
-  DateTime? _expirationTime; // Store expiration time
+  DateTime? _expirationTime;
 
   final TokenStorage _tokenStorage = TokenStorage();
 
@@ -18,8 +18,6 @@ class AuthProvider with ChangeNotifier {
   String get errorMessage => _errorMessage;
   String? get token => _token;
   String? get username => _username;
-
-//
 
   Future<void> login(
       String username, String password, BuildContext context) async {
@@ -49,13 +47,15 @@ class AuthProvider with ChangeNotifier {
         final token = responseData['token'];
         final refreshToken = responseData['refreshToken'];
         _expirationTime = DateTime.parse(responseData['expiration'].toString());
-// Store expiration time
+        // _expirationTime = DateTime.now().add(const Duration(minutes: 1));
+        print("new expiration: $_expirationTime");
 
         _username = username;
 
         await _tokenStorage.storeToken(token);
         await _tokenStorage.storeUsername(username);
         await _tokenStorage.storeRefreshToken(refreshToken);
+        await _tokenStorage.storeExpiationTime(_expirationTime!);
 
         _token = token;
         notifyListeners();
@@ -75,7 +75,6 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  // Check if the token is expired
   bool isTokenExpired() {
     print(_expirationTime);
     if (_expirationTime == null) return true;
@@ -84,10 +83,8 @@ class AuthProvider with ChangeNotifier {
     print(currentTime);
 
     return currentTime.isAfter(_expirationTime!);
-    //23>22
   }
 
-  // Load access token securely
   Future<void> loadToken() async {
     _token = await _tokenStorage.getToken();
   }
@@ -100,6 +97,9 @@ class AuthProvider with ChangeNotifier {
   // Load refresh token securely
   Future<void> loadRefreshToken() async {
     String? refreshToken = await _tokenStorage.getRefreshToken();
+    print(":refreshToken");
+    print(refreshToken);
+
     DateTime? expirationtime = await _tokenStorage.getExpirationtime();
     _expirationTime = expirationtime;
     print("expirytime loaded :$expirationtime");
@@ -119,11 +119,6 @@ class AuthProvider with ChangeNotifier {
           headers: {"Content-Type": "application/json"},
           body: json.encode({"RefreshToken": refreshToken}),
         );
-        // print(response.statusCode);
-        // print(response.body);
-        // print("refreshToken : $refreshToken");
-        // print(response.statusCode);
-        // print("break");
 
         if (response.statusCode == 200) {
           final responseData = json.decode(response.body);
@@ -134,19 +129,16 @@ class AuthProvider with ChangeNotifier {
           _expirationTime =
               DateTime.parse(responseData['expiration'].toString());
           print("newexpiration:$_expirationTime");
-
+          // _expirationTime = DateTime.now().add(const Duration(seconds: 30));
+          print("new expiration: $_expirationTime");
           await _tokenStorage.storeToken(newToken);
-
           await _tokenStorage.storeExpiationTime(_expirationTime!);
           await _tokenStorage.storeRefreshToken(newRefreshToken);
-
           _token = newToken;
           print("brek2");
-          print(
-              "Refresh Token: $newRefreshToken"); // Print the new token for debugging
+          print("Refresh Token: $newRefreshToken");
         } else {
           _setErrorMessage(" Error refreshing token: ${response.statusCode}");
-
           print(
               "Error refreshing token: ${response.statusCode} ${response.body}");
         }
@@ -154,7 +146,7 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  // Logout and remove both access and refresh tokens
+// Logout and remove both access and refresh tokens
   Future<void> logout() async {
     await _tokenStorage.removeToken();
     await _tokenStorage.removeRefreshToken();

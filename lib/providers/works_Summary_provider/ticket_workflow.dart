@@ -38,10 +38,9 @@ class TicketWorkFlowProvider with ChangeNotifier {
   List<String> get priority => _priority;
   List<String> _workflowType = ["Oldest", "Newest"];
   List<String> get workflowType => _workflowType;
-
+//MYtICKETS
   Future<void> fetchTickets(MyticketPost requestticket) async {
     _isLoading = true;
-    //notifyListeners();
 
     try {
       _branchId = await _secureStorageService.readData('workingBranchId');
@@ -174,15 +173,9 @@ class TicketWorkFlowProvider with ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
-        // Map<String, dynamic> responseDetails = json.decode(response.body);
-        // print(responseDetails);
-
         _myticketdetailsbyId = [
           TicketDetailsWithId.fromJson(json.decode(response.body)),
         ];
-        //print(_myticketdetailsbyId);
-
-        //notifyListeners();
       } else {
         _errormessage = 'Failed to load ticket summary';
       }
@@ -196,10 +189,13 @@ class TicketWorkFlowProvider with ChangeNotifier {
   }
 
 //closed the ticket
-  Future<bool> closedTicketById({required int ticketId}) async {
-    _isLoading = true;
+  Future<bool> closedTicketById(
+      {required int ticketId, toggleLoading = true}) async {
     _errormessage = '';
-    notifyListeners();
+    if (toggleLoading) {
+      _isLoading = true;
+      notifyListeners();
+    }
 
     try {
       String? token = await _secureStorageService.readData('auth_token');
@@ -226,19 +222,12 @@ class TicketWorkFlowProvider with ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
-        // Parse the response body as a boolean
         final responseBody = json.decode(response.body);
         if (responseBody is bool) {
-          _myTicket.removeWhere((ticket) => ticket.id == ticketId);
-          _myTicketAssignToMe.removeWhere((ticket) => ticket.id == ticketId);
-
-          // Also remove from details if it's there
-          _myticketdetailsbyId.removeWhere((ticket) => ticket.id == ticketId);
-          notifyListeners();
           print(responseBody);
           print("sucess");
 
-          return responseBody;
+          return true;
         } else {
           throw Exception("Unexpected response format");
         }
@@ -259,10 +248,13 @@ class TicketWorkFlowProvider with ChangeNotifier {
   }
 
 //reopen the ticket
-  Future<bool> reopenTicketById({required int ticketId}) async {
-    _isLoading = true;
+  Future<bool> reopenTicketById(
+      {required int ticketId, toggleLoading = true}) async {
     _errormessage = '';
-    notifyListeners();
+    if (toggleLoading) {
+      _isLoading = true;
+      notifyListeners();
+    }
 
     try {
       String? token = await _secureStorageService.readData('auth_token');
@@ -290,18 +282,10 @@ class TicketWorkFlowProvider with ChangeNotifier {
       if (response.statusCode == 200) {
         final responseBody = json.decode(response.body);
         if (responseBody is bool) {
-          //clearing the data
-
-          _myTicket.removeWhere((ticket) => ticket.id == ticketId);
-          _myTicketAssignToMe.removeWhere((ticket) => ticket.id == ticketId);
-
-          _myticketdetailsbyId.removeWhere((ticket) => ticket.id == ticketId);
-          notifyListeners();
-          print(ticketId);
           print(responseBody);
           print("sucess");
 
-          return responseBody;
+          return true;
         } else {
           throw Exception("Unexpected response format");
         }

@@ -98,13 +98,8 @@ class CustomDropdown2 extends StatelessWidget {
   Widget build(BuildContext context) {
     return DropdownButtonFormField2<int>(
         isExpanded: true,
-        //sautofocus: true,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         validator: validator,
-        // style: TextStyle(
-        //     color: Colors.black.withOpacity(0.8), fontSize: 14, height: 1.5),
-
-        // Ensures the dropdown takes full width
         value: value,
         barrierColor: Colors.black.withOpacity(0.5),
         items: items
@@ -150,5 +145,85 @@ class CustomDropdown2 extends StatelessWidget {
             primarySwatch.withOpacity(0.1),
           ),
         ));
+  }
+}
+
+class CustomDropdownClearFilters extends StatelessWidget {
+  final String? value;
+  final List<String> items;
+  final String hintText;
+  final ValueChanged<String?> onChanged;
+
+  const CustomDropdownClearFilters({
+    Key? key,
+    required this.value,
+    required this.items,
+    required this.hintText,
+    required this.onChanged,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    {
+      final dropdownItems = items.toSet().toList();
+
+      final validatedValue = dropdownItems.contains(value) ? value : null;
+
+      return DropdownButtonFormField2<String>(
+        isExpanded: true,
+        value: validatedValue,
+        items: dropdownItems
+            .map((String item) => DropdownMenuItem<String>(
+                  value: item,
+                  child: Text(
+                    item,
+                    style: TextStyle(
+                      color: Colors.black.withOpacity(0.8),
+                    ),
+                  ),
+                ))
+            .toList(),
+        onChanged: onChanged,
+        decoration: InputDecoration(
+          contentPadding: EdgeInsets.symmetric(
+            vertical: 12,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: primarySwatch, width: 1),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: primarySwatch, width: 3),
+          ),
+          filled: true,
+          fillColor: cardBackgroundColor,
+        ),
+        hint: Text(
+          hintText,
+          style: TextStyle(
+            color: Colors.black.withOpacity(0.5),
+          ),
+        ),
+        dropdownStyleData: DropdownStyleData(
+          decoration: BoxDecoration(
+            color: cardBackgroundColor,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          offset: const Offset(0, 0),
+        ),
+        selectedItemBuilder: (BuildContext context) {
+          return items.map((String item) {
+            return Text(
+              item,
+              style: TextStyle(
+                color: Colors.black.withOpacity(0.8),
+                fontSize: 14,
+              ),
+            );
+          }).toList();
+        },
+      );
+    }
   }
 }

@@ -30,10 +30,10 @@ class _AssignedByMeState extends State<AssignedByMe> {
 
     //assign by me severity type
     List<PieChartSectionData> pieChartAssignByMeServityType() {
-      final low = provider.assignByMeSummary!.severityLow;
-      final medium = provider.assignByMeSummary!.severityMedium;
-      final high = provider.assignByMeSummary!.severityHigh;
-      final total = low + medium + high;
+      final low = provider.assignByMeSummary?.severityLow ?? 0;
+      final medium = provider.assignByMeSummary?.severityMedium ?? 0;
+      final high = provider.assignByMeSummary?.severityHigh ?? 0;
+      final total = low + medium + high; // Now safe
 
       // To avoid division by zero
       String getPercentage(int value) {
@@ -76,10 +76,10 @@ class _AssignedByMeState extends State<AssignedByMe> {
 
     //assign by me priority type
     List<PieChartSectionData> pieChartAssignByMePirorityType() {
-      final low = provider.assignByMeSummary!.priorityLow;
-      final medium = provider.assignByMeSummary!.priorityMedium;
-      final high = provider.assignByMeSummary!.priorityHigh;
-      final total = low + medium + high;
+      final low = provider.assignByMeSummary?.severityLow ?? 0;
+      final medium = provider.assignByMeSummary?.severityMedium ?? 0;
+      final high = provider.assignByMeSummary?.severityHigh ?? 0;
+      final total = low + medium + high; // Now safe
 
       String getPercentage(int value) {
         if (total == 0) return '0%';
@@ -191,21 +191,21 @@ class _AssignedByMeState extends State<AssignedByMe> {
                           ),
                           _buildSeverityPriorityItem(
                               'Low',
-                              provider.assignByMeSummary!.severityLow,
+                              provider.assignByMeSummary?.severityLow ?? 0,
                               primarySwatch),
                           SizedBox(
                             height: 5,
                           ),
                           _buildSeverityPriorityItem(
                               'Medium',
-                              provider.assignByMeSummary!.severityMedium,
+                              provider.assignByMeSummary?.severityMedium ?? 0,
                               Colors.orange),
                           SizedBox(
                             height: 5,
                           ),
                           _buildSeverityPriorityItem(
                               'High',
-                              provider.assignByMeSummary!.severityHigh,
+                              provider.assignByMeSummary?.severityHigh ?? 0,
                               Colors.red),
                         ],
                       ),
@@ -246,21 +246,21 @@ class _AssignedByMeState extends State<AssignedByMe> {
                           ),
                           _buildSeverityPriorityItem(
                               'Low',
-                              provider.assignByMeSummary!.priorityLow,
+                              provider.assignByMeSummary?.priorityLow ?? 0,
                               primarySwatch),
                           SizedBox(
                             height: 5,
                           ),
                           _buildSeverityPriorityItem(
                               'Medium',
-                              provider.assignByMeSummary!.priorityMedium,
+                              provider.assignByMeSummary?.priorityMedium ?? 0,
                               Colors.orange),
                           SizedBox(
                             height: 5,
                           ),
                           _buildSeverityPriorityItem(
                               'High',
-                              provider.assignByMeSummary!.priorityHigh,
+                              provider.assignByMeSummary?.priorityHigh ?? 0,
                               Colors.red),
                         ],
                       ),
@@ -292,7 +292,7 @@ class _AssignedByMeState extends State<AssignedByMe> {
                         color: Colors.black),
                   ),
                   Text(
-                    "${provider.assignByMeSummary!.averageCompletionRatePerDay}",
+                    "${provider.assignByMeSummary?.averageCompletionRatePerDay}",
                     style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,

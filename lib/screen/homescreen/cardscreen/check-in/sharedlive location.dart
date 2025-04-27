@@ -53,7 +53,6 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
       body: SafeArea(
         child: Consumer<ShareliveLocation>(
           builder: (context, shareProvider, child) {
-            // Display success message
             if (shareProvider.successMessage != null) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 ScaffoldMessenger.of(context).showSnackBar(
