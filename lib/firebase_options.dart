@@ -41,48 +41,49 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyD1f1Lrw2zq-YbKoygfbr3-AmOCSRC5qPw',
-    appId: '1:773088288060:web:769f00608326a2ac659239',
-    messagingSenderId: '773088288060',
-    projectId: 'hrmnotifications-f9f90',
-    authDomain: 'hrmnotifications-f9f90.firebaseapp.com',
-    storageBucket: 'hrmnotifications-f9f90.firebasestorage.app',
-    measurementId: 'G-WYZK4X1XPD',
+    apiKey: 'AIzaSyBVY0g49hFJ0wSfAZ_eQM6fjciVWO4-fb8',
+    appId: '1:992540247722:web:d8ecb7deb854c19911b2d3',
+    messagingSenderId: '992540247722',
+    projectId: 'dynamicnotifications-2b375',
+    authDomain: 'dynamicnotifications-2b375.firebaseapp.com',
+    storageBucket: 'dynamicnotifications-2b375.firebasestorage.app',
+    measurementId: 'G-KG6LB2Z1EQ',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDTJdddbDOdLLpSUK-Km19beJdzaZ-w4x0',
-    appId: '1:773088288060:android:0150906bd6274124659239',
-    messagingSenderId: '773088288060',
-    projectId: 'hrmnotifications-f9f90',
-    storageBucket: 'hrmnotifications-f9f90.firebasestorage.app',
+    apiKey: 'AIzaSyCNGrUDr0QQQ2dFWpK0XVaF0zavhtxTdik',
+    appId: '1:992540247722:android:b86660510fae3aaf11b2d3',
+    messagingSenderId: '992540247722',
+    projectId: 'dynamicnotifications-2b375',
+    storageBucket: 'dynamicnotifications-2b375.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAu_HTnDsYwmdWhiIa_dsZU82e3r49kEmw',
-    appId: '1:773088288060:ios:e6bf114d65fb0a11659239',
-    messagingSenderId: '773088288060',
-    projectId: 'hrmnotifications-f9f90',
-    storageBucket: 'hrmnotifications-f9f90.firebasestorage.app',
-    iosBundleId: 'com.example.hrmsApp',
+    apiKey: 'AIzaSyCDWcJS8SO6D0KXXwZXpZkOnLW8MGG7Lso',
+    appId: '1:992540247722:ios:eb274c4a0f13738811b2d3',
+    messagingSenderId: '992540247722',
+    projectId: 'dynamicnotifications-2b375',
+    storageBucket: 'dynamicnotifications-2b375.firebasestorage.app',
+    iosBundleId: 'com.dynamicEmr',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAu_HTnDsYwmdWhiIa_dsZU82e3r49kEmw',
-    appId: '1:773088288060:ios:e6bf114d65fb0a11659239',
-    messagingSenderId: '773088288060',
-    projectId: 'hrmnotifications-f9f90',
-    storageBucket: 'hrmnotifications-f9f90.firebasestorage.app',
+    apiKey: 'AIzaSyCDWcJS8SO6D0KXXwZXpZkOnLW8MGG7Lso',
+    appId: '1:992540247722:ios:e0d79124b1c5197e11b2d3',
+    messagingSenderId: '992540247722',
+    projectId: 'dynamicnotifications-2b375',
+    storageBucket: 'dynamicnotifications-2b375.firebasestorage.app',
     iosBundleId: 'com.example.hrmsApp',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyD1f1Lrw2zq-YbKoygfbr3-AmOCSRC5qPw',
-    appId: '1:773088288060:web:9fe6cdf67d27f3c7659239',
-    messagingSenderId: '773088288060',
-    projectId: 'hrmnotifications-f9f90',
-    authDomain: 'hrmnotifications-f9f90.firebaseapp.com',
-    storageBucket: 'hrmnotifications-f9f90.firebasestorage.app',
-    measurementId: 'G-S76Z4VXT4V',
+    apiKey: 'AIzaSyBVY0g49hFJ0wSfAZ_eQM6fjciVWO4-fb8',
+    appId: '1:992540247722:web:304a044bbcadfa9711b2d3',
+    messagingSenderId: '992540247722',
+    projectId: 'dynamicnotifications-2b375',
+    authDomain: 'dynamicnotifications-2b375.firebaseapp.com',
+    storageBucket: 'dynamicnotifications-2b375.firebasestorage.app',
+    measurementId: 'G-1HNSGGSMG6',
   );
+
 }

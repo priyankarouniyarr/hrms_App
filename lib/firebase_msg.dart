@@ -1,16 +1,24 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
+// import 'package:firebase_messaging/firebase_messaging.dart';
 
-class FirebaseMsg {
-  final msgService = FirebaseMessaging.instance;
-  initFCM() async {
-    await msgService.requestPermission();
-    var token = msgService.getToken();
-    print("FCM Token: $token");
-    print("hello");
+// class FirebaseMsg {
+//   //create an instance of FirebaseMessaging
 
-    FirebaseMessaging.onBackgroundMessage(handleNotification);
-    FirebaseMessaging.onMessage.listen((handleNotification));
-  }
-}
+//   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+//   //function to intialize notifications
 
-Future<void> handleNotification(RemoteMessage message) async {}
+//   Future<void> initNotifications() async {
+//     //request premission from user(will prompt userr)
+
+//     await _firebaseMessaging.requestPermission();
+//     //get the token for this device
+//     final FCMtoken = await _firebaseMessaging.getToken();
+//     //print the token(normally you would send to your server)
+//     print("FCM Token: $FCMtoken");
+// //fetch the fcm token for this device
+
+// //print the token(normally you would send to your server)
+//   }
+//   //function to handle recived messages
+
+//   //function to initalize foreground messages and background settings
+// }

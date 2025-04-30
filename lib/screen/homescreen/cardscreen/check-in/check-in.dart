@@ -60,14 +60,14 @@ class _CheckInScreenState extends State<CheckInScreen> {
                           await checkInProvider.punchPost();
                           _showDialog(checkInProvider);
 
-                          mapController!.animateCamera(
-                            CameraUpdate.newCameraPosition(
-                              CameraPosition(
-                                target: userLocation,
-                                zoom: 15.0, // Adjust zoom level
-                              ),
-                            ),
-                          );
+                          // mapController!.animateCamera(
+                          //   CameraUpdate.newCameraPosition(
+                          //     CameraPosition(
+                          //       target: userLocation,
+                          //       zoom: 15.0, // Adjust zoom level
+                          //     ),
+                          //   ),
+                          // );
                         },
                         child: _buildCheckInButton(checkInProvider),
                       ),
@@ -132,80 +132,80 @@ class _CheckInScreenState extends State<CheckInScreen> {
                 SizedBox(height: 10),
                 // Google Map
 
-                if (checkInProvider.getPunches.isEmpty)
-                  Container(
-                    width: double.infinity,
-                    height: 500,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: GoogleMap(
-                        initialCameraPosition: CameraPosition(
-                          target: splitLatLon(
-                              checkInProvider.getPunches.last.systemDtl),
-                          zoom: 15,
-                        ),
-                        markers: {
-                          Marker(
-                            visible: true,
-                            markerId: MarkerId("current_location"),
-                            position: userLocation,
-                            infoWindow: InfoWindow(
-                                title: checkInProvider.aDDress,
-                                snippet:
-                                    'Lat: ${userLocation.latitude}, Lng: ${userLocation.longitude}'),
-                          )
-                        },
-                        onMapCreated: (GoogleMapController controller) {
-                          mapController = controller;
+                // if (checkInProvider.getPunches.isEmpty)
+                //   Container(
+                //     width: double.infinity,
+                //     height: 500,
+                //     child: ClipRRect(
+                //       borderRadius: BorderRadius.circular(12),
+                //       child: GoogleMap(
+                //         initialCameraPosition: CameraPosition(
+                //           target: splitLatLon(
+                //               checkInProvider.getPunches.last.systemDtl),
+                //           zoom: 15,
+                //         ),
+                //         markers: {
+                //           Marker(
+                //             visible: true,
+                //             markerId: MarkerId("current_location"),
+                //             position: userLocation,
+                //             infoWindow: InfoWindow(
+                //                 title: checkInProvider.aDDress,
+                //                 snippet:
+                //                     'Lat: ${userLocation.latitude}, Lng: ${userLocation.longitude}'),
+                //           )
+                //         },
+                //         onMapCreated: (GoogleMapController controller) {
+                //           mapController = controller;
 
-                          mapController!.animateCamera(
-                            CameraUpdate.newCameraPosition(
-                              CameraPosition(
-                                target: userLocation,
-                                zoom: 15,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  )
-                else
-                  // If there are punches, show the map and last punch location
-                  Container(
-                    height: 300,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: GoogleMap(
-                        initialCameraPosition: CameraPosition(
-                          target: userLocation,
-                          zoom: 15,
-                        ),
-                        markers: {
-                          Marker(
-                            visible: true,
-                            markerId: MarkerId("current_location"),
-                            position: userLocation,
-                            infoWindow: InfoWindow(
-                                title: checkInProvider.aDDress,
-                                snippet:
-                                    'Lat: ${userLocation.latitude}, Lng: ${userLocation.longitude}'),
-                          ),
-                        },
-                        onMapCreated: (GoogleMapController controller) {
-                          mapController = controller;
-                          mapController!.animateCamera(
-                            CameraUpdate.newCameraPosition(
-                              CameraPosition(
-                                target: userLocation,
-                                zoom: 15,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
+                //           mapController!.animateCamera(
+                //             CameraUpdate.newCameraPosition(
+                //               CameraPosition(
+                //                 target: userLocation,
+                //                 zoom: 15,
+                //               ),
+                //             ),
+                //           );
+                //         },
+                //       ),
+                //     ),
+                //   )
+                // else
+                //   // If there are punches, show the map and last punch location
+                //   Container(
+                //     height: 300,
+                //     child: ClipRRect(
+                //       borderRadius: BorderRadius.circular(12),
+                //       child: GoogleMap(
+                //         initialCameraPosition: CameraPosition(
+                //           target: userLocation,
+                //           zoom: 15,
+                //         ),
+                //         markers: {
+                //           Marker(
+                //             visible: true,
+                //             markerId: MarkerId("current_location"),
+                //             position: userLocation,
+                //             infoWindow: InfoWindow(
+                //                 title: checkInProvider.aDDress,
+                //                 snippet:
+                //                     'Lat: ${userLocation.latitude}, Lng: ${userLocation.longitude}'),
+                //           ),
+                //         },
+                //         onMapCreated: (GoogleMapController controller) {
+                //           mapController = controller;
+                //           mapController!.animateCamera(
+                //             CameraUpdate.newCameraPosition(
+                //               CameraPosition(
+                //                 target: userLocation,
+                //                 zoom: 15,
+                //               ),
+                //             ),
+                //           );
+                //         },
+                //       ),
+                //     ),
+                //   ),
                 SizedBox(
                   height: 20,
                 ),

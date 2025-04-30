@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
+import 'package:hrms_app/storage/token_storage.dart';
 import 'package:hrms_app/screen/login%20screen.dart';
 import 'package:hrms_app/providers/hosptial_code_provider/hosptial_code_provider.dart';
 
@@ -22,7 +23,12 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
       final provider =
           Provider.of<HospitalCodeProvider>(context, listen: false);
       await provider.fetchBaseUrl(enteredCode);
+      print("Entered Code: $enteredCode");
       if (provider.baseUrl.isNotEmpty) {
+        // Store the hospital code
+        final tokenStorage = TokenStorage();
+        await tokenStorage.storeHospitalCode(enteredCode);
+
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => LoginScreen()),
@@ -98,13 +104,10 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
                   return SizedBox(
                     width: 56,
                     child: TextField(
-                      keyboardType:
-                          TextInputType.number, // Restrict keyboard to numbers
+                      keyboardType: TextInputType.number,
                       inputFormatters: [
-                        FilteringTextInputFormatter
-                            .digitsOnly, // Allow only digits
+                        FilteringTextInputFormatter.digitsOnly,
                       ],
-
                       controller: controllers[index],
                       focusNode: focusNodes[index],
                       cursorColor: primarySwatch[900],

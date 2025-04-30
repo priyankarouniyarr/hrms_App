@@ -6,19 +6,23 @@ import 'package:hrms_app/models/hosptial_code_models/hospital_code.dart';
 class HospitalCodeProvider with ChangeNotifier {
   String _baseUrl = '';
   String _errorMessage = '';
+  String _applicationId = '';
   bool _isLoading = false;
-
+  String get applicationId => _applicationId;
   String get baseUrl => _baseUrl;
   String get errorMessage => _errorMessage;
+  String _hospitalCode = '';
+  String get hospitalCode => _hospitalCode;
+
   bool get isLoading => _isLoading;
 
-  Future<void> fetchBaseUrl(String code) async {
+  Future<void> fetchBaseUrl(String hosptialcode) async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      final response = await http
-          .get(Uri.parse('http://45.117.153.90:5005/api/CodeUrl/$code'));
+      final response = await http.get(
+          Uri.parse('http://45.117.153.90:5005/api/CodeUrl/$hosptialcode'));
       // print(response.body);
 
       if (response.statusCode == 200) {
@@ -26,6 +30,7 @@ class HospitalCodeProvider with ChangeNotifier {
         HospitalCode hospitalCode = HospitalCode.fromJson(decodedResponse);
 
         _baseUrl = hospitalCode.url;
+        print(_baseUrl);
 
         notifyListeners();
       } else {

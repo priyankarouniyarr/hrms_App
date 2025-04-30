@@ -21,6 +21,7 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
+    // Fetch location when the screen is initialized
     Future.microtask(() =>
         Provider.of<ShareliveLocation>(context, listen: false)
             .sharelivelocation());
@@ -31,13 +32,6 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
     WidgetsBinding.instance.removeObserver(this);
     _controller?.dispose();
     super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused) {
-      _controller?.dispose();
-    }
   }
 
   void _shareLocation(double latitude, double longitude) {
@@ -53,6 +47,7 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
       body: SafeArea(
         child: Consumer<ShareliveLocation>(
           builder: (context, shareProvider, child) {
+            // Show success message
             if (shareProvider.successMessage != null) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -71,32 +66,34 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
               });
             }
 
+            // Get user location
             LatLng? userLocation = (shareProvider.latitude != null &&
                     shareProvider.longitude != null)
                 ? LatLng(double.parse(shareProvider.latitude!),
                     double.parse(shareProvider.longitude!))
                 : null;
 
+            // Show loading indicator while fetching location
             if (shareProvider.loading) {
               return Center(child: CircularProgressIndicator());
             }
 
+            // Show error message if there's an error
             if (shareProvider.errorMessage.isNotEmpty) {
               return Center(child: Text(shareProvider.errorMessage));
             }
 
+            // Show map or "Location not available" message
             return Column(
               children: [
                 Expanded(
                   child: userLocation == null
-                      ? shareProvider.loading
-                          ? Center(child: CircularProgressIndicator())
-                          : Center(
-                              child: Text(
-                                "Location not available",
-                                style: TextStyle(fontSize: 18),
-                              ),
-                            )
+                      ? Center(
+                          child: Text(
+                            "Location not available",
+                            style: TextStyle(fontSize: 18),
+                          ),
+                        )
                       : GoogleMap(
                           initialCameraPosition: CameraPosition(
                             target: userLocation,
@@ -113,6 +110,12 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
                           },
                           onMapCreated: (GoogleMapController controller) {
                             _controller = controller;
+                            // Update camera position when map is created
+                            if (userLocation != null) {
+                              controller.animateCamera(
+                                CameraUpdate.newLatLng(userLocation),
+                              );
+                            }
                           },
                         ),
                 ),
@@ -126,11 +129,13 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('Location is unavailable',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                )),
+                            content: Text(
+                              'Location is unavailable',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
                             backgroundColor: Colors.red,
                           ),
                         );

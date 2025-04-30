@@ -15,14 +15,20 @@ class NoticesProvider with ChangeNotifier {
     final branchId = await _secureStorageService.readData('workingBranchId');
 
     final token = await _secureStorageService.readData('auth_token');
+    final fiscalYear =
+        await _secureStorageService.readData('selected_fiscal_year');
 
-    if (branchId == null && token == null) {
+    if (branchId == null || token == null || fiscalYear == null) {
       throw Exception('No branchId or token found');
     }
 
     final response = await http.get(
       Uri.parse('http://45.117.153.90:5004/api/Notice/GetAllNotices'),
-      headers: {'Authorization': 'Bearer $token', "workingBranchId": branchId!},
+      headers: {
+        'Authorization': 'Bearer $token',
+        "workingBranchId": branchId!,
+        "workingFinancialId": fiscalYear!
+      },
     );
 
     if (response.statusCode == 200) {
@@ -39,14 +45,20 @@ class NoticesProvider with ChangeNotifier {
   Future<void> fetchNoticesbyId() async {
     final branchId = await _secureStorageService.readData('workingBranchId');
     final token = await _secureStorageService.readData('auth_token');
+    final fiscalYear =
+        await _secureStorageService.readData('selected_fiscal_year');
 
-    if (branchId == null || token == null) {
+    if (branchId == null || token == null || fiscalYear == null) {
       throw Exception('No branchId or token found');
     }
 
     final response = await http.get(
       Uri.parse('http://45.117.153.90:5004/api/Notice/GetNoticeById/1'),
-      headers: {'Authorization': 'Bearer $token', "workingBranchId": branchId},
+      headers: {
+        'Authorization': 'Bearer $token',
+        "workingBranchId": branchId!,
+        "workingFinancialId": fiscalYear!
+      },
     );
 
     if (response.statusCode == 200) {

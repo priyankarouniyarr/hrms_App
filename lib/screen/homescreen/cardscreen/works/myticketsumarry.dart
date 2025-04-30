@@ -36,7 +36,6 @@ class _MyticketsumarryState extends State<Myticketsumarry> {
       final high = provider.myTicketSummary!.severityHigh;
       final total = low + medium + high;
 
-      // To avoid division by zero
       String getPercentage(int value) {
         if (total == 0) return '0%';
         double percent = (value / total) * 100;

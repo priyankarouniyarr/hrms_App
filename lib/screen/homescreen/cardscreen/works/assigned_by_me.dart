@@ -74,7 +74,6 @@ class _AssignedByMeState extends State<AssignedByMe> {
       });
     }
 
-    //assign by me priority type
     List<PieChartSectionData> pieChartAssignByMePirorityType() {
       final low = provider.assignByMeSummary?.severityLow ?? 0;
       final medium = provider.assignByMeSummary?.severityMedium ?? 0;
@@ -90,7 +89,6 @@ class _AssignedByMeState extends State<AssignedByMe> {
       final List<int> values = [low, medium, high];
       final List<Color> colors = [primarySwatch, Colors.orange, Colors.red];
 
-      // If total is 0, show a default pie chart with grey and brown
       if (total == 0) {
         return [
           PieChartSectionData(

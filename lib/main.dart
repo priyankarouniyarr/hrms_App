@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hrms_app/splash_scrren.dart';
+import 'package:hrms_app/firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:hrms_app/providers/payroll/payroll_provider.dart';
 import 'package:hrms_app/providers/notices_provider/notices_provider.dart';
 import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
+import 'package:hrms_app/providers/notifications/notification_provider.dart';
 import 'package:hrms_app/providers/login_screen_provider/auth_provider.dart';
 import 'package:hrms_app/providers/check-in_provider/check_in_provider.dart';
 import 'package:hrms_app/providers/holidays_provider/holidays_provider.dart';
@@ -27,8 +30,13 @@ import 'package:hrms_app/providers/works_Summary_provider/summary_details/my_tic
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   // await FirebaseMsg().initFCM();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   await handleLocationPermission();
 
   runApp(
@@ -59,6 +67,9 @@ void main() async {
         ChangeNotifierProvider(create: (context) => LeaveRequestProvider()),
         ChangeNotifierProvider(create: (context) => TicketWorkFlowProvider()),
         ChangeNotifierProvider(create: (context) => ShareliveLocation()),
+        ChangeNotifierProvider(
+          create: (context) => FcmnotificationProvider(),
+        ),
       ],
       child: MyApp(),
     ),
@@ -92,7 +103,6 @@ Future<void> handleLocationPermission() async {
         "Permission permanently denied. App will continue without location access.");
   }
 
-  // If permission is granted, get the current location
   if (permission == LocationPermission.always ||
       permission == LocationPermission.whileInUse) {
     try {

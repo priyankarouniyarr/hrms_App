@@ -11,7 +11,7 @@
         <key>CFBundleDevelopmentRegion</key>
         <string>$(DEVELOPMENT_LANGUAGE)</string>
         <key>CFBundleDisplayName</key>
-        <string>DynamicEMR</string>
+	<string>DynamicEMR</string>
         <key>CFBundleExecutable</key>
         <string>$(EXECUTABLE_NAME)</string>
         <key>CFBundleIdentifier</key>
@@ -33,7 +33,7 @@
 
 
         <key>CFBundleName</key>
-        <string>DynamicEMR</string>
+	<string>DynamicEMR</string>
         <key>CFBundlePackageType</key>
         <string>APPL</string>
         <key>CFBundleShortVersionString</key>

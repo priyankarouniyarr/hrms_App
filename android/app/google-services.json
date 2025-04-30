@@ -1,13 +1,32 @@
 {
   "project_info": {
-    "project_number": "773088288060",
-    "project_id": "hrmnotifications-f9f90",
-    "storage_bucket": "hrmnotifications-f9f90.firebasestorage.app"
+    "project_number": "992540247722",
+    "project_id": "dynamicnotifications-2b375",
+    "storage_bucket": "dynamicnotifications-2b375.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:773088288060:android:0150906bd6274124659239",
+        "mobilesdk_app_id": "1:992540247722:android:b86660510fae3aaf11b2d3",
+        "android_client_info": {
+          "package_name": "com.dynamicEmr"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNGrUDr0QQQ2dFWpK0XVaF0zavhtxTdik"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:992540247722:android:818cb271696b80e511b2d3",
         "android_client_info": {
           "package_name": "com.example.hrms_app"
         }
@@ -15,7 +34,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDTJdddbDOdLLpSUK-Km19beJdzaZ-w4x0"
+          "current_key": "AIzaSyCNGrUDr0QQQ2dFWpK0XVaF0zavhtxTdik"
         }
       ],
       "services": {
