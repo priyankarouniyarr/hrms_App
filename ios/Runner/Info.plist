@@ -19,6 +19,7 @@
         <key>CFBundleInfoDictionaryVersion</key>
         <string>6.0</string>
         
+        
         <!-- Add location permissions -->
         <!-- <key>NSLocationWhenInUseUsageDescription</key>
         <string>Your app needs access to your location to function properly</string>

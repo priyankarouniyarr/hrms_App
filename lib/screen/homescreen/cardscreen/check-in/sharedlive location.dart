@@ -20,8 +20,6 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-
-    // Fetch location when the screen is initialized
     Future.microtask(() =>
         Provider.of<ShareliveLocation>(context, listen: false)
             .sharelivelocation());
@@ -32,6 +30,14 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
     WidgetsBinding.instance.removeObserver(this);
     _controller?.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      Provider.of<ShareliveLocation>(context, listen: false)
+          .sharelivelocation();
+    }
   }
 
   void _shareLocation(double latitude, double longitude) {
@@ -46,7 +52,7 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
       appBar: CustomAppBarProfile(title: "Live Location"),
       body: SafeArea(
         child: Consumer<ShareliveLocation>(
-          builder: (context, shareProvider, child) {
+          builder: (context, shareProvider, _) {
             // Show success message
             if (shareProvider.successMessage != null) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -66,6 +72,25 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
               });
             }
 
+            // Show error message
+            if (shareProvider.errorMessage.isNotEmpty) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      shareProvider.errorMessage,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
+                    ),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                shareProvider.clearSuccessMessage();
+              });
+            }
+
             // Get user location
             LatLng? userLocation = (shareProvider.latitude != null &&
                     shareProvider.longitude != null)
@@ -73,25 +98,32 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
                     double.parse(shareProvider.longitude!))
                 : null;
 
-            // Show loading indicator while fetching location
+            // Show loading
             if (shareProvider.loading) {
               return Center(child: CircularProgressIndicator());
             }
 
-            // Show error message if there's an error
-            if (shareProvider.errorMessage.isNotEmpty) {
-              return Center(child: Text(shareProvider.errorMessage));
-            }
-
-            // Show map or "Location not available" message
+            // Show map or retry
             return Column(
               children: [
                 Expanded(
                   child: userLocation == null
                       ? Center(
-                          child: Text(
-                            "Location not available",
-                            style: TextStyle(fontSize: 18),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Location not available",
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              SizedBox(height: 12),
+                              ElevatedButton(
+                                onPressed: () {
+                                  shareProvider.sharelivelocation();
+                                },
+                                child: Text("Retry"),
+                              ),
+                            ],
                           ),
                         )
                       : GoogleMap(
@@ -110,12 +142,9 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
                           },
                           onMapCreated: (GoogleMapController controller) {
                             _controller = controller;
-                            // Update camera position when map is created
-                            if (userLocation != null) {
-                              controller.animateCamera(
-                                CameraUpdate.newLatLng(userLocation),
-                              );
-                            }
+                            controller.animateCamera(
+                              CameraUpdate.newLatLng(userLocation),
+                            );
                           },
                         ),
                 ),

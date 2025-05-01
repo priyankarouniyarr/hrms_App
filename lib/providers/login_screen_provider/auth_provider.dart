@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hrms_app/screen/branch_id.dart';
+import 'package:hrms_app/screen/hospitalcode.dart';
 import 'package:hrms_app/models/login_screen_models/loginscreen_models.dart';
 import 'package:hrms_app/storage/token_storage.dart'; // Import the TokenStorage
 
@@ -109,7 +110,7 @@ class AuthProvider with ChangeNotifier {
   }
 
   // Refresh the access token using the refresh token
-  Future<void> refreshAccessToken() async {
+  Future<void> refreshAccessToken(BuildContext context) async {
     if (isTokenExpired()) {
       String? refreshToken = await _tokenStorage.getRefreshToken();
 
@@ -139,6 +140,15 @@ class AuthProvider with ChangeNotifier {
           print("Refresh Token: $newRefreshToken");
         } else {
           _setErrorMessage(" Error refreshing token: ${response.statusCode}");
+
+          // Clear tokens and navigate to login screen if token refresh fails
+          // await logout();
+
+          // Navigator.pushReplacement(
+          //   context,
+          //   MaterialPageRoute(builder: (context) => HospitalCodeScreen()),
+          // );
+
           print(
               "Error refreshing token: ${response.statusCode} ${response.body}");
         }

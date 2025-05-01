@@ -90,12 +90,6 @@ class TokenStorage {
     }
   }
 
-  // Future<void> _saveTokenfcm(String fcmtoken, BuildContext context) async {
-  //   await _secureStorage.write(key: 'fcm_token', value: fcmtoken);
-
-  //   print("fcmtoken: $fcmtoken"); // Send token to the API
-  // }
-
   Future<void> _saveTokenfcm(String fcmtoken, BuildContext context) async {
     await _secureStorage.write(key: 'fcm_token', value: fcmtoken);
     print("Stored FCM token locally: $fcmtoken");

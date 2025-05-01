@@ -95,7 +95,7 @@ class ShareliveLocation with ChangeNotifier {
 
       print(response.body);
     } catch (e) {
-      _setErrorMessage("Error: $e");
+      _setErrorMessage("  UnExcepted Error: $e");
     } finally {
       _setLoading(false);
     }
@@ -103,7 +103,7 @@ class ShareliveLocation with ChangeNotifier {
 
   void _setLoading(bool value) {
     _loading = value;
-    notifyListeners(); // Notify listeners to update UI
+    notifyListeners();
   }
 
   void _setErrorMessage(String message) {
