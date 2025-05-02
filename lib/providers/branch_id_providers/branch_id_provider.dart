@@ -19,7 +19,7 @@ class BranchProvider with ChangeNotifier {
 
   Future<void> setSelectedBranch(String branchId) async {
     _selectedBranchId = branchId;
-    //print("selectedbranchId: $_selectedBranchId");
+
     await _secureStorageService.writeData('workingBranchId', branchId);
     notifyListeners();
   }
@@ -27,7 +27,7 @@ class BranchProvider with ChangeNotifier {
   Future<void> loadSelectedBranch() async {
     String? storedBranchId =
         await _secureStorageService.readData('workingBranchId');
-    //print("Loaded branch ID: $storedBranchId");
+
     if (storedBranchId != null) {
       _selectedBranchId = storedBranchId;
     }
@@ -51,15 +51,21 @@ class BranchProvider with ChangeNotifier {
           "Authorization": "Bearer $token",
         },
       );
-      // print(response.body);
-
+      print("Response status: ${response.statusCode}");
       if (response.statusCode == 200) {
+        print("Response status: ${response.statusCode}");
         List<dynamic> jsonData = json.decode(response.body);
-        _branches =
-            jsonData.map((branch) => BranchModel.fromJson(branch)).toList();
+        if (jsonData.isEmpty) {
+          _branches = [];
+          print("hello1");
+        } else {
+          _branches =
+              jsonData.map((branch) => BranchModel.fromJson(branch)).toList();
+        }
+
         notifyListeners();
       } else {
-        _setErrorMessage("Failed to fetch branches");
+        _setErrorMessage("");
       }
     } catch (e) {
       _setErrorMessage("Error: $e");

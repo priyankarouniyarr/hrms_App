@@ -55,10 +55,6 @@ class _SelectFiscalYearScreenState extends State<SelectFiscalYearScreen> {
                 return Center(child: Text(fiscalYearProvider.errorMessage));
               }
 
-              if (fiscalYearProvider.fiscalYears.isEmpty) {
-                return Center(child: Text("No fiscal years available"));
-              }
-
               List<Map<String, dynamic>> fiscalYearNames = fiscalYearProvider
                   .fiscalYears
                   .map((fiscalYear) => {
@@ -99,11 +95,12 @@ class _SelectFiscalYearScreenState extends State<SelectFiscalYearScreen> {
                   GestureDetector(
                     onTap: selectedFiscalYear != null
                         ? () {
-                            Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => AppMainScreen()),
-                                (route) => false);
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AppMainScreen(),
+                              ),
+                            );
                           }
                         : null,
                     child: Container(

@@ -36,24 +36,22 @@ class FiscalYearProvider with ChangeNotifier {
           "workingBranchId": branchId.toString(),
         },
       );
-
-      // print('Fiscal Year Fetch Status Code: ${response.statusCode}');
-      // print('Raw Response Body: ${response.body}');
-
+      print("Response status: ${response.statusCode}");
       if (response.statusCode == 200) {
+        print("Response status: ${response.statusCode}");
         List<dynamic> jsonData = json.decode(response.body);
 
         if (jsonData.isEmpty) {
-          _setErrorMessage("No fiscal years found.");
+          _fiscalYears = [];
+          print("hello1");
         } else {
           _fiscalYears = jsonData
               .map((fiscalYear) => FiscalYearModel.fromJson(fiscalYear))
               .toList();
-          notifyListeners();
         }
+        notifyListeners();
       } else {
-        _setErrorMessage(
-            "Failed to fetch fiscal years: ${response.statusCode}");
+        _setErrorMessage("");
       }
     } catch (e) {
       print("Error: $e"); // Log the error

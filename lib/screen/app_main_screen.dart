@@ -23,9 +23,8 @@ class _AppMainScreenState extends State<AppMainScreen> {
 
   void _onItemTapped(int index) {
     setState(() {
-      _selectedIndex = index; // Update the selected index
+      _selectedIndex = index;
     });
-    //print("Selected Index: $_selectedIndex"); // Debug print
   }
 
   @override

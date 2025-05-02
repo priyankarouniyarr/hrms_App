@@ -132,11 +132,6 @@ class CheckInProvider with ChangeNotifier {
       if (response.statusCode == 200) {
         final List<dynamic> jsonData = json.decode(response.body);
         getPunches = jsonData.map((e) => EmployeePunch.fromJson(e)).toList();
-
-        // Print all punch times
-        // for (var punch in getPunches) {
-        //   // print('Punch Time: ${punch.systemDtl}');
-        // }
       } else {
         _errorMessage = "Failed to fetch punch data: ${response.statusCode}";
       }

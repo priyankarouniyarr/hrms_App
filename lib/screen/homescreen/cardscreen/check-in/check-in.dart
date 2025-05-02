@@ -18,10 +18,10 @@ class _CheckInScreenState extends State<CheckInScreen> {
 
   @override
   void initState() {
+    super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<CheckInProvider>(context, listen: false).getpunches();
     });
-    super.initState();
   }
 
   @override
@@ -35,11 +35,12 @@ class _CheckInScreenState extends State<CheckInScreen> {
   Widget build(BuildContext context) {
     final checkInProvider = Provider.of<CheckInProvider>(context);
 
-    userLocation =
-        (checkInProvider.latitude != null && checkInProvider.longitude != null)
-            ? LatLng(double.parse(checkInProvider.latitude!),
-                double.parse(checkInProvider.longitude!))
-            : LatLng(0.0, 0.0);
+    if (checkInProvider.latitude != null && checkInProvider.longitude != null) {
+      userLocation = LatLng(
+        double.parse(checkInProvider.latitude!),
+        double.parse(checkInProvider.longitude!),
+      );
+    }
 
     return Scaffold(
       backgroundColor: cardBackgroundColor,
@@ -69,7 +70,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
                           //   ),
                           // );
                         },
-                        child: _buildCheckInButton(checkInProvider),
+                        child: _buildCheckInButton(),
                       ),
                     ),
                     SizedBox(width: 10),
@@ -129,10 +130,39 @@ class _CheckInScreenState extends State<CheckInScreen> {
                   ],
                 ),
 
-                SizedBox(height: 10),
+                SizedBox(height: 20),
+                checkInProvider.getPunches.isEmpty
+                    ? Container(
+                        height: 300,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: GoogleMap(
+                            initialCameraPosition: CameraPosition(
+                              target: userLocation,
+                              zoom: 15,
+                            ),
+                            onMapCreated: (GoogleMapController controller) {
+                              mapController = controller;
+                              mapController!.animateCamera(
+                                CameraUpdate.newCameraPosition(
+                                  CameraPosition(
+                                    target: userLocation,
+                                    zoom: 15,
+                                  ),
+                                ),
+                              );
+                            },
+                            zoomControlsEnabled: false, // optional
+                            myLocationEnabled: false, // optional
+                            myLocationButtonEnabled: false, // optional
+                          ),
+                        ),
+                      )
+                    : Container() // No map if punches are not empty
+
                 // Google Map
 
-                // if (checkInProvider.getPunches.isEmpty)
+                //if (checkInProvider.getPunches.isEmpty)
                 //   Container(
                 //     width: double.infinity,
                 //     height: 500,
@@ -206,9 +236,6 @@ class _CheckInScreenState extends State<CheckInScreen> {
                 //       ),
                 //     ),
                 //   ),
-                SizedBox(
-                  height: 20,
-                ),
               ],
             ),
           ),
@@ -217,7 +244,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
     );
   }
 
-  Widget _buildCheckInButton(CheckInProvider provider) {
+  Widget _buildCheckInButton() {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 18, horizontal: 30),
       decoration: BoxDecoration(
@@ -433,6 +460,39 @@ class _CheckInScreenState extends State<CheckInScreen> {
         );
       },
     );
+//   }
+// Widget _buildGoogleMap(CheckInProvider provider) {
+//     return ClipRRect(
+//       borderRadius: BorderRadius.circular(12),
+//       child: Container(
+//         height: 300,
+//         child: GoogleMap(
+//           initialCameraPosition: CameraPosition(
+//             target: userLocation,
+//             zoom: 15,
+//           ),
+//           markers: {
+//             Marker(
+//               markerId: MarkerId("current_location"),
+//               position: userLocation,
+//               infoWindow: InfoWindow(
+//                 title: provider.aDDress ?? "Your Location",
+//                 snippet:
+//                     'Lat: ${userLocation.latitude}, Lng: ${userLocation.longitude}',
+//               ),
+//             ),
+//           },
+//           onMapCreated: (controller) {
+//             mapController = controller;
+//             mapController!.animateCamera(
+//               CameraUpdate.newCameraPosition(
+//                 CameraPosition(target: userLocation, zoom: 15),
+//               ),
+//             );
+//           },
+//         ),
+//       ),
+//     );
   }
 
   void _showDialog(CheckInProvider checkInProvider) {
@@ -453,6 +513,10 @@ class _CheckInScreenState extends State<CheckInScreen> {
             actions: [
               TextButton(
                 onPressed: () async {
+                  print("gud");
+                  print(
+                      splitLatLon(checkInProvider.getPunches.first.systemDtl));
+                  print("done");
                   Navigator.pop(context);
                   await checkInProvider.getpunches();
                   setState(() {});
@@ -487,12 +551,12 @@ class _CheckInScreenState extends State<CheckInScreen> {
   splitLatLon(String systemDtl) {
     // Split the string by comma
     List<String> parts = systemDtl.split(',');
-    print(parts);
+    // print(parts);
     // Check if the list has at least two elements
     var lat = parts[0].trim().split(': ')[1].trim();
     var lon = parts[1].trim().split(': ')[1].trim();
-    print(lat);
-    print(lon);
+    // print(lat);
+    // print(lon);
     return LatLng(double.parse(lat), double.parse(lon));
   }
 }

@@ -198,7 +198,7 @@ class _LeaveStatementScreenState extends State<LeaveStatementScreen> {
                                                         fontSize: 14.0),
                                                   ),
                                                   Text(
-                                                    '${DateFormat('yyyy-MM-dd').format(DateTime.parse(leave.toDate)) ?? '-'}',
+                                                    '${DateFormat('yyyy-MM-dd').format(DateTime.parse(leave.toDate))}',
                                                     style: TextStyle(
                                                       fontSize: 14.0,
                                                     ),
@@ -240,7 +240,7 @@ class _LeaveStatementScreenState extends State<LeaveStatementScreen> {
                                                         fontSize: 14.0),
                                                   ),
                                                   Text(
-                                                    '  ${DateFormat('yyyy-MM-dd').format(DateTime.parse(leave.applicationDate)) ?? '-'}',
+                                                    '  ${DateFormat('yyyy-MM-dd').format(DateTime.parse(leave.applicationDate))}',
                                                     style: TextStyle(
                                                       fontSize: 14.0,
                                                     ),

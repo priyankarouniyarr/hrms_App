@@ -89,6 +89,8 @@ class EmployeeProvider with ChangeNotifier {
       // Retrieve token and branchId from secure storage
       String? token = await secureStorageService.readData('auth_token');
       String? branchId = await secureStorageService.readData('workingBranchId');
+      String? fiscalYear =
+          await secureStorageService.readData('workingFinancialId');
 
       if (token == null || branchId == null) {
         errorMessage = 'Token or BranchId is missing';
@@ -107,6 +109,7 @@ class EmployeeProvider with ChangeNotifier {
         headers: {
           'Authorization': 'Bearer $token',
           'workingBranchId': branchId,
+          'workingFinancialId': fiscalYear ?? '',
         },
       );
 
@@ -182,7 +185,7 @@ class EmployeeProvider with ChangeNotifier {
               EmployeeCurrentShift.fromJson(data['employeeCurrentShift']);
         } else {
           _currentShift = EmployeeCurrentShift(
-            primaryShiftName: '',
+            primaryShiftName: ' ',
             primaryShiftStart: '',
             primaryShiftEnd: '',
             extendedShiftName: '',
@@ -198,6 +201,7 @@ class EmployeeProvider with ChangeNotifier {
 
         notifyListeners();
       } else {
+        print('Failed to load employee details: ${response.statusCode}');
         errorMessage = 'Failed to load employee details';
       }
     } catch (e) {

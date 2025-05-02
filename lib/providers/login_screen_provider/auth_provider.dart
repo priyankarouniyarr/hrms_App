@@ -76,30 +76,33 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+//token checking
   bool isTokenExpired() {
-    print(_expirationTime);
+    print("expiration time: $_expirationTime");
+
     if (_expirationTime == null) return true;
 
     final currentTime = DateTime.now();
-    print(currentTime);
+    print("current time: $currentTime");
 
     return currentTime.isAfter(_expirationTime!);
   }
 
+//token
   Future<void> loadToken() async {
     _token = await _tokenStorage.getToken();
   }
-//
+//username
 
   Future<void> loadUsername() async {
     _username = await _tokenStorage.getUsername();
+
+    print(_username);
   }
 
   // Load refresh token securely
   Future<void> loadRefreshToken() async {
     String? refreshToken = await _tokenStorage.getRefreshToken();
-    print(":refreshToken");
-    print(refreshToken);
 
     DateTime? expirationtime = await _tokenStorage.getExpirationtime();
     _expirationTime = expirationtime;
@@ -108,6 +111,13 @@ class AuthProvider with ChangeNotifier {
       print("Loaded Refresh Token: $refreshToken");
     }
   }
+
+//fiscal yearid
+  // Future<void> loadFiscalYearId() async {
+  //   String? fiscalYearId = await _tokenStorage.getBranchIdAndFiscalYearId();
+
+  //   print("Loaded Fiscal Year ID: $fiscalYearId");
+  // }
 
   // Refresh the access token using the refresh token
   Future<void> refreshAccessToken(BuildContext context) async {
@@ -142,12 +152,12 @@ class AuthProvider with ChangeNotifier {
           _setErrorMessage(" Error refreshing token: ${response.statusCode}");
 
           // Clear tokens and navigate to login screen if token refresh fails
-          // await logout();
+          await logout();
 
-          // Navigator.pushReplacement(
-          //   context,
-          //   MaterialPageRoute(builder: (context) => HospitalCodeScreen()),
-          // );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => HospitalCodeScreen()),
+          );
 
           print(
               "Error refreshing token: ${response.statusCode} ${response.body}");
@@ -159,8 +169,15 @@ class AuthProvider with ChangeNotifier {
 // Logout and remove both access and refresh tokens
   Future<void> logout() async {
     await _tokenStorage.removeToken();
+    print("Token removed");
+    await _tokenStorage.removeUsername();
+    print("username removed");
     await _tokenStorage.removeRefreshToken();
-    _token = null;
+
+    await _tokenStorage.removeExpirationTime();
+    await _tokenStorage.removeBranchIdAndFiscalYearId();
+    await _tokenStorage.removeBranchId();
+
     notifyListeners();
   }
 

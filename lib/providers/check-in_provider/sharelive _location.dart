@@ -35,42 +35,6 @@ class ShareliveLocation with ChangeNotifier {
         _setErrorMessage("No branch selected. Please select a branch.");
         return;
       }
-
-      // Permission checking here
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        await Geolocator.openLocationSettings();
-        return sharelivelocation();
-      }
-
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          _setErrorMessage("Location permission denied.");
-          return sharelivelocation();
-        }
-      }
-      if (permission == LocationPermission.deniedForever) {
-        _setErrorMessage("Location permission denied forever.");
-        return sharelivelocation();
-      }
-
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-
-      _latitude = position.latitude.toString();
-      _longitude = position.longitude.toString();
-      await _secureStorageService.writeData('checkinPositionLat', _latitude!);
-      await _secureStorageService.writeData('checkinPositionLong', _longitude!);
-
-      List<Placemark> address =
-          await placemarkFromCoordinates(position.latitude, position.longitude);
-      if (address.isNotEmpty) {
-        _address =
-            '${address[0].name}, ${address[0].locality}, ${address[0].administrativeArea}';
-      }
-
       final response = await http.post(
         Uri.parse(
             'http://45.117.153.90:5004/api/Employee//LiveLocationSharePost'),
@@ -87,7 +51,7 @@ class ShareliveLocation with ChangeNotifier {
       );
       if (response.statusCode == 200) {
         _setSuccessMessage("Live Location sharing successfully!");
-        print("Success message: $_successMessage"); // Fixed
+        print("Success message: $_successMessage");
       } else {
         _setErrorMessage(
             "Failed to submit: ${response.statusCode}\n ${response.body}");
@@ -95,7 +59,7 @@ class ShareliveLocation with ChangeNotifier {
 
       print(response.body);
     } catch (e) {
-      _setErrorMessage("  UnExcepted Error: $e");
+      _setErrorMessage("UnExcepted Error: $e");
     } finally {
       _setLoading(false);
     }
@@ -119,5 +83,35 @@ class ShareliveLocation with ChangeNotifier {
   void clearSuccessMessage() {
     _successMessage = null;
     notifyListeners();
+  }
+
+  getcurrentlocation() async {
+    // Permission checking here
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      await Geolocator.openLocationSettings();
+      return sharelivelocation();
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      LocationPermission ask = await Geolocator.requestPermission();
+    } else {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+
+      _latitude = position.latitude.toString();
+      _longitude = position.longitude.toString();
+      await _secureStorageService.writeData('checkinPositionLat', _latitude!);
+      await _secureStorageService.writeData('checkinPositionLong', _longitude!);
+
+      List<Placemark> address =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
+      if (address.isNotEmpty) {
+        _address =
+            '${address[0].name}, ${address[0].locality}, ${address[0].administrativeArea}';
+      }
+    }
   }
 }

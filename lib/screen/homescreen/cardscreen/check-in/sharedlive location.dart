@@ -32,14 +32,6 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
     super.dispose();
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      Provider.of<ShareliveLocation>(context, listen: false)
-          .sharelivelocation();
-    }
-  }
-
   void _shareLocation(double latitude, double longitude) {
     String googleMapsUrl =
         "https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude";
@@ -51,146 +43,156 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
     return Scaffold(
       appBar: CustomAppBarProfile(title: "Live Location"),
       body: SafeArea(
-        child: Consumer<ShareliveLocation>(
-          builder: (context, shareProvider, _) {
-            // Show success message
-            if (shareProvider.successMessage != null) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      shareProvider.successMessage!,
-                      style: TextStyle(
-                        color: Colors.green,
-                        fontSize: 16,
-                      ),
-                    ),
-                    backgroundColor: cardBackgroundColor,
-                  ),
-                );
-                shareProvider.clearSuccessMessage();
-              });
-            }
-
-            // Show error message
-            if (shareProvider.errorMessage.isNotEmpty) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      shareProvider.errorMessage,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
-                    ),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-                shareProvider.clearSuccessMessage();
-              });
-            }
-
-            // Get user location
-            LatLng? userLocation = (shareProvider.latitude != null &&
-                    shareProvider.longitude != null)
-                ? LatLng(double.parse(shareProvider.latitude!),
-                    double.parse(shareProvider.longitude!))
-                : null;
-
-            // Show loading
-            if (shareProvider.loading) {
-              return Center(child: CircularProgressIndicator());
-            }
-
-            // Show map or retry
-            return Column(
-              children: [
-                Expanded(
-                  child: userLocation == null
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Location not available",
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              SizedBox(height: 12),
-                              ElevatedButton(
-                                onPressed: () {
-                                  shareProvider.sharelivelocation();
-                                },
-                                child: Text("Retry"),
-                              ),
-                            ],
-                          ),
-                        )
-                      : GoogleMap(
-                          initialCameraPosition: CameraPosition(
-                            target: userLocation,
-                            zoom: 15,
-                          ),
-                          markers: {
-                            Marker(
-                              markerId: MarkerId("current_location"),
-                              position: userLocation,
-                              infoWindow: InfoWindow(
-                                title: shareProvider.aDDress ?? "Your Location",
-                              ),
-                            ),
-                          },
-                          onMapCreated: (GoogleMapController controller) {
-                            _controller = controller;
-                            controller.animateCamera(
-                              CameraUpdate.newLatLng(userLocation),
-                            );
-                          },
-                        ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (userLocation != null) {
-                        _shareLocation(
-                            userLocation.latitude, userLocation.longitude);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Location is unavailable',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                              ),
-                            ),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: primarySwatch[900],
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(
-                          vertical: 16.0, horizontal: 32.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                      elevation: 5,
-                    ),
-                    child: Text(
-                      'Share Location',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                  ),
-                ),
-              ],
-            );
-          },
+          child: Text(
+        "Share Live Location",
+        style: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
         ),
-      ),
+      )),
+      //   child: Consumer<ShareliveLocation>(
+      //     builder: (context, shareProvider, _) {
+      //       // Show success message
+      //       if (shareProvider.successMessage != null) {
+      //         WidgetsBinding.instance.addPostFrameCallback((_) {
+      //           ScaffoldMessenger.of(context).showSnackBar(
+      //             SnackBar(
+      //               content: Text(
+      //                 shareProvider.successMessage!,
+      //                 style: TextStyle(
+      //                   color: Colors.green,
+      //                   fontSize: 16,
+      //                 ),
+      //               ),
+      //               backgroundColor: cardBackgroundColor,
+      //             ),
+      //           );
+      //           shareProvider.clearSuccessMessage();
+      //         });
+      //       }
+
+      //       // Show error message
+      //       if (shareProvider.errorMessage.isNotEmpty) {
+      //         WidgetsBinding.instance.addPostFrameCallback((_) {
+      //           ScaffoldMessenger.of(context).showSnackBar(
+      //             SnackBar(
+      //               content: Text(
+      //                 shareProvider.errorMessage,
+      //                 style: TextStyle(
+      //                   color: Colors.white,
+      //                   fontSize: 16,
+      //                 ),
+      //               ),
+      //               backgroundColor: Colors.red,
+      //             ),
+      //           );
+      //           shareProvider.clearSuccessMessage();
+      //         });
+      //       }
+
+      //       // Get user location
+      //       LatLng? userLocation = (shareProvider.latitude != null &&
+      //               shareProvider.longitude != null)
+      //           ? LatLng(double.parse(shareProvider.latitude!),
+      //               double.parse(shareProvider.longitude!))
+      //           : null;
+      //       print("hello");
+      //       print(
+      //           userLocation?.latitude); // Debugging: Print the latitude value
+
+      //       // Show loading
+      //       if (shareProvider.loading) {
+      //         return Center(child: CircularProgressIndicator());
+      //       }
+
+      //       // Show map or retry
+      //       return Column(
+      //         children: [
+      //           Expanded(
+      //             child: userLocation == null
+      //                 ? Center(
+      //                     child: Column(
+      //                       mainAxisAlignment: MainAxisAlignment.center,
+      //                       children: [
+      //                         Text(
+      //                           "Location not available",
+      //                           style: TextStyle(fontSize: 18),
+      //                         ),
+      //                         SizedBox(height: 12),
+      //                         ElevatedButton(
+      //                           onPressed: () {
+      //                             shareProvider.sharelivelocation();
+      //                           },
+      //                           child: Text("Retry"),
+      //                         ),
+      //                       ],
+      //                     ),
+      //                   )
+      //                 : GoogleMap(
+      //                     initialCameraPosition: CameraPosition(
+      //                       target: userLocation,
+      //                       zoom: 15,
+      //                     ),
+      //                     markers: {
+      //                       Marker(
+      //                         markerId: MarkerId("current_location"),
+      //                         position: userLocation,
+      //                         infoWindow: InfoWindow(
+      //                           title: shareProvider.aDDress ?? "Your Location",
+      //                         ),
+      //                       ),
+      //                     },
+      //                     onMapCreated: (GoogleMapController controller) {
+      //                       _controller = controller;
+      //                       controller.animateCamera(
+      //                         CameraUpdate.newLatLng(userLocation),
+      //                       );
+      //                     },
+      //                   ),
+      //           ),
+      //           Padding(
+      //             padding: const EdgeInsets.all(16.0),
+      //             child: ElevatedButton(
+      //               onPressed: () {
+      //                 if (userLocation != null) {
+      //                   _shareLocation(
+      //                       userLocation.latitude, userLocation.longitude);
+      //                 } else {
+      //                   ScaffoldMessenger.of(context).showSnackBar(
+      //                     SnackBar(
+      //                       content: Text(
+      //                         'Location is unavailable',
+      //                         style: TextStyle(
+      //                           color: Colors.white,
+      //                           fontSize: 16,
+      //                         ),
+      //                       ),
+      //                       backgroundColor: Colors.red,
+      //                     ),
+      //                   );
+      //                 }
+      //               },
+      //               style: ElevatedButton.styleFrom(
+      //                 backgroundColor: primarySwatch[900],
+      //                 foregroundColor: Colors.white,
+      //                 padding: EdgeInsets.symmetric(
+      //                     vertical: 16.0, horizontal: 32.0),
+      //                 shape: RoundedRectangleBorder(
+      //                   borderRadius: BorderRadius.circular(20.0),
+      //                 ),
+      //                 elevation: 5,
+      //               ),
+      //               child: Text(
+      //                 'Share Location',
+      //                 style: TextStyle(fontSize: 18),
+      //               ),
+      //             ),
+      //           ),
+      //         ],
+      //       );
+      //     },
+      //   ),
+      // ),
     );
   }
 }

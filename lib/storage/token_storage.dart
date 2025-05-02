@@ -23,34 +23,20 @@ class TokenStorage {
     }
   }
 
-  // Remove access token securely
+// Remove access token securely
   Future<void> removeToken() async {
     await _secureStorage.delete(key: 'auth_token');
+    print("sucessfully removed token");
   }
 
-  // Store refresh token securely
-  Future<void> storeRefreshToken(String refreshToken) async {
-    await _secureStorage.write(key: 'refresh_token', value: refreshToken);
-  }
-
-  // Retrieve refresh token securely with try-catch
-  Future<String?> getRefreshToken() async {
-    try {
-      return await _secureStorage.read(key: 'refresh_token');
-    } catch (e) {
-      // print("Error reading refresh token: $e");
-      return null;
-    }
-  }
-
-  // Remove refresh token securely
-  Future<void> removeRefreshToken() async {
-    await _secureStorage.delete(key: 'refresh_token');
-  }
-
-  // Store username
+// Store username
   Future<void> storeUsername(String username) async {
     await _secureStorage.write(key: 'username', value: username);
+  }
+
+  //remove the username
+  Future<void> removeUsername() async {
+    await _secureStorage.delete(key: 'username');
   }
 
   // Retrieve username securely with try-catch
@@ -60,6 +46,33 @@ class TokenStorage {
     } catch (e) {
       return null;
     }
+  }
+
+  // Retrieve refresh token securely with try-catch
+  Future<String?> getRefreshToken() async {
+    try {
+      print("refresh token");
+      return await _secureStorage.read(key: 'refresh_token');
+    } catch (e) {
+      print("Error reading refresh token: $e");
+      return null;
+    }
+  }
+
+  // Store refresh token securely
+  Future<void> storeRefreshToken(String refreshToken) async {
+    await _secureStorage.write(key: 'refresh_token', value: refreshToken);
+  }
+
+  // Remove refresh token securely
+  Future<void> removeRefreshToken() async {
+    await _secureStorage.delete(key: 'refresh_token');
+    print("sucessfully removed refresh token");
+  }
+
+  Future<void> removeExpirationTime() async {
+    await _secureStorage.delete(key: 'expiration_time');
+    print("sucessfully removed expiration time");
   }
 
 //Stores the expiration time of the token
@@ -72,10 +85,11 @@ class TokenStorage {
     try {
       final response = await _secureStorage.read(key: 'expiration_time');
       if (response != null) {
+        print("Expiration time: $response");
         return DateTime.parse(response);
       }
     } catch (e) {
-      // print("Error reading auth token: $e");
+      print("Error reading expiration time: $e");
     }
     return null;
   }
@@ -152,7 +166,7 @@ class TokenStorage {
     await _secureStorage.write(key: 'hospital_code', value: hospitalCode);
   }
 
-  // Retrieve hospital code securely
+// Retrieve hospital code securely
   Future<String?> getHospitalCode() async {
     try {
       return await _secureStorage.read(key: 'hospital_code');
@@ -164,5 +178,45 @@ class TokenStorage {
 
   Future<void> removeHospitalCode() async {
     await _secureStorage.delete(key: 'hospital_code');
+  }
+
+  // Store branch ID securely
+  Future<void> storeWorkingBranchid(String branchId) async {
+    await _secureStorage.write(
+        key: ' selected_workingbranchId', value: branchId);
+  }
+
+  // Retrieve branch ID securely
+  Future<String?> getBranchId() async {
+    try {
+      return await _secureStorage.read(key: 'selected_workingbranchId');
+    } catch (e) {
+      print("Error reading branch ID: $e");
+      return null;
+    }
+  }
+
+  Future<void> storeBranchIdAndFiscalYearId(String fiscalyear) async {
+    await _secureStorage.write(key: 'selected_fiscal_year', value: fiscalyear);
+  }
+
+  // Retrieve branch ID and fiscal year ID securely
+  Future<String?> getBranchIdAndFiscalYearId() async {
+    try {
+      return await _secureStorage.read(key: 'selected_fiscal_year');
+    } catch (e) {
+      print("Error reading branch ID: $e");
+      return null;
+    }
+  }
+
+  Future<void> removeBranchId() async {
+    await _secureStorage.delete(key: 'selected_workingbranchId');
+    print("sucessfully removed branch id");
+  }
+
+  Future<void> removeBranchIdAndFiscalYearId() async {
+    await _secureStorage.delete(key: 'selected_fiscal_year');
+    print("sucessfully removed branch id and fiscal year id");
   }
 }

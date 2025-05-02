@@ -110,6 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               GestureDetector(
                 onTap: () async {
+                  print("hello2");
                   authProvider.login(
                     _usernameController.text,
                     _passwordController.text,
