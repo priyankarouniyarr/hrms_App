@@ -49,7 +49,7 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
   void _shareLocation(double latitude, double longitude) {
     String googleMapsUrl =
         "https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude";
-    Share.share("My current location: $googleMapsUrl");
+    Share.share("$googleMapsUrl");
   }
 
   Future<void> _retryLocation() async {
@@ -69,6 +69,44 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
     }
   }
 
+  void _showSnackbarMessages(BuildContext context, ShareliveLocation provider) {
+    if (provider.successMessage != null &&
+        provider.latitude != null &&
+        provider.longitude != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            provider.successMessage!,
+            style: TextStyle(
+              color: Colors.green,
+              fontSize: 16,
+            ),
+          ),
+          backgroundColor: cardBackgroundColor,
+        ),
+      );
+      provider.clearSuccessMessage();
+    }
+
+    if (provider.errorMessage.isNotEmpty &&
+        provider.latitude != null &&
+        provider.longitude != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            provider.errorMessage,
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 16,
+            ),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+      provider.clearErrorMessage();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,40 +114,6 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
       body: SafeArea(
         child: Consumer<ShareliveLocation>(
           builder: (context, provider, child) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (provider.successMessage != null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      provider.successMessage!,
-                      style: TextStyle(
-                        color: Colors.green,
-                        fontSize: 16,
-                      ),
-                    ),
-                    backgroundColor: cardBackgroundColor,
-                  ),
-                );
-                provider.clearSuccessMessage();
-              }
-
-              if (provider.errorMessage.isNotEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      provider.errorMessage,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                      ),
-                    ),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-                provider.clearErrorMessage();
-              }
-            });
-
             LatLng? userLocation =
                 (provider.latitude != null && provider.longitude != null)
                     ? LatLng(
@@ -140,9 +144,17 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
                           },
                           onMapCreated: (GoogleMapController controller) {
                             _controller = controller;
-                            controller.animateCamera(
-                              CameraUpdate.newLatLng(userLocation),
-                            );
+                            Future.delayed(Duration(milliseconds: 300), () {
+                              if (mounted && userLocation != null) {
+                                _controller?.animateCamera(
+                                  CameraUpdate.newLatLng(userLocation),
+                                );
+                              }
+                            });
+
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              _showSnackbarMessages(context, provider);
+                            });
                           },
                           myLocationEnabled: true,
                           myLocationButtonEnabled: true,
@@ -161,7 +173,7 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
                             ],
                           ),
                         ),
-                      if (!provider.loading && userLocation == null)
+                      if (userLocation == null && !provider.loading)
                         Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,

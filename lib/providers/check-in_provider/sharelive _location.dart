@@ -71,7 +71,7 @@ class ShareliveLocation with ChangeNotifier {
       if (!serviceEnabled) {
         await Geolocator.openLocationSettings();
 
-        return sharelivelocation();
+        return;
       }
 
       LocationPermission permission = await Geolocator.checkPermission();
