@@ -192,7 +192,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 elevation: 3,
                 child: InkWell(
                   onTap: () async {
-                    await authProvider.logout();
+                    await authProvider.logout(
+                      context,
+                    );
 
                     Navigator.pushReplacement(
                       context,

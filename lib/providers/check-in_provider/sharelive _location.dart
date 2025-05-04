@@ -13,7 +13,6 @@ class ShareliveLocation with ChangeNotifier {
   String? _longitude;
   String? _address;
 
-  String? get aDDress => _address;
   final SecureStorageService _secureStorageService = SecureStorageService();
 
   bool get loading => _loading;
@@ -21,48 +20,85 @@ class ShareliveLocation with ChangeNotifier {
   String? get successMessage => _successMessage;
   String? get latitude => _latitude;
   String? get longitude => _longitude;
+  String? get aDDress => _address;
 
   Future<void> sharelivelocation() async {
     _setLoading(true);
     try {
       String? token = await _secureStorageService.readData('auth_token');
-      String? _fiscalYear =
+      String? fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
-      String? _branchId =
+      String? branchId =
           await _secureStorageService.readData('workingBranchId');
 
-      if (_branchId == null || _fiscalYear == null || token == null) {
+      if (branchId == null || fiscalYear == null || token == null) {
         _setErrorMessage("No branch selected. Please select a branch.");
         return;
       }
+
       final response = await http.post(
         Uri.parse(
-            'http://45.117.153.90:5004/api/Employee//LiveLocationSharePost'),
+            'http://45.117.153.90:5004/api/Employee/LiveLocationSharePost'),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
-          "workingBranchId": _branchId,
-          "fiscalYearId": _fiscalYear
+          "workingBranchId": branchId,
+          "fiscalYearId": fiscalYear
         },
         body: json.encode({
           "latitude": _latitude,
           "longitude": _longitude,
         }),
       );
+      print(_latitude);
+      print(_longitude);
       if (response.statusCode == 200) {
-        _setSuccessMessage("Live Location sharing successfully!");
-        print("Success message: $_successMessage");
+        _setSuccessMessage("Live Location shared successfully!");
       } else {
         _setErrorMessage(
             "Failed to submit: ${response.statusCode}\n ${response.body}");
       }
-
-      print(response.body);
     } catch (e) {
-      _setErrorMessage("UnExcepted Error: $e");
+      _setErrorMessage("Unexpected Error: $e");
     } finally {
       _setLoading(false);
     }
+  }
+
+  Future<void> getcurrentlocation() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      await Geolocator.openLocationSettings();
+      return;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        _setErrorMessage("Location permission denied.");
+        return;
+      }
+    }
+
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    _latitude = position.latitude.toString();
+    _longitude = position.longitude.toString();
+
+    await _secureStorageService.writeData('checkinPositionLat', _latitude!);
+    await _secureStorageService.writeData('checkinPositionLong', _longitude!);
+
+    List<Placemark> placemarks =
+        await placemarkFromCoordinates(position.latitude, position.longitude);
+    if (placemarks.isNotEmpty) {
+      _address =
+          '${placemarks[0].name}, ${placemarks[0].locality}, ${placemarks[0].administrativeArea}';
+    }
+
+    notifyListeners();
   }
 
   void _setLoading(bool value) {
@@ -85,33 +121,13 @@ class ShareliveLocation with ChangeNotifier {
     notifyListeners();
   }
 
-  getcurrentlocation() async {
-    // Permission checking here
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      await Geolocator.openLocationSettings();
-      return sharelivelocation();
-    }
+  void clearErrorMessage() {
+    _errorMessage = '';
+    notifyListeners();
+  }
 
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
-      LocationPermission ask = await Geolocator.requestPermission();
-    } else {
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-
-      _latitude = position.latitude.toString();
-      _longitude = position.longitude.toString();
-      await _secureStorageService.writeData('checkinPositionLat', _latitude!);
-      await _secureStorageService.writeData('checkinPositionLong', _longitude!);
-
-      List<Placemark> address =
-          await placemarkFromCoordinates(position.latitude, position.longitude);
-      if (address.isNotEmpty) {
-        _address =
-            '${address[0].name}, ${address[0].locality}, ${address[0].administrativeArea}';
-      }
-    }
+  void stopLiveLocation() {
+    _loading = false;
+    notifyListeners();
   }
 }

@@ -90,4 +90,11 @@ class BranchProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  void reset() {
+    _branches = [];
+    _selectedBranchId = null;
+    _setErrorMessage("");
+    notifyListeners();
+  }
 }

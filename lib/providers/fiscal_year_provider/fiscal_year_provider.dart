@@ -61,6 +61,12 @@ class FiscalYearProvider with ChangeNotifier {
     }
   }
 
+  void reset() {
+    _fiscalYears = [];
+    _setErrorMessage("");
+    notifyListeners();
+  }
+
   void _setLoading(bool value) {
     _loading = value;
     notifyListeners();

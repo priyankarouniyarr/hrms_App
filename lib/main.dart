@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
@@ -13,6 +14,7 @@ import 'package:hrms_app/providers/check-in_provider/check_in_provider.dart';
 import 'package:hrms_app/providers/holidays_provider/holidays_provider.dart';
 import 'package:hrms_app/providers/create_tickets/new_tickets_provider.dart';
 import 'package:hrms_app/providers/create_tickets/ne_tickets_providers.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:hrms_app/providers/leaves_provider/leavehistory_provider.dart';
 import 'package:hrms_app/providers/branch_id_providers/branch_id_provider.dart';
 import 'package:hrms_app/providers/works_Summary_provider/ticket_workflow.dart';
@@ -31,8 +33,14 @@ import 'package:hrms_app/providers/works_Summary_provider/summary_details/my_tic
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // await FirebaseMsg().initFCM();
-
+// Check internet connection before proceeding
+  bool isConnected =
+      await InternetConnectionChecker.createInstance().hasConnection;
+  if (!isConnected) {
+    print("No internet connection.");
+  } else {
+    print("Internet connection available.");
+  }
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -125,6 +133,30 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   @override
+  late StreamSubscription<InternetConnectionStatus> _listener;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Listen for internet connection status changes
+    _listener = InternetConnectionChecker.createInstance()
+        .onStatusChange
+        .listen((status) {
+      if (status == InternetConnectionStatus.connected) {
+        print("Internet connection is available.");
+      } else {
+        print("No internet connection.");
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _listener.cancel();
+    super.dispose();
+  }
+
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,

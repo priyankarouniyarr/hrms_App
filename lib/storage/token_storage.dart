@@ -26,7 +26,6 @@ class TokenStorage {
 // Remove access token securely
   Future<void> removeToken() async {
     await _secureStorage.delete(key: 'auth_token');
-    print("sucessfully removed token");
   }
 
 // Store username
@@ -67,12 +66,10 @@ class TokenStorage {
   // Remove refresh token securely
   Future<void> removeRefreshToken() async {
     await _secureStorage.delete(key: 'refresh_token');
-    print("sucessfully removed refresh token");
   }
 
   Future<void> removeExpirationTime() async {
     await _secureStorage.delete(key: 'expiration_time');
-    print("sucessfully removed expiration time");
   }
 
 //Stores the expiration time of the token
@@ -106,7 +103,6 @@ class TokenStorage {
 
   Future<void> _saveTokenfcm(String fcmtoken, BuildContext context) async {
     await _secureStorage.write(key: 'fcm_token', value: fcmtoken);
-    print("Stored FCM token locally: $fcmtoken");
 
     try {
       final notificationProvider =
@@ -200,7 +196,6 @@ class TokenStorage {
     await _secureStorage.write(key: 'selected_fiscal_year', value: fiscalyear);
   }
 
-  // Retrieve branch ID and fiscal year ID securely
   Future<String?> getBranchIdAndFiscalYearId() async {
     try {
       return await _secureStorage.read(key: 'selected_fiscal_year');
@@ -212,11 +207,9 @@ class TokenStorage {
 
   Future<void> removeBranchId() async {
     await _secureStorage.delete(key: 'selected_workingbranchId');
-    print("sucessfully removed branch id");
   }
 
   Future<void> removeBranchIdAndFiscalYearId() async {
     await _secureStorage.delete(key: 'selected_fiscal_year');
-    print("sucessfully removed branch id and fiscal year id");
   }
 }

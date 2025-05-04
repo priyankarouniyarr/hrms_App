@@ -3,8 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hrms_app/screen/branch_id.dart';
 import 'package:hrms_app/screen/hospitalcode.dart';
+import 'package:hrms_app/storage/token_storage.dart';
+import 'package:provider/provider.dart'; // Import the TokenStorage
 import 'package:hrms_app/models/login_screen_models/loginscreen_models.dart';
-import 'package:hrms_app/storage/token_storage.dart'; // Import the TokenStorage
+import 'package:hrms_app/providers/branch_id_providers/branch_id_provider.dart';
+import 'package:hrms_app/providers/fiscal_year_provider/fiscal_year_provider.dart'
+    show FiscalYearProvider;
 
 class AuthProvider with ChangeNotifier {
   bool _loading = false;
@@ -152,7 +156,9 @@ class AuthProvider with ChangeNotifier {
           _setErrorMessage(" Error refreshing token: ${response.statusCode}");
 
           // Clear tokens and navigate to login screen if token refresh fails
-          await logout();
+          await logout(
+            context,
+          );
 
           Navigator.pushReplacement(
             context,
@@ -167,18 +173,18 @@ class AuthProvider with ChangeNotifier {
   }
 
 // Logout and remove both access and refresh tokens
-  Future<void> logout() async {
+  Future<void> logout(BuildContext context) async {
     await _tokenStorage.removeToken();
-    print("Token removed");
+
     await _tokenStorage.removeUsername();
-    print("username removed");
+
     await _tokenStorage.removeRefreshToken();
 
     await _tokenStorage.removeExpirationTime();
     await _tokenStorage.removeBranchIdAndFiscalYearId();
     await _tokenStorage.removeBranchId();
-
-    notifyListeners();
+    Provider.of<BranchProvider>(context, listen: false).reset();
+    Provider.of<FiscalYearProvider>(context, listen: false).reset();
   }
 
   void _setLoading(bool value) {
