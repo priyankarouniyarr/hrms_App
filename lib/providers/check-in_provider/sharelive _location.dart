@@ -43,20 +43,19 @@ class ShareliveLocation with ChangeNotifier {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
           "workingBranchId": branchId,
-          "fiscalYearId": fiscalYear
+          "selected_fiscal_year": fiscalYear
         },
         body: json.encode({
           "latitude": _latitude,
           "longitude": _longitude,
         }),
       );
-      print(_latitude);
-      print(_longitude);
+
       if (response.statusCode == 200) {
         _setSuccessMessage("Live Location shared successfully!");
       } else {
         _setErrorMessage(
-            "Failed to submit: ${response.statusCode}\n ${response.body}");
+            "Failed to submit: ${response.statusCode}\n${response.body}");
       }
     } catch (e) {
       _setErrorMessage("Unexpected Error: $e");
@@ -66,44 +65,50 @@ class ShareliveLocation with ChangeNotifier {
   }
 
   Future<void> getcurrentlocation() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      await Geolocator.openLocationSettings();
-      return;
-    }
+    _setLoading(true);
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        await Geolocator.openLocationSettings();
 
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
-      permission = await Geolocator.requestPermission();
+        return sharelivelocation();
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
-        _setErrorMessage("Location permission denied.");
-        return;
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied ||
+            permission == LocationPermission.deniedForever) {
+          return sharelivelocation();
+        }
       }
+
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      _latitude = position.latitude.toString();
+      _longitude = position.longitude.toString();
+
+      await _secureStorageService.writeData('checkinPositionLat', _latitude!);
+      await _secureStorageService.writeData('checkinPositionLong', _longitude!);
+
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
+      if (placemarks.isNotEmpty) {
+        _address =
+            '${placemarks[0].name}, ${placemarks[0].locality}, ${placemarks[0].administrativeArea}';
+      }
+    } catch (e) {
+      _setErrorMessage("Failed to get location: $e");
+    } finally {
+      _setLoading(false);
     }
 
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    _latitude = position.latitude.toString();
-    _longitude = position.longitude.toString();
-
-    await _secureStorageService.writeData('checkinPositionLat', _latitude!);
-    await _secureStorageService.writeData('checkinPositionLong', _longitude!);
-
-    List<Placemark> placemarks =
-        await placemarkFromCoordinates(position.latitude, position.longitude);
-    if (placemarks.isNotEmpty) {
-      _address =
-          '${placemarks[0].name}, ${placemarks[0].locality}, ${placemarks[0].administrativeArea}';
-    }
-
-    notifyListeners();
+    Future.microtask(() => notifyListeners());
   }
 
   void _setLoading(bool value) {
     _loading = value;
-    notifyListeners();
   }
 
   void _setErrorMessage(String message) {

@@ -28,38 +28,6 @@ class _SplashScreenState extends State<SplashScreen> {
     _checkLoginState();
   }
 
-//handle location permission'
-
-  //  Monitor internet connectivity
-  // void _startMonitoring() {
-  //   subscription = InternetConnectionChecker.createInstance()
-  //       .onStatusChange
-  //       .listen((InternetConnectionStatus status) async {
-  //     if (status == InternetConnectionStatus.connected) {
-  //       print('Connected to the Internet');
-  //       await Future.delayed(Duration(seconds: 5));
-  //       await _proceedAfterConnection();
-  //     } else {
-  //       print('No Internet Connection');
-  //       _showNoInternetDialog();
-  //     }
-  //   });
-  // }
-
-  // //  Proceeds only after internet is confirmed
-  // Future<void> _proceedAfterConnection() async {
-  //   try {
-  //     await _checkLoginState();
-  //   } on SocketException catch (_) {
-  //     _showSocketErrorDialog();
-  //   } catch (e) {
-  //     setState(() {
-  //       _errorMessage = e.toString();
-  //     });
-  //   }
-  // }
-
-  //Dialog for socket error (e.g., API not reachable)
   void _showSocketErrorDialog() {
     showDialog(
       context: context,
@@ -80,34 +48,6 @@ class _SplashScreenState extends State<SplashScreen> {
       },
     );
   }
-
-  // void _showNoInternetDialog() {
-  //   showDialog(
-  //     barrierDismissible: false,
-  //     context: context,
-  //     builder: (context) {
-  //       return AlertDialog(
-  //         title: Text('No Internet Connection'),
-  //         content: Text('Please check your internet connection.'),
-  //         actions: <Widget>[
-  //           TextButton(
-  //             child: Text('Retry'),
-  //             onPressed: () async {
-  //               Navigator.of(context).pop();
-  //               final checker = InternetConnectionChecker.createInstance();
-  //               bool connected = await checker.hasConnection;
-  //               if (connected) {
-  //                 await _proceedAfterConnection();
-  //               } else {
-  //                 _showNoInternetDialog();
-  //               }
-  //             },
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
 
   Future<void> _checkLoginState() async {
     try {
@@ -137,8 +77,6 @@ class _SplashScreenState extends State<SplashScreen> {
       }
 
       if (isLoggedIn) {
-        //only after login sucess :checking branch id and fiscal year id
-
         try {
           final branchid = Provider.of<BranchProvider>(context, listen: false);
 

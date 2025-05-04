@@ -131,38 +131,10 @@ class _CheckInScreenState extends State<CheckInScreen> {
                 ),
 
                 SizedBox(height: 20),
-                checkInProvider.getPunches.isEmpty
-                    ? Container(
-                        height: 300,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: GoogleMap(
-                            initialCameraPosition: CameraPosition(
-                              target: userLocation,
-                              zoom: 15,
-                            ),
-                            onMapCreated: (GoogleMapController controller) {
-                              mapController = controller;
-                              mapController!.animateCamera(
-                                CameraUpdate.newCameraPosition(
-                                  CameraPosition(
-                                    target: userLocation,
-                                    zoom: 15,
-                                  ),
-                                ),
-                              );
-                            },
-                            zoomControlsEnabled: false, // optional
-                            myLocationEnabled: false, // optional
-                            myLocationButtonEnabled: false, // optional
-                          ),
-                        ),
-                      )
-                    : Container() // No map if punches are not empty
 
                 // Google Map
 
-                //if (checkInProvider.getPunches.isEmpty)
+                //  / if (checkInProvider.getPunches.isEmpty)
                 //   Container(
                 //     width: double.infinity,
                 //     height: 500,
@@ -551,12 +523,12 @@ class _CheckInScreenState extends State<CheckInScreen> {
   splitLatLon(String systemDtl) {
     // Split the string by comma
     List<String> parts = systemDtl.split(',');
-    // print(parts);
+    print(parts);
     // Check if the list has at least two elements
     var lat = parts[0].trim().split(': ')[1].trim();
     var lon = parts[1].trim().split(': ')[1].trim();
-    // print(lat);
-    // print(lon);
+    print(lat);
+    print(lon);
     return LatLng(double.parse(lat), double.parse(lon));
   }
 }

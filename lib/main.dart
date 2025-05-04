@@ -36,6 +36,7 @@ void main() async {
 // Check internet connection before proceeding
   bool isConnected =
       await InternetConnectionChecker.createInstance().hasConnection;
+  print(isConnected);
   if (!isConnected) {
     print("No internet connection.");
   } else {
