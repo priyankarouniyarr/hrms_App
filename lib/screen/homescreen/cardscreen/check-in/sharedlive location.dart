@@ -109,135 +109,135 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<ShareliveLocation>(context);
+    print("hlo");
+    print(provider.latitude);
+
+    LatLng? userLocation =
+        (provider.latitude != null && provider.longitude != null)
+            ? LatLng(
+                double.parse(provider.latitude!),
+                double.parse(provider.longitude!),
+              )
+            : null;
+
     return Scaffold(
       appBar: CustomAppBarProfile(title: "Live Location"),
       body: SafeArea(
-        child: Consumer<ShareliveLocation>(
-          builder: (context, provider, child) {
-            LatLng? userLocation =
-                (provider.latitude != null && provider.longitude != null)
-                    ? LatLng(
-                        double.parse(provider.latitude!),
-                        double.parse(provider.longitude!),
-                      )
-                    : null;
-
-            return Column(
-              children: [
-                Expanded(
-                  child: Stack(
-                    children: [
-                      if (!provider.loading && userLocation != null)
-                        GoogleMap(
-                          initialCameraPosition: CameraPosition(
-                            target: userLocation,
-                            zoom: 15,
-                          ),
-                          markers: {
-                            Marker(
-                              markerId: MarkerId("current_location"),
-                              position: userLocation,
-                              infoWindow: InfoWindow(
-                                title: provider.aDDress ?? "Your Location",
-                              ),
-                            ),
-                          },
-                          onMapCreated: (GoogleMapController controller) {
-                            _controller = controller;
-                            Future.delayed(Duration(milliseconds: 300), () {
-                              if (mounted && userLocation != null) {
-                                _controller?.animateCamera(
-                                  CameraUpdate.newLatLng(userLocation),
-                                );
-                              }
-                            });
-
-                            WidgetsBinding.instance.addPostFrameCallback((_) {
-                              _showSnackbarMessages(context, provider);
-                            });
-                          },
-                          myLocationEnabled: true,
-                          myLocationButtonEnabled: true,
-                        ),
-                      if (provider.loading)
-                        Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              CircularProgressIndicator(),
-                              SizedBox(height: 16),
-                              Text(
-                                "Fetching location...",
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ],
-                          ),
-                        ),
-                      if (userLocation == null && !provider.loading)
-                        Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.location_off,
-                                size: 48,
-                                color: Colors.grey,
-                              ),
-                              SizedBox(height: 12),
-                              Text(
-                                "Location unavailable",
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              SizedBox(height: 12),
-                              ElevatedButton(
-                                onPressed: _retryLocation,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: primarySwatch,
-                                  foregroundColor: Colors.white,
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 24, vertical: 12),
-                                ),
-                                child: Text(
-                                  "Retry",
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                if (userLocation != null)
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        _shareLocation(
-                            userLocation.latitude, userLocation.longitude);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primarySwatch[900],
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(
-                            vertical: 16.0, horizontal: 32.0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        elevation: 5,
+        child: Column(
+          children: [
+            Expanded(
+              child: Stack(
+                children: [
+                  if (!provider.loading && userLocation != null)
+                    GoogleMap(
+                      initialCameraPosition: CameraPosition(
+                        target: userLocation,
+                        zoom: 15,
                       ),
-                      child: Text(
-                        'Share Location',
-                        style: TextStyle(fontSize: 18),
+                      markers: {
+                        Marker(
+                          markerId: MarkerId("current_location"),
+                          position: userLocation,
+                          infoWindow: InfoWindow(
+                            title: provider.aDDress ?? "Your Location",
+                          ),
+                        ),
+                      },
+                      onMapCreated: (GoogleMapController controller) {
+                        _controller = controller;
+                        Future.delayed(Duration(milliseconds: 300), () {
+                          if (mounted && userLocation != null) {
+                            _controller?.animateCamera(
+                              CameraUpdate.newLatLng(userLocation),
+                            );
+                          }
+                        });
+
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          _showSnackbarMessages(context, provider);
+                        });
+                      },
+                      myLocationEnabled: true,
+                      myLocationButtonEnabled: true,
+                    ),
+                  if (provider.loading)
+                    Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircularProgressIndicator(),
+                          SizedBox(height: 16),
+                          Text(
+                            "Fetching location...",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ],
                       ),
                     ),
+                  if (userLocation == null && !provider.loading)
+                    Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.location_off,
+                            size: 48,
+                            color: Colors.grey,
+                          ),
+                          SizedBox(height: 12),
+                          Text(
+                            "Location unavailable",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          SizedBox(height: 12),
+                          ElevatedButton(
+                            onPressed: _retryLocation,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primarySwatch,
+                              foregroundColor: Colors.white,
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 24, vertical: 12),
+                            ),
+                            child: Text(
+                              "Retry",
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            if (userLocation != null)
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    _shareLocation(
+                        userLocation.latitude, userLocation.longitude);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primarySwatch[900],
+                    foregroundColor: Colors.white,
+                    padding:
+                        EdgeInsets.symmetric(vertical: 16.0, horizontal: 32.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    elevation: 5,
                   ),
-              ],
-            );
-          },
+                  child: Text(
+                    'Share Location',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
     );
