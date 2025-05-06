@@ -92,9 +92,7 @@ class EmployeeProvider with ChangeNotifier {
           await secureStorageService.readData('selected_workingbranchId');
       String? fiscalYear =
           await secureStorageService.readData('selected_fiscal_year');
-      print("branchId: $branchId");
-      print("token: $token");
-      print("fiscalYear: $fiscalYear");
+
       if (token == null || branchId == null || fiscalYear == null) {
         errorMessage = 'Token or BranchId is missing';
         print(errorMessage);
@@ -103,7 +101,6 @@ class EmployeeProvider with ChangeNotifier {
         return;
       }
 
-      // Define API endpoint
       final url =
           Uri.parse('http://45.117.153.90:5004/api/Employee/GetEmployeeDetail');
 

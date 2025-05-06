@@ -6,7 +6,6 @@ import 'package:hrms_app/screen/onboardscreen.dart';
 import 'package:hrms_app/storage/token_storage.dart';
 import 'package:hrms_app/screen/app_main_screen.dart';
 import 'package:hrms_app/providers/login_screen_provider/auth_provider.dart';
-import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:hrms_app/providers/branch_id_providers/branch_id_provider.dart';
 import 'package:hrms_app/providers/fiscal_year_provider/fiscal_year_provider.dart';
 
@@ -19,7 +18,6 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   String? _errorMessage;
-  late StreamSubscription<InternetConnectionStatus> subscription;
 
   @override
   void initState() {

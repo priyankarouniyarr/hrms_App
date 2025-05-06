@@ -14,7 +14,6 @@ import 'package:hrms_app/providers/check-in_provider/check_in_provider.dart';
 import 'package:hrms_app/providers/holidays_provider/holidays_provider.dart';
 import 'package:hrms_app/providers/create_tickets/new_tickets_provider.dart';
 import 'package:hrms_app/providers/create_tickets/ne_tickets_providers.dart';
-import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:hrms_app/providers/leaves_provider/leavehistory_provider.dart';
 import 'package:hrms_app/providers/branch_id_providers/branch_id_provider.dart';
 import 'package:hrms_app/providers/works_Summary_provider/ticket_workflow.dart';
@@ -25,6 +24,7 @@ import 'package:hrms_app/providers/fiscal_year_provider/fiscal_year_provider.dar
 import 'package:hrms_app/providers/payroll/payroll_monthly_salarayy_provider.dart';
 import 'package:hrms_app/providers/profile_providers/employee_contract_provider.dart';
 import 'package:hrms_app/providers/hosptial_code_provider/hosptial_code_provider.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:hrms_app/providers/attendance_providers/attendance_history_provider.dart';
 import 'package:hrms_app/providers/works_Summary_provider/summary_details/assign_by_me_ticket_provider.dart';
 import 'package:hrms_app/providers/leaves_provider/leaves_history%20_contract%20and%20fiscalyear_period.dart';
@@ -33,15 +33,6 @@ import 'package:hrms_app/providers/works_Summary_provider/summary_details/my_tic
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-// Check internet connection before proceeding
-  bool isConnected =
-      await InternetConnectionChecker.createInstance().hasConnection;
-  print(isConnected);
-  if (!isConnected) {
-    print("No internet connection.");
-  } else {
-    print("Internet connection available.");
-  }
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -134,32 +125,73 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late StreamSubscription<InternetConnectionStatus> _listener;
+  bool isConnectionToInternet = false;
+  StreamSubscription? _internetConnectionSubscription;
+  bool _isDialogShowing = false;
 
   @override
   void initState() {
     super.initState();
-
-    _listener = InternetConnectionChecker.createInstance()
-        .onStatusChange
-        .listen((status) {
-      print(_listener);
-
-      print(status);
-      if (status == InternetConnectionStatus.connected) {
-        print("Internet connection is available.");
-      } else {
-        print("No internet connection.");
+    _internetConnectionSubscription =
+        InternetConnection().onStatusChange.listen((event) {
+      print(event);
+      if (event == InternetStatus.disconnected) {
+        setState(() {
+          isConnectionToInternet = false;
+          _showNoInternetDialog();
+          print(isConnectionToInternet);
+        });
+      } else if (event == InternetStatus.connected) {
+        setState(() {
+          isConnectionToInternet = true;
+        });
+        // _hideNoInternetDialog();
       }
     });
   }
 
+  void _showNoInternetDialog() {
+    if (!_isDialogShowing) {
+      _isDialogShowing = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => AlertDialog(
+              title: Text("No Internet Connection"),
+              content:
+                  Text("Please check your Wi-Fi or mobile data connection."),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    _isDialogShowing = false;
+                    Navigator.of(context, rootNavigator: true).pop();
+                  },
+                  child: Text("Retry"),
+                ),
+              ],
+            ),
+          );
+        }
+      });
+    }
+  }
+
+  void _hideNoInternetDialog() {
+    if (_isDialogShowing) {
+      Navigator.of(context, rootNavigator: true).pop();
+      _isDialogShowing = false;
+    }
+  }
+
   @override
   void dispose() {
-    _listener.cancel();
+    _internetConnectionSubscription?.cancel();
     super.dispose();
   }
 
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,

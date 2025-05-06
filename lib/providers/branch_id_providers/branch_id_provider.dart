@@ -51,14 +51,12 @@ class BranchProvider with ChangeNotifier {
           "Authorization": "Bearer $token",
         },
       );
-      print("Response status: ${response.statusCode}");
-      print("Response body: ${response.body}");
+
       if (response.statusCode == 200) {
         print("Response status: ${response.statusCode}");
         List<dynamic> jsonData = json.decode(response.body);
         if (jsonData.isEmpty) {
           _branches = [];
-          print("hello1");
         } else {
           _branches =
               jsonData.map((branch) => BranchModel.fromJson(branch)).toList();
