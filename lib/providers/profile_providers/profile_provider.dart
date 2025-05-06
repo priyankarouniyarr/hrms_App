@@ -88,12 +88,16 @@ class EmployeeProvider with ChangeNotifier {
 
       // Retrieve token and branchId from secure storage
       String? token = await secureStorageService.readData('auth_token');
-      String? branchId = await secureStorageService.readData('workingBranchId');
+      String? branchId =
+          await secureStorageService.readData('selected_workingbranchId');
       String? fiscalYear =
-          await secureStorageService.readData('workingFinancialId');
-
-      if (token == null || branchId == null) {
+          await secureStorageService.readData('selected_fiscal_year');
+      print("branchId: $branchId");
+      print("token: $token");
+      print("fiscalYear: $fiscalYear");
+      if (token == null || branchId == null || fiscalYear == null) {
         errorMessage = 'Token or BranchId is missing';
+        print(errorMessage);
         isLoading = false;
         notifyListeners();
         return;
@@ -108,8 +112,8 @@ class EmployeeProvider with ChangeNotifier {
         url,
         headers: {
           'Authorization': 'Bearer $token',
-          'workingBranchId': branchId,
-          'workingFinancialId': fiscalYear ?? '',
+          'selected_workingbranchId': branchId,
+          'selected_fiscal_year': fiscalYear ?? '',
         },
       );
 

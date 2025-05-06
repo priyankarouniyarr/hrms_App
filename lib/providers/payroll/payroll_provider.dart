@@ -32,9 +32,15 @@ class LoanAndAdvanceProvider with ChangeNotifier {
     try {
       String? token = await _secureStorageService.readData('auth_token');
       String? branchId =
-          await _secureStorageService.readData('workingBranchId');
+          await _secureStorageService.readData('selected_workingbranchId');
+      String? fiscalYear =
+          await _secureStorageService.readData('selected_fiscal_year');
+      print("branchId: $branchId");
+      print("fiscalYear: $fiscalYear");
+      print("token: $token");
 
-      if (token == null || branchId == null) {
+      if (token == null && branchId == null && fiscalYear == null) {
+        print("Token or Branch ID is missing");
         throw Exception("Token or Branch ID is missing.");
       }
 
@@ -45,7 +51,8 @@ class LoanAndAdvanceProvider with ChangeNotifier {
         url,
         headers: {
           'Authorization': 'Bearer $token',
-          'workingBranchId': branchId
+          'selected_workingbranchId': branchId!,
+          'selected_fiscal_year': fiscalYear!,
         },
       );
 
@@ -72,9 +79,12 @@ class LoanAndAdvanceProvider with ChangeNotifier {
     try {
       String? token = await _secureStorageService.readData('auth_token');
       String? branchId =
-          await _secureStorageService.readData('workingBranchId');
+          await _secureStorageService.readData('selected_workingbranchId');
+      String? fiscalYear =
+          await _secureStorageService.readData('selected_fiscal_year');
 
-      if (token == null && branchId == null) {
+      if (token == null && branchId == null && fiscalYear == null) {
+        print("Token or Branch ID is missing");
         throw Exception("Token is missing.");
       }
 
@@ -84,7 +94,8 @@ class LoanAndAdvanceProvider with ChangeNotifier {
         url,
         headers: {
           'Authorization': 'Bearer $token',
-          'workingBranchId': branchId!,
+          'selected_workingbranchId': branchId!,
+          'selected_fiscal_year': fiscalYear!,
         },
       );
 

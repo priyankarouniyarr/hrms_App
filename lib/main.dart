@@ -122,6 +122,7 @@ Future<void> handleLocationPermission() async {
       print("Error getting location: $e");
     }
   } else {
+    // Handle the case when permission is denied or not granted
     print(
         "Location permission denied or not granted. App will continue without location access.");
   }
@@ -133,17 +134,18 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  @override
   late StreamSubscription<InternetConnectionStatus> _listener;
 
   @override
   void initState() {
     super.initState();
 
-    // Listen for internet connection status changes
     _listener = InternetConnectionChecker.createInstance()
         .onStatusChange
         .listen((status) {
+      print(_listener);
+
+      print(status);
       if (status == InternetConnectionStatus.connected) {
         print("Internet connection is available.");
       } else {

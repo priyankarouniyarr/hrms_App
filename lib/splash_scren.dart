@@ -144,11 +144,6 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 
-  // void dispose() {
-  //   subscription?.cancel();
-  //   super.dispose();
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

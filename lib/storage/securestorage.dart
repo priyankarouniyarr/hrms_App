@@ -1,6 +1,4 @@
-import 'package:provider/provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:hrms_app/providers/notifications/notification_provider.dart';
 
 class SecureStorageService {
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
@@ -32,5 +30,4 @@ class SecureStorageService {
       print('Error deleting $key from secure storage: $e');
     }
   }
-  // Fetch the FCM token
 }

@@ -29,7 +29,8 @@ class LeaveRequestProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _branchId = await _secureStorageService.readData('workingBranchId');
+      _branchId =
+          await _secureStorageService.readData('selected_workingbranchId');
       _token = await _secureStorageService.readData('auth_token');
       _fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
@@ -95,7 +96,8 @@ class LeaveRequestProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _branchId = await _secureStorageService.readData('workingBranchId');
+      _branchId =
+          await _secureStorageService.readData('selected_workingbranchId');
       _token = await _secureStorageService.readData('auth_token');
       _fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
@@ -145,7 +147,8 @@ class LeaveRequestProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _branchId = await _secureStorageService.readData('workingBranchId');
+      _branchId =
+          await _secureStorageService.readData('selected_workingbranchId');
       _token = await _secureStorageService.readData('auth_token');
       _fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');

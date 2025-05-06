@@ -26,6 +26,7 @@ class NoticesScreen extends StatelessWidget {
             }
 
             final notices = Provider.of<NoticesProvider>(context).notices;
+
             if (notices.isEmpty) {
               return const Center(
                 child: Text(

@@ -12,7 +12,8 @@ class NoticesProvider with ChangeNotifier {
   final SecureStorageService _secureStorageService = SecureStorageService();
 
   Future<void> fetchNotice() async {
-    final branchId = await _secureStorageService.readData('workingBranchId');
+    final branchId =
+        await _secureStorageService.readData('selected_workingbranchId');
 
     final token = await _secureStorageService.readData('auth_token');
     final fiscalYear =
@@ -26,8 +27,8 @@ class NoticesProvider with ChangeNotifier {
       Uri.parse('http://45.117.153.90:5004/api/Notice/GetAllNotices'),
       headers: {
         'Authorization': 'Bearer $token',
-        "workingBranchId": branchId!,
-        "workingFinancialId": fiscalYear!
+        "workingBranchId": branchId,
+        "workingFinancialId": fiscalYear,
       },
     );
 
@@ -43,7 +44,8 @@ class NoticesProvider with ChangeNotifier {
   }
 
   Future<void> fetchNoticesbyId() async {
-    final branchId = await _secureStorageService.readData('workingBranchId');
+    final branchId =
+        await _secureStorageService.readData('selected_workingbranchId');
     final token = await _secureStorageService.readData('auth_token');
     final fiscalYear =
         await _secureStorageService.readData('selected_fiscal_year');
@@ -56,8 +58,8 @@ class NoticesProvider with ChangeNotifier {
       Uri.parse('http://45.117.153.90:5004/api/Notice/GetNoticeById/1'),
       headers: {
         'Authorization': 'Bearer $token',
-        "workingBranchId": branchId!,
-        "workingFinancialId": fiscalYear!
+        "workingBranchId": branchId,
+        "workingFinancialId": fiscalYear,
       },
     );
 

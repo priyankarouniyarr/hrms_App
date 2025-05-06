@@ -27,7 +27,7 @@ class SalaryProvider with ChangeNotifier {
     try {
       String? token = await _secureStorageService.readData('auth_token');
       String? branchId =
-          await _secureStorageService.readData('workingBranchId');
+          await _secureStorageService.readData('selected_workingbranchId');
       String? fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
 
@@ -42,8 +42,8 @@ class SalaryProvider with ChangeNotifier {
         url,
         headers: {
           'Authorization': 'Bearer $token',
-          'workingBranchId': branchId,
-          'workingFinancialId': fiscalYear,
+          'selected_workingbranchId': branchId,
+          'selected_fiscal_year': fiscalYear,
         },
       );
 
@@ -71,7 +71,7 @@ class SalaryProvider with ChangeNotifier {
     try {
       String? token = await _secureStorageService.readData('auth_token');
       String? branchId =
-          await _secureStorageService.readData('workingBranchId');
+          await _secureStorageService.readData('selected_workingbranchId');
       String? fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
 
@@ -85,8 +85,8 @@ class SalaryProvider with ChangeNotifier {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
-          'workingBranchId': branchId,
-          'workingFinancialId': fiscalYear,
+          'selected_workingbranchId': branchId,
+          'selected_fiscal_year': fiscalYear,
         },
         body: json.encode(request.toJson()),
       );

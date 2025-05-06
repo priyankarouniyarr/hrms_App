@@ -179,7 +179,7 @@ class TokenStorage {
   // Store branch ID securely
   Future<void> storeWorkingBranchid(String branchId) async {
     await _secureStorage.write(
-        key: ' selected_workingbranchId', value: branchId);
+        key: 'selected_workingbranchId', value: branchId);
   }
 
   // Retrieve branch ID securely

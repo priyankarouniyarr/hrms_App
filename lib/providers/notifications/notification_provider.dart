@@ -18,7 +18,9 @@ class FcmnotificationProvider with ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      final branchId = await _secureStorageService.readData('workingBranchId');
+      // Fetch stored data (branchId, authToken, fiscalYear)
+      final branchId =
+          await _secureStorageService.readData('selected_workingbranchId');
       final authToken = await _secureStorageService.readData('auth_token');
       final fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
@@ -27,7 +29,7 @@ class FcmnotificationProvider with ChangeNotifier {
         print('Error: branchId, authToken, or fiscalYear is null');
         _isLoading = false;
         notifyListeners();
-        return;
+        return; // Early return if any of these are null
       }
 
       final url = Uri.parse(
@@ -36,8 +38,8 @@ class FcmnotificationProvider with ChangeNotifier {
       final headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $authToken',
-        'workingBranchId': branchId,
-        'workingFinancialId': fiscalYear,
+        'selected_workingbranchId': branchId,
+        'selected_fiscal_year': fiscalYear,
       };
 
       final body = jsonEncode({
@@ -75,7 +77,8 @@ class FcmnotificationProvider with ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      final branchId = await _secureStorageService.readData('workingBranchId');
+      final branchId =
+          await _secureStorageService.readData('selected_workingbranchId');
       final authToken = await _secureStorageService.readData('auth_token');
       final fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
@@ -93,8 +96,8 @@ class FcmnotificationProvider with ChangeNotifier {
       final headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $authToken',
-        'workingBranchId': branchId,
-        'workingFinancialId': fiscalYear,
+        'selected_workingbranchId': branchId,
+        'selected_fiscal_year': fiscalYear,
       };
 
       final body = jsonEncode({

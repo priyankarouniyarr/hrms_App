@@ -108,11 +108,9 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     final provider = Provider.of<ShareliveLocation>(context);
-    print("hlo");
-    print(provider.latitude);
-
     LatLng? userLocation =
         (provider.latitude != null && provider.longitude != null)
             ? LatLng(
