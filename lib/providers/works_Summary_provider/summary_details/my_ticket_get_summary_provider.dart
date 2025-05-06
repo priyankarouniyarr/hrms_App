@@ -24,7 +24,7 @@ class MyTicketGetSummaryProvider with ChangeNotifier {
     try {
       String? token = await _secureStorageService.readData('auth_token');
       String? branchId =
-          await _secureStorageService.readData(' workingBranchId');
+          await _secureStorageService.readData('selected_workingbranchId');
       String? fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
 
@@ -42,7 +42,7 @@ class MyTicketGetSummaryProvider with ChangeNotifier {
         url,
         headers: {
           'Authorization': 'Bearer $token',
-          ' workingBranchId': branchId,
+          'workingBranchId': branchId,
           'workingFinancialId': fiscalYear,
         },
       );

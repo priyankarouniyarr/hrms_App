@@ -43,7 +43,8 @@ class TicketWorkFlowProvider with ChangeNotifier {
     _isLoading = true;
 
     try {
-      _branchId = await _secureStorageService.readData(' workingBranchId');
+      _branchId =
+          await _secureStorageService.readData('selected_workingbranchId');
       _token = await _secureStorageService.readData('auth_token');
       _fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
@@ -61,7 +62,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer $_token',
-            ' workingBranchId': _branchId!,
+            'workingBranchId': _branchId!,
             'workingFinancialId': _fiscalYear!,
           },
           body: jsonEncode(requestticket.toJson()));
@@ -96,7 +97,8 @@ class TicketWorkFlowProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      _branchId = await _secureStorageService.readData(' workingBranchId');
+      _branchId =
+          await _secureStorageService.readData('selected_workingbranchId');
       _token = await _secureStorageService.readData('auth_token');
       _fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
@@ -115,7 +117,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer $_token',
-            ' workingBranchId': _branchId!,
+            'workingBranchId': _branchId!,
             'workingFinancialId': _fiscalYear!,
           },
           body: jsonEncode(requestticket.toJson()));
@@ -151,7 +153,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
     try {
       String? token = await _secureStorageService.readData('auth_token');
       String? branchId =
-          await _secureStorageService.readData(' workingBranchId');
+          await _secureStorageService.readData('selected_workingbranchId');
       String? fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
       //  print(branchId);
@@ -167,7 +169,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
         url,
         headers: {
           'Authorization': 'Bearer $token',
-          ' workingBranchId': branchId,
+          'workingBranchId': branchId,
           'workingFinancialId': fiscalYear,
         },
       );
@@ -200,7 +202,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
     try {
       String? token = await _secureStorageService.readData('auth_token');
       String? branchId =
-          await _secureStorageService.readData(' workingBranchId');
+          await _secureStorageService.readData('selected_workingbranchId');
       String? fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
 
@@ -216,7 +218,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
-          ' workingBranchId': branchId,
+          'workingBranchId': branchId,
           'workingFinancialId': fiscalYear,
         },
       );
@@ -259,7 +261,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
     try {
       String? token = await _secureStorageService.readData('auth_token');
       String? branchId =
-          await _secureStorageService.readData(' workingBranchId');
+          await _secureStorageService.readData('selected_workingbranchId');
       String? fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
 
@@ -274,7 +276,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
-          ' workingBranchId': branchId,
+          'workingBranchId': branchId,
           'workingFinancialId': fiscalYear,
         },
       );
@@ -314,7 +316,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
     try {
       String? token = await _secureStorageService.readData('auth_token');
       String? branchId =
-          await _secureStorageService.readData(' workingBranchId');
+          await _secureStorageService.readData('selected_workingbranchId');
       String? fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
 
@@ -329,7 +331,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
-          ' workingBranchId': branchId,
+          'workingBranchId': branchId,
           'workingFinancialId': fiscalYear,
         },
         body: jsonEncode(request.toJson()), // Use the request object
@@ -378,7 +380,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
     try {
       String? token = await _secureStorageService.readData('auth_token');
       String? branchId =
-          await _secureStorageService.readData(' workingBranchId');
+          await _secureStorageService.readData('selected_workingbranchId');
       String? fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
 
@@ -393,7 +395,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
-          ' workingBranchId': branchId,
+          'workingBranchId': branchId,
           'workingFinancialId': fiscalYear,
         },
         body: jsonEncode(request1.toJson()),
@@ -439,7 +441,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
     try {
       String? token = await _secureStorageService.readData('auth_token');
       String? branchId =
-          await _secureStorageService.readData(' workingBranchId');
+          await _secureStorageService.readData('selected_workingbranchId');
       String? fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
 
@@ -454,7 +456,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
-          ' workingBranchId': branchId,
+          'workingBranchId': branchId,
           'workingFinancialId': fiscalYear,
         },
         body: jsonEncode(request2.toJson()), // Use the request object
@@ -501,7 +503,8 @@ class TicketWorkFlowProvider with ChangeNotifier {
 
     try {
       // Validate credentials first
-      _branchId = await _secureStorageService.readData(' workingBranchId');
+      _branchId =
+          await _secureStorageService.readData('selected_workingbranchId');
       _token = await _secureStorageService.readData('auth_token');
       _fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
@@ -521,7 +524,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
       dio.options.headers = {
         'content-type': 'application/json',
         'Authorization': 'Bearer $_token',
-        ' workingBranchId': _branchId!,
+        'workingBranchId': _branchId!,
         'workingFinancialId': _fiscalYear!,
       };
 

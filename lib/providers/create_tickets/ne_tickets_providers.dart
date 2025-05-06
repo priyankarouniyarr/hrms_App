@@ -25,10 +25,14 @@ class NewTicketProvider extends ChangeNotifier {
 
     try {
       // Read required data from Secure Storage
-      _branchId = await _secureStorageService.readData('workingBranchId');
+      _branchId =
+          await _secureStorageService.readData('selected_workingbranchId');
       _token = await _secureStorageService.readData('auth_token');
       _fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
+      print(_branchId);
+      print(_token);
+      print(_fiscalYear);
 
       if (_token == null || _branchId == null || _fiscalYear == null) {
         _errorMessage = 'Missing required credentials';

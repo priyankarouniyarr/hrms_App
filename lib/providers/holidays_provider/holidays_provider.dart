@@ -47,7 +47,8 @@ class HolidayProvider with ChangeNotifier {
 
   Future<void> fetchPastHolidays() async {
     try {
-      final branchId = await _secureStorageService.readData('workingBranchId');
+      final branchId =
+          await _secureStorageService.readData('selected_workingbranchId');
       final token = await _secureStorageService.readData('auth_token');
       final fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
@@ -84,7 +85,8 @@ class HolidayProvider with ChangeNotifier {
   // Fetch Upcoming Holidays
   Future<void> fetchUpcomingHolidays() async {
     try {
-      final branchId = await _secureStorageService.readData('workingBranchId');
+      final branchId =
+          await _secureStorageService.readData('selected_workingbranchId');
       final token = await _secureStorageService.readData('auth_token');
       final fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
@@ -120,7 +122,8 @@ class HolidayProvider with ChangeNotifier {
   // Fetch All Holidays
   Future<void> fetchAllHolidays() async {
     try {
-      final branchId = await _secureStorageService.readData('workingBranchId');
+      final branchId =
+          await _secureStorageService.readData('selected_workingbranchId');
       final token = await _secureStorageService.readData('auth_token');
       final fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');

@@ -12,6 +12,7 @@ class AttendanceDetailsProvider with ChangeNotifier {
   AttendanceReport? _attendanceReport;
   String? _branchId;
   String? _token;
+  String? _fiscalYear;
   List<String> _shiftTypes = ["Primary", "Extended"];
   List<AttendanceSummary> _summaryAttendance = [];
   List<AttendanceDetails> _detsilsAttendance = [];
@@ -28,10 +29,12 @@ class AttendanceDetailsProvider with ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    _branchId = await _secureStorageService.readData('workingBranchId');
+    _branchId =
+        await _secureStorageService.readData('selected_workingbranchId');
     _token = await _secureStorageService.readData('auth_token');
+    _fiscalYear = await _secureStorageService.readData('selected_fiscal_year');
 
-    if (_token == null || _branchId == null) {
+    if (_token == null || _branchId == null || _fiscalYear == null) {
       _errorMessage = 'No token or branchId found';
       _isLoading = false;
       notifyListeners();
@@ -46,6 +49,7 @@ class AttendanceDetailsProvider with ChangeNotifier {
           'Authorization': 'Bearer $_token',
           'Content-Type': 'application/json',
           'workingBranchId': _branchId!,
+          'workingFinancialId': _fiscalYear!,
         },
         body: json.encode(filter.toJson()),
       );
