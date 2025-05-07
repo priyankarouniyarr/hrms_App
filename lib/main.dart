@@ -41,7 +41,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  await handleLocationPermission();
+  //await handleLocationPermission();
 
   runApp(
     MultiProvider(
@@ -130,9 +130,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: ConnectivityListener(
-        child: SplashScreen(),
-      ),
+      home: ConnectivityListener(child: SplashScreen()),
     );
   }
 }

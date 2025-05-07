@@ -2,12 +2,14 @@ import 'dart:io';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:hrms_app/connectivitychecker.dart';
 import 'package:hrms_app/screen/onboardscreen.dart';
 import 'package:hrms_app/storage/token_storage.dart';
 import 'package:hrms_app/screen/app_main_screen.dart';
 import 'package:hrms_app/providers/login_screen_provider/auth_provider.dart';
 import 'package:hrms_app/providers/branch_id_providers/branch_id_provider.dart';
 import 'package:hrms_app/providers/fiscal_year_provider/fiscal_year_provider.dart';
+import 'package:hrms_app/providers/connectivity_checker/connectivity_provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -23,7 +25,10 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
-    _checkLoginState();
+    // Show logo for 5 seconds before checking login state
+    Future.delayed(Duration(seconds: 5), () {
+      _checkLoginState();
+    });
   }
 
   void _showSocketErrorDialog() {
@@ -52,7 +57,10 @@ class _SplashScreenState extends State<SplashScreen> {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
       await authProvider.loadToken();
+      print(authProvider.token);
+
       await authProvider.loadUsername();
+
       await authProvider.loadRefreshToken();
 
       bool isLoggedIn = false;
@@ -89,7 +97,7 @@ class _SplashScreenState extends State<SplashScreen> {
           _showSocketErrorDialog();
           return;
         } catch (e) {
-          await _showErrorDialogAndReset(); // Reset app on error
+          // await _showErrorDialogAndReset(); // Reset app on error
 
           return;
         }
@@ -98,49 +106,48 @@ class _SplashScreenState extends State<SplashScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              isLoggedIn ? const AppMainScreen() : OnboardScreen(),
+          builder: (context) => isLoggedIn ? AppMainScreen() : OnboardScreen(),
         ),
       );
     } on SocketException catch (_) {
       _showSocketErrorDialog();
     } catch (e) {
-      await _showErrorDialogAndReset(); // Reset app on error
+      //await _showErrorDialogAndReset(); // Reset app on error
     }
   }
 
-  Future<void> _showErrorDialogAndReset() async {
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Something went wrong"),
-        content: const Text("Please try again."),
-        actions: [
-          TextButton(
-            onPressed: () async {
-              final tokenStorage = TokenStorage();
-              await tokenStorage.removeToken();
-              await tokenStorage.removeUsername();
-              await tokenStorage.removeRefreshToken();
-              await tokenStorage.removeExpirationTime();
-              await tokenStorage.removeHospitalCode();
-              await tokenStorage.removeBranchId();
-              await tokenStorage.removeBranchIdAndFiscalYearId();
+  // Future<void> _showErrorDialogAndReset() async {
+  //   await showDialog(
+  //     context: context,
+  //     builder: (context) => AlertDialog(
+  //       title: const Text("Something went wrong"),
+  //       content: const Text("Please try again."),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () async {
+  //             final tokenStorage = TokenStorage();
+  //             await tokenStorage.removeToken();
+  //             await tokenStorage.removeUsername();
+  //             await tokenStorage.removeRefreshToken();
+  //             await tokenStorage.removeExpirationTime();
+  //             await tokenStorage.removeHospitalCode();
+  //             await tokenStorage.removeBranchId();
+  //             await tokenStorage.removeBranchIdAndFiscalYearId();
 
-              Navigator.of(context).pop(); // Close the dialog
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        OnboardScreen()), // Navigate to Onboarding
-              );
-            },
-            child: const Text("OK"),
-          ),
-        ],
-      ),
-    );
-  }
+  //             Navigator.of(context).pop(); // Close the dialog
+  //             Navigator.pushReplacement(
+  //               context,
+  //               MaterialPageRoute(
+  //                   builder: (context) =>
+  //                       OnboardScreen()), // Navigate to Onboarding
+  //             );
+  //           },
+  //           child: const Text("OK"),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {

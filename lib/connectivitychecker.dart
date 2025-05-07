@@ -12,39 +12,57 @@ class ConnectivityListener extends StatefulWidget {
 
 class _ConnectivityListenerState extends State<ConnectivityListener> {
   bool _dialogShown = false;
+  late ConnectivityProvider _connectivityProvider;
+
+  @override
+  void initState() {
+    super.initState();
+    // Safe because it's not tied to the widget tree structure yet
+    _connectivityProvider =
+        Provider.of<ConnectivityProvider>(context, listen: false);
+    _connectivityProvider.addListener(_onConnectivityChanged);
+  }
+
+  @override
+  void dispose() {
+    _connectivityProvider.removeListener(_onConnectivityChanged);
+    super.dispose();
+  }
+
+  void _onConnectivityChanged() async {
+    if (!_connectivityProvider.isConnected && !_dialogShown) {
+      _dialogShown = true;
+      await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          title: const Text('No Internet Connection'),
+          content: const Text(
+              'Please check your internet connection and try again.'),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                _connectivityProvider.retryCheck();
+                if (_connectivityProvider.isConnected) {
+                  Navigator.of(context).pop();
+                  _dialogShown = false;
+                }
+              },
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    } else if (_connectivityProvider.isConnected && _dialogShown) {
+      if (Navigator.canPop(context)) {
+        Navigator.of(context, rootNavigator: true).pop();
+      }
+      _dialogShown = false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ConnectivityProvider>(
-      builder: (context, provider, _) {
-        if (!provider.isConnected && !_dialogShown) {
-          _dialogShown = true;
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (context) => AlertDialog(
-                title: const Text('Connection Lost'),
-                content: const Text(
-                    'Your internet connection appears to be offline. Some features may not work properly.'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      _dialogShown = false;
-                    },
-                    child: const Text('OK'),
-                  ),
-                ],
-              ),
-            );
-          });
-        } else if (provider.isConnected && _dialogShown) {
-          _dialogShown = false;
-          Navigator.of(context, rootNavigator: true).pop();
-        }
-        return widget.child;
-      },
-    );
+    return widget.child;
   }
 }
