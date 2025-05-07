@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:hrms_app/utlis/socket_handle.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/attendance%20_models/attendance_details_models.dart';
 
@@ -25,7 +27,8 @@ class AttendanceDetailsProvider with ChangeNotifier {
   List<AttendanceDetails> get detailsAttendance =>
       _detsilsAttendance; // Details attendance
 
-  Future<void> fetchAttendanceSummary(Filter filter) async {
+  Future<void> fetchAttendanceSummary(
+      Filter filter, BuildContext context) async {
     _isLoading = true;
     notifyListeners();
 
@@ -77,9 +80,15 @@ class AttendanceDetailsProvider with ChangeNotifier {
         _errorMessage =
             'Failed to load attendance summary: ${response.statusCode}';
       }
-    } catch (error) {
-      _errorMessage = 'Error: $error';
+    } on SocketException catch (_) {
+      await showSocketErrorDialog(
+        context: context,
+        onRetry: () => fetchAttendanceSummary(filter, context),
+      );
     }
+    // } catch (error) {
+    //   _errorMessage = 'Error: $error';
+    // }
 
     _isLoading = false;
     notifyListeners();

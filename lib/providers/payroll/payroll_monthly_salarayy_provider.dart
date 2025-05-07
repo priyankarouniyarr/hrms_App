@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:hrms_app/utlis/socket_handle.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/payrolls_models/monthly_salary_models.dart';
 
@@ -19,7 +21,7 @@ class SalaryProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
 
   // Fetch Current Month Salary
-  Future<void> fetchCurrentMonthSalary() async {
+  Future<void> fetchCurrentMonthSalary(BuildContext context) async {
     _isLoading = true;
     _errorMessage = '';
     notifyListeners();
@@ -54,16 +56,24 @@ class SalaryProvider with ChangeNotifier {
       } else {
         _errorMessage = 'Failed to load current month salary';
       }
-    } catch (e) {
-      _errorMessage = 'An error occurred: $e';
-    } finally {
+    } on SocketException catch (_) {
+      await showSocketErrorDialog(
+        context: context,
+        onRetry: () => fetchCurrentMonthSalary(
+            context), // Pass the filter and context for retry
+      );
+
+      // } catch (e) {
+      //   _errorMessage = 'An error occurred: $e';
+      //} finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
   // Fetch Salary for Specific Month
-  Future<void> fetchMonthSalary(int month, int year) async {
+  Future<void> fetchMonthSalary(
+      int month, int year, BuildContext context) async {
     _isLoading = true;
     _errorMessage = '';
     notifyListeners();
@@ -93,11 +103,15 @@ class SalaryProvider with ChangeNotifier {
 
       if (response.statusCode == 200) {
         _monthSalary = GetMyMonthSalary.fromJson(json.decode(response.body));
-
         notifyListeners();
       } else {
         _errorMessage = 'Failed to load month salary';
       }
+    } on SocketException catch (_) {
+      await showSocketErrorDialog(
+        context: context,
+        onRetry: () => fetchMonthSalary(month, year, context),
+      );
     } catch (e) {
       _errorMessage = 'An error occurred: $e';
     } finally {

@@ -32,8 +32,6 @@ import 'package:hrms_app/providers/works_Summary_provider/summary_details/assign
 import 'package:hrms_app/providers/leaves_provider/leaves_history%20_contract%20and%20fiscalyear_period.dart';
 import 'package:hrms_app/providers/works_Summary_provider/summary_details/my_ticket_get_summary_provider.dart';
 
-//import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -79,13 +77,13 @@ void main() async {
   );
 }
 
-//handle location permission'
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(debugShowCheckedModeBanner: false, home: SplashScreen());
+    return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: ConnectivityListener(child: SplashScreen()));
   }
 }

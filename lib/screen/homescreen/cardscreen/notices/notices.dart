@@ -6,7 +6,12 @@ import 'package:hrms_app/providers/notices_provider/notices_provider.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/notices/noticesdetails_screen.dart';
 import '../../../profile/subcategories/appbar_profilescreen categories/customprofile_appbar.dart';
 
-class NoticesScreen extends StatelessWidget {
+class NoticesScreen extends StatefulWidget {
+  @override
+  State<NoticesScreen> createState() => _NoticesScreenState();
+}
+
+class _NoticesScreenState extends State<NoticesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:hrms_app/utlis/socket_handle.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/attendance%20_models/attendence_models.dart';
 
@@ -22,7 +24,7 @@ class AttendanceProvider with ChangeNotifier {
 
   get attendanceReport => null;
 
-  Future<void> fetchAttendanceData() async {
+  Future<void> fetchAttendanceData(BuildContext context) async {
     _branchId =
         await _secureStorageService.readData('selected_workingbranchId');
     _token = await _secureStorageService.readData('auth_token');
@@ -73,8 +75,11 @@ class AttendanceProvider with ChangeNotifier {
       } else {
         _errorMessage = 'Failed to load data.';
       }
-    } catch (error) {
-      _errorMessage = 'An error occurred: $error';
+    } on SocketException catch (_) {
+      await showSocketErrorDialog(
+        context: context,
+        onRetry: () => fetchAttendanceData(context),
+      );
     }
 
     _isLoading = false;

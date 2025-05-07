@@ -3,12 +3,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:hrms_app/utlis/socket_handle.dart';
 import 'package:hrms_app/screen/onboardscreen.dart';
 import 'package:hrms_app/storage/token_storage.dart';
 import 'package:hrms_app/screen/app_main_screen.dart';
 import 'package:hrms_app/providers/login_screen_provider/auth_provider.dart';
 import 'package:hrms_app/providers/branch_id_providers/branch_id_provider.dart';
 import 'package:hrms_app/providers/fiscal_year_provider/fiscal_year_provider.dart';
+import 'package:hrms_app/providers/connectivity_checker/connectivity_provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -24,6 +26,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+
     _initApp();
   }
 
@@ -74,33 +77,11 @@ class _SplashScreenState extends State<SplashScreen> {
     }
   }
 
-  void _showSocketErrorDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Connection Error"),
-          content: Text("Unable to connect to the server. Please try again."),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _checkLoginState();
-              },
-              child: Text("Retry"),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   Future<void> _checkLoginState() async {
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
       await authProvider.loadToken();
-      print(authProvider.token);
 
       await authProvider.loadUsername();
 
@@ -117,7 +98,10 @@ class _SplashScreenState extends State<SplashScreen> {
             await authProvider.refreshAccessToken(context);
             isLoggedIn = true;
           } on SocketException catch (_) {
-            _showSocketErrorDialog();
+            await showSocketErrorDialog(
+              context: context,
+              onRetry: _checkLoginState,
+            );
             return;
           }
         } else {
@@ -137,7 +121,10 @@ class _SplashScreenState extends State<SplashScreen> {
             int.parse(branchid.branches.first.branchId.toString()),
           );
         } on SocketException catch (_) {
-          _showSocketErrorDialog();
+          await showSocketErrorDialog(
+            context: context,
+            onRetry: _checkLoginState,
+          );
           return;
         } catch (e) {
           await _showErrorDialogAndReset(); // Reset app on error
@@ -153,7 +140,11 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
       );
     } on SocketException catch (_) {
-      _showSocketErrorDialog();
+      await showSocketErrorDialog(
+        context: context,
+        onRetry: _checkLoginState,
+      );
+      return;
     } catch (e) {
       await _showErrorDialogAndReset(); // Reset app on error
     }

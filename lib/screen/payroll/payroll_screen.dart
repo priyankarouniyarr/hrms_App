@@ -34,10 +34,10 @@ class _PayrollScreenState extends State<PayrollScreen> {
           Provider.of<SalaryProvider>(context, listen: false);
 
       // Load data sequentially to avoid race conditions
-      await loanProvider.fetchLoanAndAdvances();
-      await loanProvider.fetchMyTaxes();
-      await salaryProvider.fetchCurrentMonthSalary();
-      await salaryProvider.fetchMonthSalary(currentMonth, currentYear);
+      await loanProvider.fetchLoanAndAdvances(context);
+      await loanProvider.fetchMyTaxes(context);
+      await salaryProvider.fetchCurrentMonthSalary(context);
+      await salaryProvider.fetchMonthSalary(currentMonth, currentYear, context);
     } catch (e) {
       debugPrint('Initial data loading error: $e');
     } finally {
@@ -59,7 +59,7 @@ class _PayrollScreenState extends State<PayrollScreen> {
     }
 
     await Provider.of<SalaryProvider>(context, listen: false)
-        .fetchMonthSalary(newMonth, newYear);
+        .fetchMonthSalary(newMonth, newYear, context);
 
     if (mounted) {
       setState(() {
@@ -81,7 +81,7 @@ class _PayrollScreenState extends State<PayrollScreen> {
     }
 
     await Provider.of<SalaryProvider>(context, listen: false)
-        .fetchMonthSalary(newMonth, newYear);
+        .fetchMonthSalary(newMonth, newYear, context);
 
     if (mounted) {
       setState(() {

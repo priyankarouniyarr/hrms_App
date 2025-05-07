@@ -4,11 +4,16 @@ import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/models/notices_models/notices_models.dart';
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
 
-class NoticeDetailScreen extends StatelessWidget {
+class NoticeDetailScreen extends StatefulWidget {
   final Notices notice;
 
   const NoticeDetailScreen({required this.notice});
 
+  @override
+  State<NoticeDetailScreen> createState() => _NoticeDetailScreenState();
+}
+
+class _NoticeDetailScreenState extends State<NoticeDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,7 +32,7 @@ class NoticeDetailScreen extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        notice.title.trim(),
+                        widget.notice.title.trim(),
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -54,7 +59,8 @@ class NoticeDetailScreen extends StatelessWidget {
                         ],
                       ),
                       child: Text(
-                        categoryValues.reverse[notice.category] ?? 'Unknown',
+                        categoryValues.reverse[widget.notice.category] ??
+                            'Unknown',
                         style: const TextStyle(
                           fontSize: 14,
                           color: Colors.white,
@@ -65,7 +71,7 @@ class NoticeDetailScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 15),
-                if (notice.publishedTime != null)
+                if (widget.notice.publishedTime != null)
                   Row(
                     mainAxisAlignment:
                         MainAxisAlignment.spaceBetween, // Align date & time
@@ -76,8 +82,8 @@ class NoticeDetailScreen extends StatelessWidget {
                               size: 18, color: Colors.blue), // Date Icon
                           const SizedBox(width: 6),
                           Text(
-                            DateFormat('yyyy-MM-dd')
-                                .format(notice.publishedTime!), // Only date
+                            DateFormat('yyyy-MM-dd').format(
+                                widget.notice.publishedTime!), // Only date
                             style: TextStyle(
                               fontSize: 16,
                               color: Colors.grey[900],
@@ -92,8 +98,8 @@ class NoticeDetailScreen extends StatelessWidget {
                               size: 18, color: Colors.blue), // Time Icon
                           const SizedBox(width: 6),
                           Text(
-                            DateFormat('HH:mm:ss')
-                                .format(notice.publishedTime!), // Only time
+                            DateFormat('HH:mm:ss').format(
+                                widget.notice.publishedTime!), // Only time
                             style: TextStyle(
                               fontSize: 16,
                               color: Colors.grey[900],
@@ -108,7 +114,7 @@ class NoticeDetailScreen extends StatelessWidget {
                 Divider(color: Colors.grey[300], thickness: 1),
                 const SizedBox(height: 15),
                 Text(
-                  notice.content,
+                  widget.notice.content,
                   style: const TextStyle(
                     fontSize: 16,
                     color: Colors.black87,

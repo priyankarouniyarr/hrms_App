@@ -17,7 +17,7 @@ class _ConnectivityListenerState extends State<ConnectivityListener> {
   @override
   void initState() {
     super.initState();
-    // Safe because it's not tied to the widget tree structure yet
+
     _connectivityProvider =
         Provider.of<ConnectivityProvider>(context, listen: false);
     _connectivityProvider.addListener(_onConnectivityChanged);

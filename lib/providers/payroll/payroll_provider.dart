@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:hrms_app/utlis/socket_handle.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/payrolls_models/loan_and_advance_data.dart';
 import 'package:hrms_app/models/payrolls_models/salary_deduction_models.dart';
@@ -24,7 +26,7 @@ class LoanAndAdvanceProvider with ChangeNotifier {
   String get errorMessage => _errorMessage;
 
   /// Fetch loan and advance data
-  Future<void> fetchLoanAndAdvances() async {
+  Future<void> fetchLoanAndAdvances(BuildContext context) async {
     _isLoading = true;
     _errorMessage = '';
     notifyListeners();
@@ -62,8 +64,11 @@ class LoanAndAdvanceProvider with ChangeNotifier {
       } else {
         _errorMessage = 'Failed to fetch loan and advances: ${response.body}';
       }
-    } catch (e) {
-      _errorMessage = 'Error: $e';
+    } on SocketException catch (_) {
+      await showSocketErrorDialog(
+        context: context,
+        onRetry: () => fetchLoanAndAdvances(context),
+      );
     }
 
     _isLoading = false;
@@ -71,7 +76,7 @@ class LoanAndAdvanceProvider with ChangeNotifier {
   }
 
   /// Fetch salary deductions (taxes)
-  Future<void> fetchMyTaxes() async {
+  Future<void> fetchMyTaxes(BuildContext context) async {
     _isLoading = true;
     _errorMessage = '';
     notifyListeners();
@@ -106,6 +111,11 @@ class LoanAndAdvanceProvider with ChangeNotifier {
       } else {
         _errorMessage = 'Failed to fetch taxes: ${response.body}';
       }
+    } on SocketException catch (_) {
+      await showSocketErrorDialog(
+        context: context,
+        onRetry: () => fetchMyTaxes(context),
+      );
     } catch (e) {
       _errorMessage = 'Error: $e';
     }
