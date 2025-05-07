@@ -26,7 +26,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
 
     // Show logo for 5 seconds before checking login state
-    Future.delayed(Duration(seconds: 5), () {
+    Future.delayed(Duration(seconds: 3), () {
       _checkLoginState();
     });
   }
@@ -97,7 +97,7 @@ class _SplashScreenState extends State<SplashScreen> {
           _showSocketErrorDialog();
           return;
         } catch (e) {
-          // await _showErrorDialogAndReset(); // Reset app on error
+          await _showErrorDialogAndReset(); // Reset app on error
 
           return;
         }
@@ -112,42 +112,42 @@ class _SplashScreenState extends State<SplashScreen> {
     } on SocketException catch (_) {
       _showSocketErrorDialog();
     } catch (e) {
-      //await _showErrorDialogAndReset(); // Reset app on error
+      await _showErrorDialogAndReset(); // Reset app on error
     }
   }
 
-  // Future<void> _showErrorDialogAndReset() async {
-  //   await showDialog(
-  //     context: context,
-  //     builder: (context) => AlertDialog(
-  //       title: const Text("Something went wrong"),
-  //       content: const Text("Please try again."),
-  //       actions: [
-  //         TextButton(
-  //           onPressed: () async {
-  //             final tokenStorage = TokenStorage();
-  //             await tokenStorage.removeToken();
-  //             await tokenStorage.removeUsername();
-  //             await tokenStorage.removeRefreshToken();
-  //             await tokenStorage.removeExpirationTime();
-  //             await tokenStorage.removeHospitalCode();
-  //             await tokenStorage.removeBranchId();
-  //             await tokenStorage.removeBranchIdAndFiscalYearId();
+  Future<void> _showErrorDialogAndReset() async {
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Something went wrong"),
+        content: const Text("Please try again."),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              final tokenStorage = TokenStorage();
+              await tokenStorage.removeToken();
+              await tokenStorage.removeUsername();
+              await tokenStorage.removeRefreshToken();
+              await tokenStorage.removeExpirationTime();
+              await tokenStorage.removeHospitalCode();
+              await tokenStorage.removeBranchId();
+              await tokenStorage.removeBranchIdAndFiscalYearId();
 
-  //             Navigator.of(context).pop(); // Close the dialog
-  //             Navigator.pushReplacement(
-  //               context,
-  //               MaterialPageRoute(
-  //                   builder: (context) =>
-  //                       OnboardScreen()), // Navigate to Onboarding
-  //             );
-  //           },
-  //           child: const Text("OK"),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
+              Navigator.of(context).pop(); // Close the dialog
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        OnboardScreen()), // Navigate to Onboarding
+              );
+            },
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
