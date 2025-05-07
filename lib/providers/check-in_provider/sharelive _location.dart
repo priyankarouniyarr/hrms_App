@@ -50,15 +50,9 @@ class ShareliveLocation with ChangeNotifier {
           "longitude": _longitude,
         }),
       );
-      print(latitude);
-      print(longitude);
-      print(response.body);
-      print(response.statusCode);
 
       if (response.statusCode == 200) {
-        print(loading);
         _setSuccessMessage("Live Location shared successfully!");
-        print(successMessage);
       } else {
         _setErrorMessage(
             "Failed to submit: ${response.statusCode}\n${response.body}");
@@ -76,7 +70,6 @@ class ShareliveLocation with ChangeNotifier {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         await Geolocator.openLocationSettings();
-
         return;
       }
 
@@ -86,7 +79,7 @@ class ShareliveLocation with ChangeNotifier {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied ||
             permission == LocationPermission.deniedForever) {
-          return sharelivelocation();
+          return;
         }
       }
 
@@ -108,9 +101,8 @@ class ShareliveLocation with ChangeNotifier {
       _setErrorMessage("Failed to get location: $e");
     } finally {
       _setLoading(false);
+      notifyListeners();
     }
-
-    Future.microtask(() => notifyListeners());
   }
 
   void _setLoading(bool value) {
@@ -119,18 +111,22 @@ class ShareliveLocation with ChangeNotifier {
 
   void _setErrorMessage(String message) {
     _errorMessage = message;
+    notifyListeners();
   }
 
   void _setSuccessMessage(String message) {
     _successMessage = message;
+    notifyListeners();
   }
 
   void clearSuccessMessage() {
     _successMessage = null;
+    notifyListeners();
   }
 
   void clearErrorMessage() {
     _errorMessage = '';
+    notifyListeners();
   }
 
   void stopLiveLocation() {
