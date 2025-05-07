@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hrms_app/splash_scren.dart';
 import 'package:hrms_app/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:hrms_app/connectivitychecker.dart';
 import 'package:hrms_app/providers/payroll/payroll_provider.dart';
 import 'package:hrms_app/providers/notices_provider/notices_provider.dart';
 import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
@@ -22,13 +24,15 @@ import 'package:hrms_app/providers/check-in_provider/sharelive%20_location.dart'
 import 'package:hrms_app/providers/attendance_providers/attendance_provider.dart';
 import 'package:hrms_app/providers/fiscal_year_provider/fiscal_year_provider.dart';
 import 'package:hrms_app/providers/payroll/payroll_monthly_salarayy_provider.dart';
+import 'package:hrms_app/providers/connectivity_checker/connectivity_provider.dart';
 import 'package:hrms_app/providers/profile_providers/employee_contract_provider.dart';
 import 'package:hrms_app/providers/hosptial_code_provider/hosptial_code_provider.dart';
-import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:hrms_app/providers/attendance_providers/attendance_history_provider.dart';
 import 'package:hrms_app/providers/works_Summary_provider/summary_details/assign_by_me_ticket_provider.dart';
 import 'package:hrms_app/providers/leaves_provider/leaves_history%20_contract%20and%20fiscalyear_period.dart';
 import 'package:hrms_app/providers/works_Summary_provider/summary_details/my_ticket_get_summary_provider.dart';
+
+//import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,6 +46,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (context) => ConnectivityProvider()),
         ChangeNotifierProvider(create: (context) => HospitalCodeProvider()),
         ChangeNotifierProvider(create: (context) => AuthProvider()),
         ChangeNotifierProvider(create: (context) => BranchProvider()),
@@ -113,89 +118,21 @@ Future<void> handleLocationPermission() async {
       print("Error getting location: $e");
     }
   } else {
-    // Handle the case when permission is denied or not granted
     print(
         "Location permission denied or not granted. App will continue without location access.");
   }
 }
 
-class MyApp extends StatefulWidget {
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  bool isConnectionToInternet = false;
-  StreamSubscription? _internetConnectionSubscription;
-  bool _isDialogShowing = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _internetConnectionSubscription =
-        InternetConnection().onStatusChange.listen((event) {
-      print(event);
-      if (event == InternetStatus.disconnected) {
-        setState(() {
-          isConnectionToInternet = false;
-          _showNoInternetDialog();
-          print(isConnectionToInternet);
-        });
-      } else if (event == InternetStatus.connected) {
-        setState(() {
-          isConnectionToInternet = true;
-        });
-        // _hideNoInternetDialog();
-      }
-    });
-  }
-
-  void _showNoInternetDialog() {
-    if (!_isDialogShowing) {
-      _isDialogShowing = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) => AlertDialog(
-              title: Text("No Internet Connection"),
-              content:
-                  Text("Please check your Wi-Fi or mobile data connection."),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    _isDialogShowing = false;
-                    Navigator.of(context, rootNavigator: true).pop();
-                  },
-                  child: Text("Retry"),
-                ),
-              ],
-            ),
-          );
-        }
-      });
-    }
-  }
-
-  void _hideNoInternetDialog() {
-    if (_isDialogShowing) {
-      Navigator.of(context, rootNavigator: true).pop();
-      _isDialogShowing = false;
-    }
-  }
-
-  @override
-  void dispose() {
-    _internetConnectionSubscription?.cancel();
-    super.dispose();
-  }
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SplashScreen(),
+      home: ConnectivityListener(
+        child: SplashScreen(),
+      ),
     );
   }
 }

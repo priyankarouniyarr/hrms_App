@@ -32,7 +32,7 @@ class CheckInProvider with ChangeNotifier {
           await _secureStorageService.readData('selected_fiscal_year');
 
       String? _branchId =
-          await _secureStorageService.readData('workingBranchId');
+          await _secureStorageService.readData('selected_workingbranchId');
 
       if (_branchId == null || _fiscalYear == null || token == null) {
         _setErrorMessage("No branch selected. Please select a branch.");
@@ -108,7 +108,7 @@ class CheckInProvider with ChangeNotifier {
 
     try {
       String? _branchId =
-          await _secureStorageService.readData('workingBranchId');
+          await _secureStorageService.readData('selected_workingbranchId');
       String? _token = await _secureStorageService.readData('auth_token');
       String? _fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
