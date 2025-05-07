@@ -29,7 +29,7 @@ class ShareliveLocation with ChangeNotifier {
       String? fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
       String? branchId =
-          await _secureStorageService.readData('workingBranchId');
+          await _secureStorageService.readData('selected_workingbranchId');
 
       if (branchId == null || fiscalYear == null || token == null) {
         _setErrorMessage("No branch selected. Please select a branch.");

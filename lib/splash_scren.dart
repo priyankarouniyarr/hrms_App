@@ -2,14 +2,13 @@ import 'dart:io';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:hrms_app/connectivitychecker.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:hrms_app/screen/onboardscreen.dart';
 import 'package:hrms_app/storage/token_storage.dart';
 import 'package:hrms_app/screen/app_main_screen.dart';
 import 'package:hrms_app/providers/login_screen_provider/auth_provider.dart';
 import 'package:hrms_app/providers/branch_id_providers/branch_id_provider.dart';
 import 'package:hrms_app/providers/fiscal_year_provider/fiscal_year_provider.dart';
-import 'package:hrms_app/providers/connectivity_checker/connectivity_provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -22,13 +21,57 @@ class _SplashScreenState extends State<SplashScreen> {
   String? _errorMessage;
 
   @override
+  @override
   void initState() {
     super.initState();
+    _initApp();
+  }
 
-    // Show logo for 5 seconds before checking login state
-    Future.delayed(Duration(seconds: 3), () {
-      _checkLoginState();
-    });
+  Future<void> _initApp() async {
+    await handleLocationPermission();
+    await Future.delayed(Duration(seconds: 3));
+    await _checkLoginState();
+  }
+
+  Future<void> handleLocationPermission() async {
+    bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
+
+    if (!isLocationServiceEnabled) {
+      print(
+          "Location service is OFF. You can prompt the user to enable it if needed.");
+    } else {
+      print("Location service is ON");
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    print("Initial permission: $permission");
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      print("Permission after request: $permission");
+
+      if (permission == LocationPermission.denied) {
+        print("Permission denied. App will continue without location access.");
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      print(
+          "Permission permanently denied. App will continue without location access.");
+    }
+
+    if (permission == LocationPermission.always ||
+        permission == LocationPermission.whileInUse) {
+      try {
+        Position position = await Geolocator.getCurrentPosition();
+        print('Location: ${position.latitude}, ${position.longitude}');
+      } catch (e) {
+        print("Error getting location: $e");
+      }
+    } else {
+      print(
+          "Location permission denied or not granted. App will continue without location access.");
+    }
   }
 
   void _showSocketErrorDialog() {
