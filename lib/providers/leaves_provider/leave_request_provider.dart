@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:hrms_app/utlis/socket_handle.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/leaves/apply_leave.dart';
 import 'package:hrms_app/models/leaves/leave_request_models.dart';
@@ -24,7 +26,7 @@ class LeaveRequestProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
 
-  Future<void> fetchEmployeeLeaveApply() async {
+  Future<void> fetchEmployeeLeaveApply(BuildContext context) async {
     _isLoading = true;
     notifyListeners();
 
@@ -82,6 +84,11 @@ class LeaveRequestProvider extends ChangeNotifier {
         _errorMessage = "Failed to fetch leave history";
         notifyListeners();
       }
+    } on SocketException catch (_) {
+      await showSocketErrorDialog(
+        context: context,
+        onRetry: () => fetchEmployeeLeaveApply(context),
+      );
     } catch (error) {
       _errorMessage = "Error fetching leave history: $error";
     } finally {
@@ -91,7 +98,7 @@ class LeaveRequestProvider extends ChangeNotifier {
   }
 
 //get api
-  Future<void> fetchEmployeeLeaves() async {
+  Future<void> fetchEmployeeLeaves(BuildContext context) async {
     _isLoading = true;
     notifyListeners();
 
@@ -126,12 +133,14 @@ class LeaveRequestProvider extends ChangeNotifier {
 
         _leaveEmployee =
             jsonEmployeeLeaves.map((e) => EmployeeRequest.fromJson(e)).toList();
-
-        notifyListeners();
       } else {
         _errorMessage = "Failed to fetch leave history";
-        notifyListeners();
       }
+    } on SocketException catch (_) {
+      await showSocketErrorDialog(
+        context: context,
+        onRetry: () => fetchEmployeeLeaves(context),
+      );
     } catch (error) {
       _errorMessage = "Error fetching leave history: $error";
     } finally {
@@ -142,7 +151,8 @@ class LeaveRequestProvider extends ChangeNotifier {
 
   //post api for leave request
 
-  Future<bool> leaveApplyEmployee(LeaveApplicationRequest request) async {
+  Future<bool> leaveApplyEmployee(
+      LeaveApplicationRequest request, BuildContext context) async {
     _isLoading = true;
     notifyListeners();
 
@@ -199,6 +209,12 @@ class LeaveRequestProvider extends ChangeNotifier {
                   responseData['message'] ?? 'Leave application failed';
               return false;
             }
+          } on SocketException catch (_) {
+            await showSocketErrorDialog(
+              context: context,
+              onRetry: () => leaveApplyEmployee(request, context),
+            );
+            return false;
           } catch (e) {
             _errorMessage = 'Unexpected response format: ${response.body}';
             return false;

@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:hrms_app/utlis/socket_handle.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/check_in_models/check_in_history%20.dart';
 
@@ -39,8 +41,6 @@ class CheckInProvider with ChangeNotifier {
         return;
       }
 
-//permission checking here
-
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         await Geolocator.openLocationSettings();
@@ -65,8 +65,6 @@ class CheckInProvider with ChangeNotifier {
 
       _latitude = position.latitude.toString();
       _longitude = position.longitude.toString();
-      await _secureStorageService.writeData('checkinPositionLat', _latitude!);
-      await _secureStorageService.writeData('checkinPositionLong', _longitude!);
 
       List<Placemark> address =
           await placemarkFromCoordinates(position.latitude, position.longitude);
@@ -102,7 +100,53 @@ class CheckInProvider with ChangeNotifier {
     }
   }
 
-  Future<void> getpunches() async {
+  Future<void> getcurrentlocation(BuildContext context) async {
+    _setLoading(true);
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        await Geolocator.openLocationSettings();
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied ||
+            permission == LocationPermission.deniedForever) {
+          return;
+        }
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      _latitude = position.latitude.toString();
+      _longitude = position.longitude.toString();
+
+      await _secureStorageService.writeData('checkinPositionLat', _latitude!);
+      await _secureStorageService.writeData('checkinPositionLong', _longitude!);
+
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
+      if (placemarks.isNotEmpty) {
+        _address =
+            '${placemarks[0].name}, ${placemarks[0].locality}, ${placemarks[0].administrativeArea}';
+      }
+    } on SocketException catch (_) {
+      await showSocketErrorDialog(
+        context: context,
+        onRetry: () => getcurrentlocation(context),
+      );
+    } catch (e) {
+      _setErrorMessage("Failed to get location: $e");
+    } finally {
+      _setLoading(false);
+      notifyListeners();
+    }
+  }
+
+  Future<void> getpunches(BuildContext context) async {
     _loading = true;
     notifyListeners();
 
@@ -135,6 +179,11 @@ class CheckInProvider with ChangeNotifier {
       } else {
         _errorMessage = "Failed to fetch punch data: ${response.statusCode}";
       }
+    } on SocketException catch (_) {
+      await showSocketErrorDialog(
+        context: context,
+        onRetry: () => getpunches(context),
+      );
     } catch (error) {
       _errorMessage = "Error fetching punch data: $error";
     } finally {

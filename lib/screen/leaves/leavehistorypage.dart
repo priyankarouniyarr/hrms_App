@@ -20,7 +20,7 @@ class _LeaveStatementScreenState extends State<LeaveStatementScreen> {
     super.initState();
     Future.microtask(() {
       Provider.of<LeaveContractandFiscalYearProvider>(context, listen: false)
-          .fetchLeaveContracts();
+          .fetchLeaveContracts(context);
     });
   }
 
@@ -66,7 +66,8 @@ class _LeaveStatementScreenState extends State<LeaveStatementScreen> {
                             });
                             if (selectedContractPeriod != null) {
                               leaveProvider.fetchFiscalYearByContractId(
-                                  contractId: selectedContractPeriod!);
+                                  contractId: selectedContractPeriod!,
+                                  context: context);
                             }
                           },
                         ),
@@ -90,7 +91,8 @@ class _LeaveStatementScreenState extends State<LeaveStatementScreen> {
                               leaveProvider
                                   .fetchFiscalYearByContractIdandFiscalYearId(
                                       contractId: selectedContractPeriod!,
-                                      fiscalYearId: selectedFiscalYear!);
+                                      fiscalYearId: selectedFiscalYear!,
+                                      context: context);
                             }
                           },
                         ),

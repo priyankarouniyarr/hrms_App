@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:hrms_app/utlis/socket_handle.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 
 class ShareliveLocation with ChangeNotifier {
@@ -22,7 +24,7 @@ class ShareliveLocation with ChangeNotifier {
   String? get longitude => _longitude;
   String? get aDDress => _address;
 
-  Future<void> sharelivelocation() async {
+  Future<void> sharelivelocation(BuildContext context) async {
     _setLoading(true);
     try {
       String? token = await _secureStorageService.readData('auth_token');
@@ -57,6 +59,11 @@ class ShareliveLocation with ChangeNotifier {
         _setErrorMessage(
             "Failed to submit: ${response.statusCode}\n${response.body}");
       }
+    } on SocketException catch (_) {
+      await showSocketErrorDialog(
+        context: context,
+        onRetry: () => sharelivelocation(context), // retry this function
+      );
     } catch (e) {
       _setErrorMessage("Unexpected Error: $e");
     } finally {
@@ -64,7 +71,7 @@ class ShareliveLocation with ChangeNotifier {
     }
   }
 
-  Future<void> getcurrentlocation() async {
+  Future<void> getcurrentlocation(BuildContext context) async {
     _setLoading(true);
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -97,6 +104,11 @@ class ShareliveLocation with ChangeNotifier {
         _address =
             '${placemarks[0].name}, ${placemarks[0].locality}, ${placemarks[0].administrativeArea}';
       }
+    } on SocketException catch (_) {
+      await showSocketErrorDialog(
+        context: context,
+        onRetry: () => getcurrentlocation(context),
+      );
     } catch (e) {
       _setErrorMessage("Failed to get location: $e");
     } finally {

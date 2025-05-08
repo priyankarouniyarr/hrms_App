@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:hrms_app/constants/colors.dart';
+import 'package:hrms_app/utlis/socket_handle.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hrms_app/providers/check-in_provider/sharelive%20_location.dart';
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
@@ -25,8 +27,22 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
 
   Future<void> _initializeLocation() async {
     final provider = Provider.of<ShareliveLocation>(context, listen: false);
-    await provider.getcurrentlocation();
-    await provider.sharelivelocation();
+
+    try {
+      // Check internet connection first
+      final result = await InternetAddress.lookup('example.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        await provider.getcurrentlocation(context);
+        await provider.sharelivelocation(context);
+      } else {
+        throw SocketException("No Internet");
+      }
+    } on SocketException catch (_) {
+      await showSocketErrorDialog(
+        context: context,
+        onRetry: () => _initializeLocation(),
+      );
+    }
   }
 
   void _shareLocation(double latitude, double longitude) {
@@ -37,8 +53,8 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
 
   Future<void> _retryLocation() async {
     final provider = Provider.of<ShareliveLocation>(context, listen: false);
-    await provider.getcurrentlocation();
-    await provider.sharelivelocation();
+    await provider.getcurrentlocation(context);
+    await provider.sharelivelocation(context);
 
     if (_controller != null &&
         provider.latitude != null &&

@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:hrms_app/utlis/socket_handle.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/leaves/leave_history_models.dart';
 
@@ -29,7 +31,7 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
   String get errorMessage => _errorMessage;
 
   ///  Fetch all contracts (Initial Call)
-  Future<void> fetchLeaveContracts() async {
+  Future<void> fetchLeaveContracts(BuildContext context) async {
     _isLoading = true;
     notifyListeners();
 
@@ -68,6 +70,11 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
       } else {
         _errorMessage = "Failed to fetch contract data";
       }
+    } on SocketException catch (_) {
+      await showSocketErrorDialog(
+        context: context,
+        onRetry: () => fetchLeaveContracts(context),
+      );
     } catch (error) {
       _errorMessage = "Error fetching contracts: $error";
     } finally {
@@ -77,9 +84,11 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
   }
 
   // Fetch Fiscal Year by passing the contractId
-  Future<void> fetchFiscalYearByContractId({required int contractId}) async {
+  Future<void> fetchFiscalYearByContractId({
+    required int contractId,
+    required BuildContext context,
+  }) async {
     _isLoading = true;
-
     notifyListeners();
 
     try {
@@ -117,6 +126,14 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
       } else {
         _errorMessage = "Failed to fetch fiscal year data";
       }
+    } on SocketException catch (_) {
+      await showSocketErrorDialog(
+        context: context,
+        onRetry: () => fetchFiscalYearByContractId(
+          contractId: contractId,
+          context: context,
+        ),
+      );
     } catch (error) {
       _errorMessage = "Error fetching fiscal year: $error";
     } finally {
@@ -126,8 +143,11 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
   }
 
   //// Fetch Fiscal Year by passing the contractId and fiscalYearId
-  Future<void> fetchFiscalYearByContractIdandFiscalYearId(
-      {required int contractId, required int fiscalYearId}) async {
+  Future<void> fetchFiscalYearByContractIdandFiscalYearId({
+    required int contractId,
+    required int fiscalYearId,
+    required BuildContext context,
+  }) async {
     _isLoading = true;
     notifyListeners();
 
@@ -185,6 +205,15 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
       } else {
         _errorMessage = "Failed to fetch fiscal year data";
       }
+    } on SocketException catch (_) {
+      await showSocketErrorDialog(
+        context: context,
+        onRetry: () => fetchFiscalYearByContractIdandFiscalYearId(
+          contractId: contractId,
+          fiscalYearId: fiscalYearId,
+          context: context,
+        ),
+      );
     } catch (error) {
       print(error);
       _errorMessage = "Error fetching fiscal year: $error";

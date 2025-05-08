@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:hrms_app/utlis/socket_handle.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/leaves/leave_history_models.dart';
 
@@ -27,7 +29,7 @@ class LeaveProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
 
-  Future<void> fetchEmployeeLeaveHistory() async {
+  Future<void> fetchEmployeeLeaveHistory(BuildContext context) async {
     _isLoading = true;
     notifyListeners();
 
@@ -85,6 +87,13 @@ class LeaveProvider extends ChangeNotifier {
       } else {
         _errorMessage = "Failed to fetch leave history";
       }
+    } on SocketException catch (_) {
+      await showSocketErrorDialog(
+        context: context,
+        onRetry: () => fetchEmployeeLeaveHistory(
+          context,
+        ),
+      );
     } catch (error) {
       _errorMessage = "Error fetching leave history: $error";
     } finally {

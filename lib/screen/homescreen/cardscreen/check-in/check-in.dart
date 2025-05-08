@@ -20,7 +20,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<CheckInProvider>(context, listen: false).getpunches();
+      Provider.of<CheckInProvider>(context, listen: false).getpunches(context);
     });
   }
 
@@ -490,7 +490,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
                       splitLatLon(checkInProvider.getPunches.first.systemDtl));
                   print("done");
                   Navigator.pop(context);
-                  await checkInProvider.getpunches();
+                  await checkInProvider.getpunches(context);
                   setState(() {});
                 },
                 child: Text("OK"),

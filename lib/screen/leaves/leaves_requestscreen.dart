@@ -41,10 +41,10 @@ class _LeavesRequestscreenState extends State<LeavesRequestscreen> {
   void initState() {
     super.initState();
     Future.microtask(() => Provider.of<LeaveProvider>(context, listen: false)
-        .fetchEmployeeLeaveHistory());
+        .fetchEmployeeLeaveHistory(context));
     Future.microtask(() =>
         Provider.of<LeaveRequestProvider>(context, listen: false)
-            .fetchEmployeeLeaveApply());
+            .fetchEmployeeLeaveApply(context));
   }
 
   int calculateTotalLeaveDays(DateTime startDate, DateTime endDate) {
@@ -149,7 +149,7 @@ class _LeavesRequestscreenState extends State<LeavesRequestscreen> {
 
                 final success = await Provider.of<LeaveRequestProvider>(context,
                         listen: false)
-                    .leaveApplyEmployee(leaveRequest);
+                    .leaveApplyEmployee(leaveRequest, context);
 
                 if (success) {
                   showDialog(

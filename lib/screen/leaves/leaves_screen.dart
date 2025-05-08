@@ -16,9 +16,9 @@ class _LeavesScreenState extends State<LeavesScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch leave data when the screen loads
+
     Future.microtask(() => Provider.of<LeaveProvider>(context, listen: false)
-        .fetchEmployeeLeaveHistory());
+        .fetchEmployeeLeaveHistory(context));
   }
 
   @override
@@ -202,7 +202,7 @@ class _LeavesScreenState extends State<LeavesScreen> {
                                         style: TextStyle(fontSize: 14.0),
                                       ),
                                       Text(
-                                        ('${leave.totalLeaveDays.toDouble()}'),
+                                        ('${leave.totalLeaveDays.toInt()}'),
                                         style: TextStyle(fontSize: 14.0),
                                       ),
                                     ],
