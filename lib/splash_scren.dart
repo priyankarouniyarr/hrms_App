@@ -10,7 +10,6 @@ import 'package:hrms_app/screen/app_main_screen.dart';
 import 'package:hrms_app/providers/login_screen_provider/auth_provider.dart';
 import 'package:hrms_app/providers/branch_id_providers/branch_id_provider.dart';
 import 'package:hrms_app/providers/fiscal_year_provider/fiscal_year_provider.dart';
-import 'package:hrms_app/providers/connectivity_checker/connectivity_provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

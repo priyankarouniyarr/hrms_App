@@ -21,7 +21,7 @@ class SalaryProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
 
   // Fetch Current Month Salary
-  Future<void> fetchCurrentMonthSalary(BuildContext context) async {
+  Future<void> fetchCurrentMonthSalary() async {
     _isLoading = true;
     _errorMessage = '';
     notifyListeners();
@@ -56,16 +56,14 @@ class SalaryProvider with ChangeNotifier {
       } else {
         _errorMessage = 'Failed to load current month salary';
       }
-    } on SocketException catch (_) {
-      await showSocketErrorDialog(
-        context: context,
-        onRetry: () => fetchCurrentMonthSalary(
-            context), // Pass the filter and context for retry
-      );
-
-      // } catch (e) {
-      //   _errorMessage = 'An error occurred: $e';
-      //} finally {
+      // } on SocketException catch (_) {
+      //   await showSocketErrorDialog(
+      //     context: context,
+      //     onRetry: () => fetchCurrentMonthSalary(
+      //         context), // Pass the filter and context for retry
+    } catch (e) {
+      _errorMessage = 'An error occurred: $e';
+    } finally {
       _isLoading = false;
       notifyListeners();
     }
@@ -73,7 +71,9 @@ class SalaryProvider with ChangeNotifier {
 
   // Fetch Salary for Specific Month
   Future<void> fetchMonthSalary(
-      int month, int year, BuildContext context) async {
+    int month,
+    int year,
+  ) async {
     _isLoading = true;
     _errorMessage = '';
     notifyListeners();
@@ -107,11 +107,12 @@ class SalaryProvider with ChangeNotifier {
       } else {
         _errorMessage = 'Failed to load month salary';
       }
-    } on SocketException catch (_) {
-      await showSocketErrorDialog(
-        context: context,
-        onRetry: () => fetchMonthSalary(month, year, context),
-      );
+      // } on SocketException catch (_) {
+      //   await showSocketErrorDialog(
+      //     context: context,
+      //     onRetry: () => fetchMonthSalary(month, year, context),
+      //   );
+      // }
     } catch (e) {
       _errorMessage = 'An error occurred: $e';
     } finally {

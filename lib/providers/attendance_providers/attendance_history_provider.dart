@@ -27,8 +27,7 @@ class AttendanceDetailsProvider with ChangeNotifier {
   List<AttendanceDetails> get detailsAttendance =>
       _detsilsAttendance; // Details attendance
 
-  Future<void> fetchAttendanceSummary(
-      Filter filter, BuildContext context) async {
+  Future<void> fetchAttendanceSummary(Filter filter) async {
     _isLoading = true;
     notifyListeners();
 
@@ -80,15 +79,9 @@ class AttendanceDetailsProvider with ChangeNotifier {
         _errorMessage =
             'Failed to load attendance summary: ${response.statusCode}';
       }
-    } on SocketException catch (_) {
-      await showSocketErrorDialog(
-        context: context,
-        onRetry: () => fetchAttendanceSummary(filter, context),
-      );
+    } catch (error) {
+      _errorMessage = 'Error: $error';
     }
-    // } catch (error) {
-    //   _errorMessage = 'Error: $error';
-    // }
 
     _isLoading = false;
     notifyListeners();

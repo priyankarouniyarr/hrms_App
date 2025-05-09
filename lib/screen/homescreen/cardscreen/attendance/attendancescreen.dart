@@ -15,7 +15,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     super.initState();
     Future.microtask(() async {
       await Provider.of<AttendanceProvider>(context, listen: false)
-          .fetchAttendanceData(context);
+          .fetchAttendanceData();
     });
   }
 

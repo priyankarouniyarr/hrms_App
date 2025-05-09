@@ -13,7 +13,7 @@ class NoticesProvider with ChangeNotifier {
 
   final SecureStorageService _secureStorageService = SecureStorageService();
 
-  Future<void> fetchNotice(BuildContext context) async {
+  Future<void> fetchNotice() async {
     try {
       final branchId =
           await _secureStorageService.readData('selected_workingbranchId');
@@ -41,21 +41,12 @@ class NoticesProvider with ChangeNotifier {
       } else {
         throw Exception('Failed to load notices');
       }
-    } on SocketException catch (_) {
-      await showSocketErrorDialog(
-        context: context,
-        onRetry: () => fetchNotice(
-          context,
-        ),
-      );
     } catch (e) {
       throw Exception('Error loading notices: $e');
     }
   }
 
-  Future<void> fetchNoticesbyId(
-    BuildContext context,
-  ) async {
+  Future<void> fetchNoticesbyId() async {
     try {
       final branchId =
           await _secureStorageService.readData('selected_workingbranchId');
@@ -84,13 +75,6 @@ class NoticesProvider with ChangeNotifier {
       } else {
         throw Exception('Failed to load notices ');
       }
-    } on SocketException catch (_) {
-      await showSocketErrorDialog(
-        context: context,
-        onRetry: () => fetchNoticesbyId(
-          context,
-        ),
-      );
     } catch (e) {
       throw Exception('Error loading notice by ID: $e');
     }

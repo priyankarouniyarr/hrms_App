@@ -26,7 +26,7 @@ class LeaveRequestProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
 
-  Future<void> fetchEmployeeLeaveApply(BuildContext context) async {
+  Future<void> fetchEmployeeLeaveApply() async {
     _isLoading = true;
     notifyListeners();
 
@@ -84,11 +84,6 @@ class LeaveRequestProvider extends ChangeNotifier {
         _errorMessage = "Failed to fetch leave history";
         notifyListeners();
       }
-    } on SocketException catch (_) {
-      await showSocketErrorDialog(
-        context: context,
-        onRetry: () => fetchEmployeeLeaveApply(context),
-      );
     } catch (error) {
       _errorMessage = "Error fetching leave history: $error";
     } finally {
@@ -98,7 +93,7 @@ class LeaveRequestProvider extends ChangeNotifier {
   }
 
 //get api
-  Future<void> fetchEmployeeLeaves(BuildContext context) async {
+  Future<void> fetchEmployeeLeaves() async {
     _isLoading = true;
     notifyListeners();
 
@@ -136,11 +131,6 @@ class LeaveRequestProvider extends ChangeNotifier {
       } else {
         _errorMessage = "Failed to fetch leave history";
       }
-    } on SocketException catch (_) {
-      await showSocketErrorDialog(
-        context: context,
-        onRetry: () => fetchEmployeeLeaves(context),
-      );
     } catch (error) {
       _errorMessage = "Error fetching leave history: $error";
     } finally {
@@ -152,7 +142,8 @@ class LeaveRequestProvider extends ChangeNotifier {
   //post api for leave request
 
   Future<bool> leaveApplyEmployee(
-      LeaveApplicationRequest request, BuildContext context) async {
+    LeaveApplicationRequest request,
+  ) async {
     _isLoading = true;
     notifyListeners();
 
@@ -209,12 +200,6 @@ class LeaveRequestProvider extends ChangeNotifier {
                   responseData['message'] ?? 'Leave application failed';
               return false;
             }
-          } on SocketException catch (_) {
-            await showSocketErrorDialog(
-              context: context,
-              onRetry: () => leaveApplyEmployee(request, context),
-            );
-            return false;
           } catch (e) {
             _errorMessage = 'Unexpected response format: ${response.body}';
             return false;

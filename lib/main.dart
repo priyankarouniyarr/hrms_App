@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:hrms_app/splash_scren.dart';
 import 'package:hrms_app/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:hrms_app/connectivitychecker.dart';
 import 'package:hrms_app/providers/payroll/payroll_provider.dart';
 import 'package:hrms_app/providers/notices_provider/notices_provider.dart';
 import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
@@ -79,8 +78,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: ConnectivityListener(child: SplashScreen()));
+    return MaterialApp(debugShowCheckedModeBanner: false, home: SplashScreen());
   }
 }

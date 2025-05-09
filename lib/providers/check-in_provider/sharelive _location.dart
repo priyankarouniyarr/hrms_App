@@ -1,10 +1,8 @@
-import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:hrms_app/utlis/socket_handle.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 
 class ShareliveLocation with ChangeNotifier {
@@ -52,18 +50,16 @@ class ShareliveLocation with ChangeNotifier {
           "longitude": _longitude,
         }),
       );
-
+      print(_latitude);
+      print(_longitude);
       if (response.statusCode == 200) {
         _setSuccessMessage("Live Location shared successfully!");
+        print(successMessage);
       } else {
         _setErrorMessage(
             "Failed to submit: ${response.statusCode}\n${response.body}");
       }
-    } on SocketException catch (_) {
-      await showSocketErrorDialog(
-        context: context,
-        onRetry: () => sharelivelocation(context), // retry this function
-      );
+      print("your result");
     } catch (e) {
       _setErrorMessage("Unexpected Error: $e");
     } finally {
@@ -71,13 +67,12 @@ class ShareliveLocation with ChangeNotifier {
     }
   }
 
-  Future<void> getcurrentlocation(BuildContext context) async {
-    _setLoading(true);
+  Future<bool> getcurrentlocation(BuildContext context) async {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         await Geolocator.openLocationSettings();
-        return;
+        return false;
       }
 
       LocationPermission permission = await Geolocator.checkPermission();
@@ -86,7 +81,7 @@ class ShareliveLocation with ChangeNotifier {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied ||
             permission == LocationPermission.deniedForever) {
-          return;
+          return false;
         }
       }
 
@@ -104,13 +99,11 @@ class ShareliveLocation with ChangeNotifier {
         _address =
             '${placemarks[0].name}, ${placemarks[0].locality}, ${placemarks[0].administrativeArea}';
       }
-    } on SocketException catch (_) {
-      await showSocketErrorDialog(
-        context: context,
-        onRetry: () => getcurrentlocation(context),
-      );
+
+      return true;
     } catch (e) {
       _setErrorMessage("Failed to get location: $e");
+      return false;
     } finally {
       _setLoading(false);
       notifyListeners();
@@ -141,8 +134,8 @@ class ShareliveLocation with ChangeNotifier {
     notifyListeners();
   }
 
-  void stopLiveLocation() {
-    _loading = false;
-    notifyListeners();
+  void resetLocation() {
+    _latitude = null;
+    _longitude = null;
   }
 }

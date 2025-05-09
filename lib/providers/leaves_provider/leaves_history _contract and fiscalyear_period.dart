@@ -31,7 +31,7 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
   String get errorMessage => _errorMessage;
 
   ///  Fetch all contracts (Initial Call)
-  Future<void> fetchLeaveContracts(BuildContext context) async {
+  Future<void> fetchLeaveContracts() async {
     _isLoading = true;
     notifyListeners();
 
@@ -70,11 +70,6 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
       } else {
         _errorMessage = "Failed to fetch contract data";
       }
-    } on SocketException catch (_) {
-      await showSocketErrorDialog(
-        context: context,
-        onRetry: () => fetchLeaveContracts(context),
-      );
     } catch (error) {
       _errorMessage = "Error fetching contracts: $error";
     } finally {
@@ -86,7 +81,6 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
   // Fetch Fiscal Year by passing the contractId
   Future<void> fetchFiscalYearByContractId({
     required int contractId,
-    required BuildContext context,
   }) async {
     _isLoading = true;
     notifyListeners();
@@ -126,14 +120,6 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
       } else {
         _errorMessage = "Failed to fetch fiscal year data";
       }
-    } on SocketException catch (_) {
-      await showSocketErrorDialog(
-        context: context,
-        onRetry: () => fetchFiscalYearByContractId(
-          contractId: contractId,
-          context: context,
-        ),
-      );
     } catch (error) {
       _errorMessage = "Error fetching fiscal year: $error";
     } finally {
@@ -146,7 +132,6 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
   Future<void> fetchFiscalYearByContractIdandFiscalYearId({
     required int contractId,
     required int fiscalYearId,
-    required BuildContext context,
   }) async {
     _isLoading = true;
     notifyListeners();
@@ -205,15 +190,6 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
       } else {
         _errorMessage = "Failed to fetch fiscal year data";
       }
-    } on SocketException catch (_) {
-      await showSocketErrorDialog(
-        context: context,
-        onRetry: () => fetchFiscalYearByContractIdandFiscalYearId(
-          contractId: contractId,
-          fiscalYearId: fiscalYearId,
-          context: context,
-        ),
-      );
     } catch (error) {
       print(error);
       _errorMessage = "Error fetching fiscal year: $error";

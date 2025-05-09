@@ -26,7 +26,7 @@ class LoanAndAdvanceProvider with ChangeNotifier {
   String get errorMessage => _errorMessage;
 
   /// Fetch loan and advance data
-  Future<void> fetchLoanAndAdvances(BuildContext context) async {
+  Future<void> fetchLoanAndAdvances() async {
     _isLoading = true;
     _errorMessage = '';
     notifyListeners();
@@ -37,9 +37,6 @@ class LoanAndAdvanceProvider with ChangeNotifier {
           await _secureStorageService.readData('selected_workingbranchId');
       String? fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
-      print("branchId: $branchId");
-      print("fiscalYear: $fiscalYear");
-      print("token: $token");
 
       if (token == null && branchId == null && fiscalYear == null) {
         print("Token or Branch ID is missing");
@@ -64,19 +61,23 @@ class LoanAndAdvanceProvider with ChangeNotifier {
       } else {
         _errorMessage = 'Failed to fetch loan and advances: ${response.body}';
       }
-    } on SocketException catch (_) {
-      await showSocketErrorDialog(
-        context: context,
-        onRetry: () => fetchLoanAndAdvances(context),
-      );
-    }
+      print("try block");
+      // } on SocketException catch (_) {
+      //   print("hlo");
+      //   showSocketErrorDialog(
+      //     context: context,
+      //     onRetry: () => fetchLoanAndAdvances(context),
+      //   );
+      //   print("socket block");
+      // }
+    } catch (e) {}
 
     _isLoading = false;
     notifyListeners();
   }
 
   /// Fetch salary deductions (taxes)
-  Future<void> fetchMyTaxes(BuildContext context) async {
+  Future<void> fetchMyTaxes() async {
     _isLoading = true;
     _errorMessage = '';
     notifyListeners();
@@ -111,11 +112,12 @@ class LoanAndAdvanceProvider with ChangeNotifier {
       } else {
         _errorMessage = 'Failed to fetch taxes: ${response.body}';
       }
-    } on SocketException catch (_) {
-      await showSocketErrorDialog(
-        context: context,
-        onRetry: () => fetchMyTaxes(context),
-      );
+      // } on SocketException catch (_) {
+      //   await showSocketErrorDialog(
+      //     context: context,
+      //     onRetry: () => fetchMyTaxes(context),
+      //   );
+      // }
     } catch (e) {
       _errorMessage = 'Error: $e';
     }

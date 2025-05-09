@@ -172,13 +172,13 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
                         _startDate != null &&
                         _endDate != null) {
                       provider.fetchAttendanceSummary(
-                          Filter(
-                            fromDate: _startDate!,
-                            toDate: _endDate!,
-                            shiftType: _selectedShiftValue!,
-                            // Pass selected shift type
-                          ),
-                          context);
+                        Filter(
+                          fromDate: _startDate!,
+                          toDate: _endDate!,
+                          shiftType: _selectedShiftValue!,
+                          // Pass selected shift type
+                        ),
+                      );
 
                       setState(() {});
                       _showAttendanceDetails = true;

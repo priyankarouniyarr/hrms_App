@@ -2,6 +2,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
+import 'package:hrms_app/connectivitychecker.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hrms_app/providers/check-in_provider/check_in_provider.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/check-in/sharedlive%20location.dart';
@@ -51,13 +52,14 @@ class _CheckInScreenState extends State<CheckInScreen> {
           child: Padding(
             padding: EdgeInsets.all(16.0),
             child: Column(
-              // Punch and Share Live Location Buttons
               children: [
                 Row(
                   children: [
                     Expanded(
                       child: GestureDetector(
                         onTap: () async {
+                          await checkInProvider.getcurrentlocation(context);
+
                           await checkInProvider.punchPost();
                           _showDialog(checkInProvider);
 
@@ -280,6 +282,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
     );
   }
 
+//puch card
   Widget _buildStatusCard(CheckInProvider provider) {
     bool showAll = false;
 
@@ -432,6 +435,58 @@ class _CheckInScreenState extends State<CheckInScreen> {
         );
       },
     );
+  }
+
+//puch records sucess
+  void _showDialog(CheckInProvider checkInProvider) {
+    if (checkInProvider.successMessage != null) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            title: Column(
+              children: [
+                Icon(Icons.check_circle, color: Colors.green, size: 50),
+                SizedBox(height: 10),
+                Text("Punches Successfully"),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  Navigator.pop(context);
+                  await checkInProvider.getpunches(context);
+                  setState(() {});
+                },
+                child: Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+    } else if (checkInProvider.errorMessage.isNotEmpty) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Error"),
+            content: Text(checkInProvider.errorMessage),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
 //   }
 // Widget _buildGoogleMap(CheckInProvider provider) {
 //     return ClipRRect(
@@ -465,66 +520,12 @@ class _CheckInScreenState extends State<CheckInScreen> {
 //         ),
 //       ),
 //     );
-  }
-
-  void _showDialog(CheckInProvider checkInProvider) {
-    if (checkInProvider.successMessage != null) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            title: Column(
-              children: [
-                Icon(Icons.check_circle, color: Colors.green, size: 50),
-                SizedBox(height: 10),
-                Text("Punches Successfully"),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () async {
-                  print("gud");
-                  print(
-                      splitLatLon(checkInProvider.getPunches.first.systemDtl));
-                  print("done");
-                  Navigator.pop(context);
-                  await checkInProvider.getpunches(context);
-                  setState(() {});
-                },
-                child: Text("OK"),
-              ),
-            ],
-          );
-        },
-      );
-    } else if (checkInProvider.errorMessage.isNotEmpty) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text("Error"),
-            content: Text(checkInProvider.errorMessage),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text("OK"),
-              ),
-            ],
-          );
-        },
-      );
-    }
-  }
 
   splitLatLon(String systemDtl) {
     // Split the string by comma
     List<String> parts = systemDtl.split(',');
     print(parts);
-    // Check if the list has at least two elements
+
     var lat = parts[0].trim().split(': ')[1].trim();
     var lon = parts[1].trim().split(': ')[1].trim();
     print(lat);

@@ -42,6 +42,8 @@ class _ConnectivityListenerState extends State<ConnectivityListener> {
           actions: [
             TextButton(
               onPressed: () async {
+                print(
+                    "_connectivityPROvioder:${_connectivityProvider.isConnected}");
                 _connectivityProvider.retryCheck();
                 if (_connectivityProvider.isConnected) {
                   Navigator.of(context).pop();

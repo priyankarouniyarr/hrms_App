@@ -18,7 +18,7 @@ class _LeavesScreenState extends State<LeavesScreen> {
     super.initState();
 
     Future.microtask(() => Provider.of<LeaveProvider>(context, listen: false)
-        .fetchEmployeeLeaveHistory(context));
+        .fetchEmployeeLeaveHistory());
   }
 
   @override

@@ -21,7 +21,7 @@ class _NoticesScreenState extends State<NoticesScreen> {
         padding: const EdgeInsets.all(16.0),
         child: FutureBuilder(
           future: Provider.of<NoticesProvider>(context, listen: false)
-              .fetchNotice(context),
+              .fetchNotice(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
