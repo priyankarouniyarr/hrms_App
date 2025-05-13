@@ -2,11 +2,10 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
-import 'package:hrms_app/connectivitychecker.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hrms_app/providers/check-in_provider/check_in_provider.dart';
-import 'package:hrms_app/screen/homescreen/cardscreen/check-in/sharedlive%20location.dart';
-import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
+import 'package:hrms_app/screen/homescreen/cardscreen/check-in/sharedlive location.dart';
+import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen categories/customprofile_appbar.dart';
 
 class CheckInScreen extends StatefulWidget {
   @override
@@ -15,33 +14,41 @@ class CheckInScreen extends StatefulWidget {
 
 class _CheckInScreenState extends State<CheckInScreen> {
   GoogleMapController? mapController;
-  LatLng userLocation = LatLng(0.0, 0.0);
+  LatLng? mapLocation;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<CheckInProvider>(context, listen: false).getpunches(context);
+      _loadPunches();
     });
+  }
+
+  Future<void> _loadPunches() async {
+    final provider = Provider.of<CheckInProvider>(context, listen: false);
+    await provider.getpunches(context);
+
+    if (provider.getPunches.isNotEmpty) {
+      var lastPunch = provider.getPunches.first;
+      mapLocation = splitLatLon(lastPunch.systemDtl);
+      print("Using last punch location: ${mapLocation}");
+    } else {
+      mapLocation = null;
+      print("No punches - map will not show");
+    }
+
+    setState(() {});
   }
 
   @override
   void dispose() {
     mapController?.dispose();
-
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final checkInProvider = Provider.of<CheckInProvider>(context);
-
-    if (checkInProvider.latitude != null && checkInProvider.longitude != null) {
-      userLocation = LatLng(
-        double.parse(checkInProvider.latitude!),
-        double.parse(checkInProvider.longitude!),
-      );
-    }
 
     return Scaffold(
       backgroundColor: cardBackgroundColor,
@@ -59,18 +66,9 @@ class _CheckInScreenState extends State<CheckInScreen> {
                       child: GestureDetector(
                         onTap: () async {
                           await checkInProvider.getcurrentlocation(context);
-
                           await checkInProvider.punchPost();
+                          await _loadPunches();
                           _showDialog(checkInProvider);
-
-                          // mapController!.animateCamera(
-                          //   CameraUpdate.newCameraPosition(
-                          //     CameraPosition(
-                          //       target: userLocation,
-                          //       zoom: 15.0, // Adjust zoom level
-                          //     ),
-                          //   ),
-                          // );
                         },
                         child: _buildCheckInButton(),
                       ),
@@ -78,12 +76,13 @@ class _CheckInScreenState extends State<CheckInScreen> {
                     SizedBox(width: 10),
                     Expanded(
                       child: GestureDetector(
-                        onTap: () async {
+                        onTap: () {
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      ShareLiveLocationScreen()));
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    ShareLiveLocationScreen()),
+                          );
                         },
                         child: _buildLocationButton(),
                       ),
@@ -92,124 +91,41 @@ class _CheckInScreenState extends State<CheckInScreen> {
                 ),
                 SizedBox(height: 30),
                 _buildStatusCard(checkInProvider),
-                SizedBox(height: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(Icons.access_time_rounded, size: 50),
-                    StreamBuilder(
-                      stream: Stream.periodic(Duration(seconds: 1)),
-                      builder: (context, snapshot) {
-                        return Center(
-                          child: Text(
-                            "  ${DateFormat('hh:mm:ss a').format(DateTime.now())}",
-                            style: TextStyle(
-                                fontSize: 25,
-                                color: primarySwatch,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        );
-                      },
-                    ),
-                    Center(
-                      child: Text(
-                        "  ${DateFormat('d MMM yyyy').format(DateTime.now())}",
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                    Center(
-                      child: Text(
-                        checkInProvider.getPunches.isNotEmpty
-                            ? 'Last Punch Time: ${DateFormat('hh:mm a').format(checkInProvider.getPunches.first.punchTime)}'
-                            : '--',
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.red),
-                      ),
-                    ),
-                  ],
-                ),
-
                 SizedBox(height: 20),
-
-                // Google Map
-
-                //  / if (checkInProvider.getPunches.isEmpty)
-                //   Container(
-                //     width: double.infinity,
-                //     height: 500,
-                //     child: ClipRRect(
-                //       borderRadius: BorderRadius.circular(12),
-                //       child: GoogleMap(
-                //         initialCameraPosition: CameraPosition(
-                //           target: splitLatLon(
-                //               checkInProvider.getPunches.last.systemDtl),
-                //           zoom: 15,
-                //         ),
-                //         markers: {
-                //           Marker(
-                //             visible: true,
-                //             markerId: MarkerId("current_location"),
-                //             position: userLocation,
-                //             infoWindow: InfoWindow(
-                //                 title: checkInProvider.aDDress,
-                //                 snippet:
-                //                     'Lat: ${userLocation.latitude}, Lng: ${userLocation.longitude}'),
-                //           )
-                //         },
-                //         onMapCreated: (GoogleMapController controller) {
-                //           mapController = controller;
-
-                //           mapController!.animateCamera(
-                //             CameraUpdate.newCameraPosition(
-                //               CameraPosition(
-                //                 target: userLocation,
-                //                 zoom: 15,
-                //               ),
-                //             ),
-                //           );
-                //         },
-                //       ),
-                //     ),
-                //   )
-                // else
-                //   // If there are punches, show the map and last punch location
-                //   Container(
-                //     height: 300,
-                //     child: ClipRRect(
-                //       borderRadius: BorderRadius.circular(12),
-                //       child: GoogleMap(
-                //         initialCameraPosition: CameraPosition(
-                //           target: userLocation,
-                //           zoom: 15,
-                //         ),
-                //         markers: {
-                //           Marker(
-                //             visible: true,
-                //             markerId: MarkerId("current_location"),
-                //             position: userLocation,
-                //             infoWindow: InfoWindow(
-                //                 title: checkInProvider.aDDress,
-                //                 snippet:
-                //                     'Lat: ${userLocation.latitude}, Lng: ${userLocation.longitude}'),
-                //           ),
-                //         },
-                //         onMapCreated: (GoogleMapController controller) {
-                //           mapController = controller;
-                //           mapController!.animateCamera(
-                //             CameraUpdate.newCameraPosition(
-                //               CameraPosition(
-                //                 target: userLocation,
-                //                 zoom: 15,
-                //               ),
-                //             ),
-                //           );
-                //         },
-                //       ),
-                //     ),
-                //   ),
+                if (mapLocation != null)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      height: 300,
+                      child: GoogleMap(
+                        initialCameraPosition: CameraPosition(
+                          target: mapLocation!,
+                          zoom: 15,
+                        ),
+                        markers: {
+                          Marker(
+                            markerId: MarkerId("last_punch"),
+                            position: mapLocation!,
+                            infoWindow: InfoWindow(
+                                title: checkInProvider.aDDress ??
+                                    "Last Punch Location",
+                                snippet:
+                                    'Lat: ${mapLocation!.latitude}, Lng: ${mapLocation!.longitude}'),
+                          ),
+                        },
+                        myLocationEnabled: true,
+                        myLocationButtonEnabled: true,
+                        onMapCreated: (controller) {
+                          mapController = controller;
+                          mapController!.animateCamera(
+                            CameraUpdate.newCameraPosition(
+                              CameraPosition(target: mapLocation!, zoom: 15),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -282,7 +198,6 @@ class _CheckInScreenState extends State<CheckInScreen> {
     );
   }
 
-//puch card
   Widget _buildStatusCard(CheckInProvider provider) {
     bool showAll = false;
 
@@ -345,11 +260,8 @@ class _CheckInScreenState extends State<CheckInScreen> {
                               padding: EdgeInsets.symmetric(vertical: 4),
                               child: Row(
                                 children: [
-                                  Icon(
-                                    Icons.check_circle,
-                                    color: Colors.green,
-                                    size: 20,
-                                  ),
+                                  Icon(Icons.check_circle,
+                                      color: Colors.green, size: 20),
                                   SizedBox(width: 10),
                                   Expanded(
                                     child: Text(
@@ -364,12 +276,11 @@ class _CheckInScreenState extends State<CheckInScreen> {
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 2),
                             Text(
                               "${punch.systemDtl}",
                               style: TextStyle(
                                 fontSize: 14,
-                                color: const Color.fromARGB(255, 30, 146, 0),
+                                color: Color.fromARGB(255, 30, 146, 0),
                               ),
                             ),
                           ],
@@ -378,52 +289,26 @@ class _CheckInScreenState extends State<CheckInScreen> {
                       if (provider.getPunches.length > 2 && !showAll)
                         TextButton(
                           onPressed: () => setState(() => showAll = true),
-                          style: TextButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                            minimumSize: Size(50, 30),
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(
-                                'Show all ',
-                                style: TextStyle(
-                                  color: primarySwatch,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              Icon(
-                                Icons.keyboard_arrow_down,
-                                color: primarySwatch,
-                                size: 20,
-                              ),
+                              Text('Show all ',
+                                  style: TextStyle(color: primarySwatch)),
+                              Icon(Icons.keyboard_arrow_down,
+                                  color: primarySwatch),
                             ],
                           ),
                         ),
                       if (showAll && provider.getPunches.length > 4)
                         TextButton(
                           onPressed: () => setState(() => showAll = false),
-                          style: TextButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                            minimumSize: Size(50, 30),
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(
-                                'Show less',
-                                style: TextStyle(
-                                  color: primarySwatch,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              Icon(
-                                Icons.keyboard_arrow_up,
-                                color: primarySwatch,
-                                size: 20,
-                              ),
+                              Text('Show less',
+                                  style: TextStyle(color: primarySwatch)),
+                              Icon(Icons.keyboard_arrow_up,
+                                  color: primarySwatch),
                             ],
                           ),
                         ),
@@ -437,7 +322,6 @@ class _CheckInScreenState extends State<CheckInScreen> {
     );
   }
 
-//puch records sucess
   void _showDialog(CheckInProvider checkInProvider) {
     if (checkInProvider.successMessage != null) {
       showDialog(
@@ -450,15 +334,13 @@ class _CheckInScreenState extends State<CheckInScreen> {
               children: [
                 Icon(Icons.check_circle, color: Colors.green, size: 50),
                 SizedBox(height: 10),
-                Text("Punches Successfully"),
+                Text("Punch Successful"),
               ],
             ),
             actions: [
               TextButton(
-                onPressed: () async {
+                onPressed: () {
                   Navigator.pop(context);
-                  await checkInProvider.getpunches(context);
-                  setState(() {});
                 },
                 child: Text("OK"),
               ),
@@ -487,57 +369,10 @@ class _CheckInScreenState extends State<CheckInScreen> {
     }
   }
 
-//   }
-// Widget _buildGoogleMap(CheckInProvider provider) {
-//     return ClipRRect(
-//       borderRadius: BorderRadius.circular(12),
-//       child: Container(
-//         height: 300,
-//         child: GoogleMap(
-//           initialCameraPosition: CameraPosition(
-//             target: userLocation,
-//             zoom: 15,
-//           ),
-//           markers: {
-//             Marker(
-//               markerId: MarkerId("current_location"),
-//               position: userLocation,
-//               infoWindow: InfoWindow(
-//                 title: provider.aDDress ?? "Your Location",
-//                 snippet:
-//                     'Lat: ${userLocation.latitude}, Lng: ${userLocation.longitude}',
-//               ),
-//             ),
-//           },
-//           onMapCreated: (controller) {
-//             mapController = controller;
-//             mapController!.animateCamera(
-//               CameraUpdate.newCameraPosition(
-//                 CameraPosition(target: userLocation, zoom: 15),
-//               ),
-//             );
-//           },
-//         ),
-//       ),
-//     );
-
-  splitLatLon(String systemDtl) {
-    // Split the string by comma
+  LatLng splitLatLon(String systemDtl) {
     List<String> parts = systemDtl.split(',');
-    print(parts);
-
     var lat = parts[0].trim().split(': ')[1].trim();
     var lon = parts[1].trim().split(': ')[1].trim();
-    print(lat);
-    print(lon);
     return LatLng(double.parse(lat), double.parse(lon));
   }
 }
-
-
-
-/**
- * 1. load punches
- * 3. get last punched location (check by printing)
- * 2. Map render (use last puched location for both camera postion and user location)
- */
