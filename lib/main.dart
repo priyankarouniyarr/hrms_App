@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:hrms_app/splash_scren.dart';
 import 'package:hrms_app/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:hrms_app/screen/homescreen/notifications.dart';
 import 'package:hrms_app/providers/payroll/payroll_provider.dart';
 import 'package:hrms_app/providers/notices_provider/notices_provider.dart';
 import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
@@ -28,12 +30,22 @@ import 'package:hrms_app/providers/works_Summary_provider/summary_details/assign
 import 'package:hrms_app/providers/leaves_provider/leaves_history%20_contract%20and%20fiscalyear_period.dart';
 import 'package:hrms_app/providers/works_Summary_provider/summary_details/my_ticket_get_summary_provider.dart';
 
+// ✅ Create a global navigator key
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+// ✅ Background handler
+Future<void> _backgroundHandler(RemoteMessage message) async {
+  print('🔄 Handling a background message: ${message.messageId}');
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  FirebaseMessaging.onBackgroundMessage(_backgroundHandler);
 
   runApp(
     MultiProvider(
@@ -64,20 +76,124 @@ void main() async {
         ChangeNotifierProvider(create: (context) => LeaveRequestProvider()),
         ChangeNotifierProvider(create: (context) => TicketWorkFlowProvider()),
         ChangeNotifierProvider(create: (context) => ShareliveLocation()),
-        ChangeNotifierProvider(
-          create: (context) => FcmnotificationProvider(),
-        ),
+        ChangeNotifierProvider(create: (context) => FcmnotificationProvider()),
       ],
       child: MyApp(),
     ),
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    print("hello");
+    firebaseMessaging();
+  }
+
+  void firebaseMessaging() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+    // Get the token
+    String? token = await messaging.getToken();
+    print('FCM Token: $token');
+
+    // Foreground notifications using navigatorKey safely
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      final title = message.notification?.title ?? 'No Title';
+      final body = message.notification?.body ?? 'No Body';
+
+      if (navigatorKey.currentState?.context != null) {
+        showDialog(
+          barrierDismissible: false,
+          context: navigatorKey.currentState!.context,
+          builder: (context) => AlertDialog(
+            title: Text(title),
+            content: Text(
+              body,
+              maxLines: 2,
+              style: TextStyle(overflow: TextOverflow.ellipsis),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Notifications(
+                        title: title,
+                        body: body,
+                      ),
+                    ),
+                  );
+                },
+                child: Text("View"),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text("Cancel"),
+              ),
+            ],
+          ),
+        );
+      } else {
+        print(' No context available to show dialog');
+      }
+    });
+
+    // When app is in background and opened from notification
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      final title = message.notification?.title ?? 'No Title';
+      final body = message.notification?.body ?? 'No Body';
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Notifications(
+            title: title,
+            body: body,
+          ),
+        ),
+      );
+    });
+
+    // When app is terminated and opened from notification
+    FirebaseMessaging.instance
+        .getInitialMessage()
+        .then((RemoteMessage? message) {
+      if (message != null) {
+        final title = message.notification?.title ?? 'No Title';
+        final body = message.notification?.body ?? 'No Body';
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Notifications(
+              title: title,
+              body: body,
+            ),
+          ),
+        );
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(debugShowCheckedModeBanner: false, home: SplashScreen());
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      navigatorKey: navigatorKey,
+      home: SplashScreen(),
+    );
   }
 }

@@ -8,17 +8,15 @@ class FcmnotificationProvider with ChangeNotifier {
   bool _isLoading = false; // Loading indicator
   bool get isLoading => _isLoading;
   String? get fcmToken => _fcmToken;
-//device token
+
   final SecureStorageService _secureStorageService = SecureStorageService();
 
-  // Private method to send the FCM token to the server
   Future<void> sendFcmTokenToServer(
       String fcmToken, String applicationId) async {
     try {
       _isLoading = true;
       notifyListeners();
 
-      // Fetch stored data (branchId, authToken, fiscalYear)
       final branchId =
           await _secureStorageService.readData('selected_workingbranchId');
       final authToken = await _secureStorageService.readData('auth_token');
@@ -29,7 +27,7 @@ class FcmnotificationProvider with ChangeNotifier {
         print('Error: branchId, authToken, or fiscalYear is null');
         _isLoading = false;
         notifyListeners();
-        return; // Early return if any of these are null
+        return;
       }
 
       final url = Uri.parse(

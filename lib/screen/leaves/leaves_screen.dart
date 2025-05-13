@@ -220,11 +220,10 @@ class _LeavesScreenState extends State<LeavesScreen> {
                                       ),
                                       Text(
                                         DateFormat('yyyy-MM-dd').format(
-                                              DateTime.parse(leave
-                                                  .applicationDate
-                                                  .toString()),
-                                            ) ??
-                                            '-',
+                                          DateTime.parse(
+                                              leave.applicationDate.toString()),
+                                        ),
+                                        //  '-',
                                         style: TextStyle(fontSize: 14.0),
                                       ),
                                     ],
@@ -428,7 +427,9 @@ class _LeavesScreenState extends State<LeavesScreen> {
                                           style: TextStyle(fontSize: 14.0),
                                         ),
                                         Text(
-                                          '${DateFormat('yyyy-MM-dd').format(DateTime.parse(leave.toDate)) ?? '-'}',
+                                          '${DateFormat('yyyy-MM-dd').format(DateTime.parse(leave.toDate))
+                                          //?? '-'
+                                          }',
                                           style: TextStyle(
                                             fontSize: 14.0,
                                           ),
@@ -466,7 +467,9 @@ class _LeavesScreenState extends State<LeavesScreen> {
                                           style: TextStyle(fontSize: 14.0),
                                         ),
                                         Text(
-                                          '  ${DateFormat('yyyy-MM-dd').format(DateTime.parse(leave.applicationDate)) ?? '-'}',
+                                          '  ${DateFormat('yyyy-MM-dd').format(DateTime.parse(leave.applicationDate))
+                                          //?? '-'
+                                          }',
                                           style: TextStyle(
                                             fontSize: 14.0,
                                           ),

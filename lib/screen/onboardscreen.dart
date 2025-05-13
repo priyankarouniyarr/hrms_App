@@ -14,7 +14,6 @@ class _OnboardScreenState extends State<OnboardScreen> {
   int _currentPage = 0;
   Timer? _timer;
 
-  // List of pages with their titles and descriptions
   final List<Map<String, String>> _pages = [
     {
       'title': 'Welcome to Our App',
