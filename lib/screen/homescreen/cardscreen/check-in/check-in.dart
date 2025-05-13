@@ -32,6 +32,13 @@ class _CheckInScreenState extends State<CheckInScreen> {
       var lastPunch = provider.getPunches.first;
       mapLocation = splitLatLon(lastPunch.systemDtl);
       print("Using last punch location: ${mapLocation}");
+
+      /// Animate map to this location if controller already exists
+      if (mapController != null) {
+        mapController!.animateCamera(
+          CameraUpdate.newLatLngZoom(mapLocation!, 15),
+        );
+      }
     } else {
       mapLocation = null;
       print("No punches - map will not show");
@@ -68,6 +75,22 @@ class _CheckInScreenState extends State<CheckInScreen> {
                           await checkInProvider.getcurrentlocation(context);
                           await checkInProvider.punchPost();
                           await _loadPunches();
+
+                          if (checkInProvider.getPunches.isNotEmpty) {
+                            var latestPunch = checkInProvider.getPunches.first;
+                            var newLocation =
+                                splitLatLon(latestPunch.systemDtl);
+                            setState(() {
+                              mapLocation = newLocation;
+                            });
+
+                            if (mapController != null) {
+                              mapController!.animateCamera(
+                                CameraUpdate.newLatLngZoom(newLocation, 15),
+                              );
+                            }
+                          }
+
                           _showDialog(checkInProvider);
                         },
                         child: _buildCheckInButton(),

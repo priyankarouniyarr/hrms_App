@@ -145,7 +145,7 @@ class _SplashScreenState extends State<SplashScreen> {
       );
       return;
     } catch (e) {
-      await _showErrorDialogAndReset(); // Reset app on error
+      await _showErrorDialogAndReset();
     }
   }
 
@@ -170,9 +170,7 @@ class _SplashScreenState extends State<SplashScreen> {
               Navigator.of(context).pop(); // Close the dialog
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        OnboardScreen()), // Navigate to Onboarding
+                MaterialPageRoute(builder: (context) => OnboardScreen()),
               );
             },
             child: const Text("OK"),
