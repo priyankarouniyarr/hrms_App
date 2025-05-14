@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:hrms_app/dependencyInjectio.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/splash_scren.dart';
 import 'package:hrms_app/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:hrms_app/screen/homescreen/notifications.dart';
 import 'package:hrms_app/providers/payroll/payroll_provider.dart';
@@ -22,7 +24,7 @@ import 'package:hrms_app/providers/check-in_provider/sharelive%20_location.dart'
 import 'package:hrms_app/providers/attendance_providers/attendance_provider.dart';
 import 'package:hrms_app/providers/fiscal_year_provider/fiscal_year_provider.dart';
 import 'package:hrms_app/providers/payroll/payroll_monthly_salarayy_provider.dart';
-import 'package:hrms_app/providers/connectivity_checker/connectivity_provider.dart';
+import 'package:hrms_app/providers/connection_checker/check_connection_provider.dart';
 import 'package:hrms_app/providers/profile_providers/employee_contract_provider.dart';
 import 'package:hrms_app/providers/hosptial_code_provider/hosptial_code_provider.dart';
 import 'package:hrms_app/providers/attendance_providers/attendance_history_provider.dart';
@@ -48,38 +50,7 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(_backgroundHandler);
 
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => ConnectivityProvider()),
-        ChangeNotifierProvider(create: (context) => HospitalCodeProvider()),
-        ChangeNotifierProvider(create: (context) => AuthProvider()),
-        ChangeNotifierProvider(create: (context) => BranchProvider()),
-        ChangeNotifierProvider(create: (context) => FiscalYearProvider()),
-        ChangeNotifierProvider(create: (context) => CheckInProvider()),
-        ChangeNotifierProvider(create: (context) => HolidayProvider()),
-        ChangeNotifierProvider(create: (context) => NoticesProvider()),
-        ChangeNotifierProvider(create: (context) => AttendanceProvider()),
-        ChangeNotifierProvider(
-            create: (context) => AttendanceDetailsProvider()),
-        ChangeNotifierProvider(create: (context) => EmployeeProvider()),
-        ChangeNotifierProvider(create: (context) => EmployeeContractProvider()),
-        ChangeNotifierProvider(create: (context) => LoanAndAdvanceProvider()),
-        ChangeNotifierProvider(create: (context) => LeaveProvider()),
-        ChangeNotifierProvider(
-            create: (context) => LeaveContractandFiscalYearProvider()),
-        ChangeNotifierProvider(create: (context) => SalaryProvider()),
-        ChangeNotifierProvider(
-            create: (context) => MyTicketGetSummaryProvider()),
-        ChangeNotifierProvider(create: (context) => AssignByMeTicketProvider()),
-        ChangeNotifierProvider(create: (context) => NewTicketProvider()),
-        ChangeNotifierProvider(create: (context) => TicketProvider()),
-        ChangeNotifierProvider(create: (context) => LeaveRequestProvider()),
-        ChangeNotifierProvider(create: (context) => TicketWorkFlowProvider()),
-        ChangeNotifierProvider(create: (context) => ShareliveLocation()),
-        ChangeNotifierProvider(create: (context) => FcmnotificationProvider()),
-      ],
-      child: MyApp(),
-    ),
+    MyApp(),
   );
 }
 
@@ -94,7 +65,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    print("hello");
+
     firebaseMessaging();
   }
 
@@ -190,10 +161,46 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      navigatorKey: navigatorKey,
-      home: SplashScreen(),
-    );
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (context) => CheckNetworkProvider()),
+          ChangeNotifierProvider(create: (context) => HospitalCodeProvider()),
+          ChangeNotifierProvider(create: (context) => AuthProvider()),
+          ChangeNotifierProvider(create: (context) => BranchProvider()),
+          ChangeNotifierProvider(create: (context) => FiscalYearProvider()),
+          ChangeNotifierProvider(create: (context) => CheckInProvider()),
+          ChangeNotifierProvider(create: (context) => HolidayProvider()),
+          ChangeNotifierProvider(create: (context) => NoticesProvider()),
+          ChangeNotifierProvider(create: (context) => AttendanceProvider()),
+          ChangeNotifierProvider(
+              create: (context) => AttendanceDetailsProvider()),
+          ChangeNotifierProvider(create: (context) => EmployeeProvider()),
+          ChangeNotifierProvider(
+              create: (context) => EmployeeContractProvider()),
+          ChangeNotifierProvider(create: (context) => LoanAndAdvanceProvider()),
+          ChangeNotifierProvider(create: (context) => LeaveProvider()),
+          ChangeNotifierProvider(
+              create: (context) => LeaveContractandFiscalYearProvider()),
+          ChangeNotifierProvider(create: (context) => SalaryProvider()),
+          ChangeNotifierProvider(
+              create: (context) => MyTicketGetSummaryProvider()),
+          ChangeNotifierProvider(
+              create: (context) => AssignByMeTicketProvider()),
+          ChangeNotifierProvider(create: (context) => NewTicketProvider()),
+          ChangeNotifierProvider(create: (context) => TicketProvider()),
+          ChangeNotifierProvider(create: (context) => LeaveRequestProvider()),
+          ChangeNotifierProvider(create: (context) => TicketWorkFlowProvider()),
+          ChangeNotifierProvider(create: (context) => ShareliveLocation()),
+          ChangeNotifierProvider(
+              create: (context) => FcmnotificationProvider()),
+        ],
+        child: Builder(builder: (context) {
+          Dependencyinjection.init(context);
+
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            home: SplashScreen(),
+          );
+        }));
   }
 }

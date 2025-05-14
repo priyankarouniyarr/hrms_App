@@ -100,17 +100,9 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 20),
               // Show error message if available
-              if (authProvider.errorMessage.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: Text(
-                    authProvider.errorMessage,
-                    style: const TextStyle(color: Colors.red, fontSize: 16),
-                  ),
-                ),
+
               GestureDetector(
                 onTap: () async {
-                  print("hello2");
                   authProvider.login(
                     _usernameController.text,
                     _passwordController.text,
@@ -143,6 +135,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                 ),
               ),
+              const SizedBox(height: 20),
+              if (authProvider.errorMessage.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(
+                    authProvider.errorMessage,
+                    style: const TextStyle(color: Colors.red, fontSize: 16),
+                  ),
+                ),
             ],
           ),
         ),

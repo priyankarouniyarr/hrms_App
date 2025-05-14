@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hrms_app/utlis/socket_handle.dart';
 import 'package:hrms_app/screen/onboardscreen.dart';
-import 'package:hrms_app/storage/token_storage.dart';
 import 'package:hrms_app/screen/app_main_screen.dart';
 import 'package:hrms_app/providers/login_screen_provider/auth_provider.dart';
 import 'package:hrms_app/providers/branch_id_providers/branch_id_provider.dart';
@@ -22,17 +21,17 @@ class _SplashScreenState extends State<SplashScreen> {
   String? _errorMessage;
 
   @override
-  @override
   void initState() {
     super.initState();
-
     _initApp();
   }
 
   Future<void> _initApp() async {
     await handleLocationPermission();
-    await Future.delayed(Duration(seconds: 3));
+    await Future.delayed(Duration(seconds: 2));
+
     await _checkLoginState();
+    print("hello");
   }
 
   Future<void> handleLocationPermission() async {
@@ -109,6 +108,7 @@ class _SplashScreenState extends State<SplashScreen> {
       }
 
       if (isLoggedIn) {
+        print(isLoggedIn);
         try {
           final branchid = Provider.of<BranchProvider>(context, listen: false);
 
@@ -126,7 +126,7 @@ class _SplashScreenState extends State<SplashScreen> {
           );
           return;
         } catch (e) {
-          await _showErrorDialogAndReset(); // Reset app on error
+          print("your no internet");
 
           return;
         }
@@ -139,45 +139,16 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
       );
     } on SocketException catch (_) {
+      print("hello1");
       await showSocketErrorDialog(
         context: context,
         onRetry: _checkLoginState,
       );
+      print("hello2");
       return;
     } catch (e) {
-      await _showErrorDialogAndReset();
+      print("Error : $e");
     }
-  }
-
-  Future<void> _showErrorDialogAndReset() async {
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Something went wrong"),
-        content: const Text("Please try again."),
-        actions: [
-          TextButton(
-            onPressed: () async {
-              final tokenStorage = TokenStorage();
-              await tokenStorage.removeToken();
-              await tokenStorage.removeUsername();
-              await tokenStorage.removeRefreshToken();
-              await tokenStorage.removeExpirationTime();
-              await tokenStorage.removeHospitalCode();
-              await tokenStorage.removeBranchId();
-              await tokenStorage.removeBranchIdAndFiscalYearId();
-
-              Navigator.of(context).pop(); // Close the dialog
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => OnboardScreen()),
-              );
-            },
-            child: const Text("OK"),
-          ),
-        ],
-      ),
-    );
   }
 
   @override

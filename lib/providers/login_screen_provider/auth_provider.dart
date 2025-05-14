@@ -73,7 +73,7 @@ class AuthProvider with ChangeNotifier {
         _setErrorMessage("Invalid username or password");
       }
     } catch (e) {
-      _setErrorMessage("Error: $e");
+      _setErrorMessage("Connection failed");
       print("Error: $e");
     } finally {
       _setLoading(false);
@@ -115,13 +115,6 @@ class AuthProvider with ChangeNotifier {
       print("Loaded Refresh Token: $refreshToken");
     }
   }
-
-//fiscal yearid
-  // Future<void> loadFiscalYearId() async {
-  //   String? fiscalYearId = await _tokenStorage.getBranchIdAndFiscalYearId();
-
-  //   print("Loaded Fiscal Year ID: $fiscalYearId");
-  // }
 
   // Refresh the access token using the refresh token
   Future<void> refreshAccessToken(BuildContext context) async {
