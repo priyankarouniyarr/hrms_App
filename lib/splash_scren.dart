@@ -6,6 +6,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:hrms_app/utlis/socket_handle.dart';
 import 'package:hrms_app/screen/onboardscreen.dart';
 import 'package:hrms_app/screen/app_main_screen.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:hrms_app/screen/homescreen/notifications.dart';
+import 'package:permission_handler/permission_handler.dart' as AppSettings;
 import 'package:hrms_app/providers/login_screen_provider/auth_provider.dart';
 import 'package:hrms_app/providers/branch_id_providers/branch_id_provider.dart';
 import 'package:hrms_app/providers/fiscal_year_provider/fiscal_year_provider.dart';
@@ -19,10 +22,12 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   String? _errorMessage;
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
 
   @override
   void initState() {
     super.initState();
+
     _initApp();
   }
 
@@ -31,7 +36,6 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(Duration(seconds: 2));
 
     await _checkLoginState();
-    print("hello");
   }
 
   Future<void> handleLocationPermission() async {
