@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:hrms_app/notifications.dart';
 import 'package:hrms_app/utlis/socket_handle.dart';
 import 'package:hrms_app/screen/onboardscreen.dart';
 import 'package:hrms_app/screen/app_main_screen.dart';
@@ -27,6 +28,11 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    NotificationService.initalizeNotifications();
+
+    FirebaseMessaging.onBackgroundMessage(
+      NotificationService.firebaseMessagingBackgroundHandler,
+    );
 
     _initApp();
   }
@@ -37,6 +43,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
     await _checkLoginState();
   }
+
+//
 
   Future<void> handleLocationPermission() async {
     bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();

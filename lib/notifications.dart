@@ -1,9 +1,6 @@
-import 'package:hrms_app/main.dart';
-import 'package:flutter/material.dart';
 import 'package:hrms_app/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:hrms_app/screen/homescreen/notifications.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NotificationService {
@@ -11,7 +8,8 @@ class NotificationService {
       FirebaseMessaging.instance;
   static final FlutterLocalNotificationsPlugin flutterLocalNotoficationsPlugin =
       FlutterLocalNotificationsPlugin();
-
+// To check if app was launched via notification from terminated state
+  static bool openedFromNotification = false;
   //handles message when the app is in the background or terminated
   @pragma('vm:entry-point')
   static Future<void> firebaseMessagingBackgroundHandler(
@@ -38,11 +36,7 @@ class NotificationService {
     //called when app is brought to foreground from background by tapping a notification
     FirebaseMessaging.onMessageOpenedApp.listen((
       RemoteMessage message,
-    ) {
-      print("App opened from background notifications :${message.data}");
-      handleMessageNavigation(message);
-    });
-
+    ) {});
     await _getFcmToken();
     //intailize the local notifications plugins
     await _initalizelocalNotification();
@@ -63,6 +57,7 @@ class NotificationService {
     Map<String, dynamic>? data = message.data;
     String title = notification?.title ?? data['title'] ?? 'No title';
     String body = notification?.body ?? data['body'] ?? 'No body';
+
     //android notifications config
     AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'CHANNEL_ID',
@@ -116,19 +111,8 @@ class NotificationService {
     if (message != null) {
       print(
           "App launched from terminated state via notification :${message.data}");
-      handleMessageNavigation(message);
-    }
-  }
-
-  static void handleMessageNavigation(RemoteMessage message) {
-    if (navigatorKey.currentState?.mounted ?? false) {
-      navigatorKey.currentState?.push(
-        MaterialPageRoute(
-          builder: (context) => Notifications(),
-        ),
-      );
     } else {
-      print("Navigator is not ready.");
+      print("App launchednot normally");
     }
   }
 }

@@ -36,8 +36,8 @@ class FcmnotificationProvider with ChangeNotifier {
       final headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $authToken',
-        'selected_workingbranchId': branchId,
-        'selected_fiscal_year': fiscalYear,
+        'workingBranchId': branchId,
+        'workingFinancialId': fiscalYear,
       };
 
       final body = jsonEncode({
@@ -75,27 +75,11 @@ class FcmnotificationProvider with ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      final branchId =
-          await _secureStorageService.readData('selected_workingbranchId');
-      final authToken = await _secureStorageService.readData('auth_token');
-      final fiscalYear =
-          await _secureStorageService.readData('selected_fiscal_year');
-
-      if (branchId == null || authToken == null || fiscalYear == null) {
-        print('Error: branchId, authToken, or fiscalYear is null');
-        _isLoading = false;
-        notifyListeners();
-        return;
-      }
-
       final url = Uri.parse(
           'http://45.117.153.90:5004/api/FcmDeviceToken/DeviceTokenPostAnonymous');
 
       final headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $authToken',
-        'selected_workingbranchId': branchId,
-        'selected_fiscal_year': fiscalYear,
       };
 
       final body = jsonEncode({
