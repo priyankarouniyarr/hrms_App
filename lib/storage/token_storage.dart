@@ -122,41 +122,6 @@ class TokenStorage {
     }
   }
 
-  Future<void> getfcmDeviceTokenPostAnynomus(BuildContext context) async {
-    String? fcmDeviceTokenPostAnynomus = await _firebaseMessaging.getToken();
-    if (fcmDeviceTokenPostAnynomus != null) {
-      print("FCM Token: $fcmDeviceTokenPostAnynomus");
-      await _saveDeviceTokenPostAnynomus(fcmDeviceTokenPostAnynomus, context);
-      print("hlo :$fcmDeviceTokenPostAnynomus");
-    }
-  }
-
-  Future<void> _saveDeviceTokenPostAnynomus(
-      String fcmDeviceTokenPostAnynomus, BuildContext context) async {
-    await _secureStorage.write(
-        key: 'fcm_token', value: fcmDeviceTokenPostAnynomus);
-    print("Stored FCM token locally: $fcmDeviceTokenPostAnynomus");
-
-    try {
-      final notificationProvider =
-          Provider.of<FcmnotificationProvider>(context, listen: false);
-
-      final hospitalCode = await getHospitalCode();
-      print("hosptialcode: $hospitalCode");
-
-      if (hospitalCode != null) {
-        await notificationProvider.sendFcmTokenToServer(
-            fcmDeviceTokenPostAnynomus, hospitalCode);
-        print("FCM token successfully sent to server.");
-      } else {
-        print("Hospital code not found. Cannot send FCM token.");
-      }
-    } catch (e) {
-      print('Error sending FCM token to server: $e');
-    }
-    print("fcmtoken: $fcmDeviceTokenPostAnynomus");
-  }
-
 // Store hospital code securely
   Future<void> storeHospitalCode(String hospitalCode) async {
     await _secureStorage.write(key: 'hospital_code', value: hospitalCode);

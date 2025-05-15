@@ -6,10 +6,10 @@ import 'package:geolocator/geolocator.dart';
 import 'package:hrms_app/notifications.dart';
 import 'package:hrms_app/utlis/socket_handle.dart';
 import 'package:hrms_app/screen/onboardscreen.dart';
+import 'package:hrms_app/storage/token_storage.dart';
 import 'package:hrms_app/screen/app_main_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:hrms_app/screen/homescreen/notifications.dart';
-import 'package:permission_handler/permission_handler.dart' as AppSettings;
+import 'package:hrms_app/providers/notifications/notification_provider.dart';
 import 'package:hrms_app/providers/login_screen_provider/auth_provider.dart';
 import 'package:hrms_app/providers/branch_id_providers/branch_id_provider.dart';
 import 'package:hrms_app/providers/fiscal_year_provider/fiscal_year_provider.dart';
@@ -90,13 +90,19 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _checkLoginState() async {
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final fcmNotificationProvider =
+          Provider.of<FcmnotificationProvider>(context, listen: false);
 
       await authProvider.loadToken();
 
       await authProvider.loadUsername();
 
       await authProvider.loadRefreshToken();
-
+      String? fcmToken = await FirebaseMessaging.instance.getToken();
+      print("FCM Token: $fcmToken");
+      final tokenStorage = TokenStorage();
+      String? applicationId = await tokenStorage.getHospitalCode();
+      print("Application ID: $applicationId");
       bool isLoggedIn = false;
       if (authProvider.token != null) {
         bool isTokenExpired = authProvider.isTokenExpired();
@@ -121,6 +127,11 @@ class _SplashScreenState extends State<SplashScreen> {
 
       if (isLoggedIn) {
         print(isLoggedIn);
+        if (fcmToken != null) {
+          await fcmNotificationProvider.sendFcmTokenToServer(
+              fcmToken, applicationId!);
+        }
+
         try {
           final branchid = Provider.of<BranchProvider>(context, listen: false);
 
@@ -141,6 +152,12 @@ class _SplashScreenState extends State<SplashScreen> {
           print("your no internet");
 
           return;
+        }
+      } else {
+        // ✅ Send FCM token as anonymous (not logged in)
+        if (fcmToken != null) {
+          await fcmNotificationProvider.sendFcmDeviceTokenPostAnonymous(
+              fcmToken, applicationId!);
         }
       }
 

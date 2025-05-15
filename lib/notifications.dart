@@ -41,13 +41,13 @@ class NotificationService {
     //intailize the local notifications plugins
     await _initalizelocalNotification();
     //check if app was launched by tapping on a notification
-    await _getInitalNotification();
+    await _getInitialNotification();
   }
 
 //fetches and prints fcm token (optional )
   static Future<void> _getFcmToken() async {
-    String? token = await _firebaseMessaging.getToken();
-    print("fcm token : $token");
+    String? fcmtoken = await _firebaseMessaging.getToken();
+    print("fcm token : $fcmtoken");
     // use this token to send messages
   }
 
@@ -105,14 +105,12 @@ class NotificationService {
   }
 
   //handles notification tap when app is terminated
-  static Future<void> _getInitalNotification() async {
+  static Future<void> _getInitialNotification() async {
     RemoteMessage? message =
         await FirebaseMessaging.instance.getInitialMessage();
     if (message != null) {
-      print(
-          "App launched from terminated state via notification :${message.data}");
-    } else {
-      print("App launchednot normally");
+      openedFromNotification = true;
+      print("App opened from terminated state by notification.");
     }
   }
 }
