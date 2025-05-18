@@ -83,18 +83,16 @@ class AuthProvider with ChangeNotifier {
 //token checking
   bool isTokenExpired() {
     print("expiration time: $_expirationTime");
-
     if (_expirationTime == null) return true;
-
     final currentTime = DateTime.now();
     print("current time: $currentTime");
-
     return currentTime.isAfter(_expirationTime!);
   }
 
 //token
   Future<void> loadToken() async {
     _token = await _tokenStorage.getToken();
+    print(_token);
   }
 //username
 
@@ -120,7 +118,7 @@ class AuthProvider with ChangeNotifier {
   Future<void> refreshAccessToken(BuildContext context) async {
     if (isTokenExpired()) {
       String? refreshToken = await _tokenStorage.getRefreshToken();
-
+      print("refreshToken :$refreshToken");
       if (refreshToken != null) {
         final response = await http.post(
           Uri.parse('http://45.117.153.90:5004/Account/RefreshToken/refresh'),
@@ -132,12 +130,13 @@ class AuthProvider with ChangeNotifier {
           final responseData = json.decode(response.body);
 
           final newToken = responseData['token'];
+          print("newtoken:$newToken");
           final newRefreshToken = responseData['refreshToken'];
+          print("newrefreshToken:$newRefreshToken");
 
           _expirationTime =
               DateTime.parse(responseData['expiration'].toString());
-          print("newexpiration:$_expirationTime");
-          // _expirationTime = DateTime.now().add(const Duration(seconds: 30));
+
           print("new expiration: $_expirationTime");
           await _tokenStorage.storeToken(newToken);
           await _tokenStorage.storeExpiationTime(_expirationTime!);
@@ -168,14 +167,12 @@ class AuthProvider with ChangeNotifier {
 // Logout and remove both access and refresh tokens
   Future<void> logout(BuildContext context) async {
     await _tokenStorage.removeToken();
-
     await _tokenStorage.removeUsername();
-
     await _tokenStorage.removeRefreshToken();
-
     await _tokenStorage.removeExpirationTime();
     await _tokenStorage.removeBranchIdAndFiscalYearId();
     await _tokenStorage.removeBranchId();
+    await _tokenStorage.removeHospitalCode();
     Provider.of<BranchProvider>(context, listen: false).reset();
     Provider.of<FiscalYearProvider>(context, listen: false).reset();
   }

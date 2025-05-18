@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:hrms_app/notifications.dart';
 import 'package:hrms_app/utlis/socket_handle.dart';
 import 'package:hrms_app/screen/onboardscreen.dart';
 import 'package:hrms_app/storage/token_storage.dart';
@@ -28,19 +27,21 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    NotificationService.initalizeNotifications();
+    // NotificationService.initalizeNotifications();
 
-    FirebaseMessaging.onBackgroundMessage(
-      NotificationService.firebaseMessagingBackgroundHandler,
-    );
+    // FirebaseMessaging.onBackgroundMessage(
+    //   NotificationService.firebaseMessagingBackgroundHandler,
+    // );
+    // PushNotificationManager.sendNotification(
+    //     deviceToken:
+    //         "cE_PpNlJQXufWn9SI8ZI73:APA91bE9NO3eXbt_xDTKx2wOSDvKNlgEJ2XESD6EQkbdCjWbQc4hN9-TfQAqDpkIvxIFxNPKRqu60dN-zoAbrXyySjJDn2zUkfwUT_QA0oA-OIRZJ7qpEOc",
+    //     message: "Hello from Flutter");
 
     _initApp();
   }
 
   Future<void> _initApp() async {
     await handleLocationPermission();
-    await Future.delayed(Duration(seconds: 2));
-
     await _checkLoginState();
   }
 
@@ -110,7 +111,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
         if (isTokenExpired) {
           try {
-            print(isTokenExpired);
+            print("isTokenExpired:$isTokenExpired");
             await authProvider.refreshAccessToken(context);
             isLoggedIn = true;
           } on SocketException catch (_) {
@@ -126,10 +127,10 @@ class _SplashScreenState extends State<SplashScreen> {
       }
 
       if (isLoggedIn) {
-        print(isLoggedIn);
-        if (fcmToken != null) {
+        print("isLoggedIn:$isLoggedIn");
+        if (fcmToken != null && applicationId != null) {
           await fcmNotificationProvider.sendFcmTokenToServer(
-              fcmToken, applicationId!);
+              fcmToken, applicationId);
         }
 
         try {
@@ -154,10 +155,11 @@ class _SplashScreenState extends State<SplashScreen> {
           return;
         }
       } else {
+        print(isLoggedIn);
         // ✅ Send FCM token as anonymous (not logged in)
-        if (fcmToken != null) {
+        if (fcmToken != null && applicationId == null) {
           await fcmNotificationProvider.sendFcmDeviceTokenPostAnonymous(
-              fcmToken, applicationId!);
+              fcmToken, applicationId ?? '');
         }
       }
 
@@ -168,12 +170,10 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
       );
     } on SocketException catch (_) {
-      print("hello1");
       await showSocketErrorDialog(
         context: context,
         onRetry: _checkLoginState,
       );
-      print("hello2");
       return;
     } catch (e) {
       print("Error : $e");

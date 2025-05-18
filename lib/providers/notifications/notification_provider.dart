@@ -5,7 +5,7 @@ import 'package:hrms_app/storage/securestorage.dart';
 
 class FcmnotificationProvider with ChangeNotifier {
   String? _fcmToken;
-  bool _isLoading = false; // Loading indicator
+  bool _isLoading = false; 
   bool get isLoading => _isLoading;
   String? get fcmToken => _fcmToken;
 
@@ -86,6 +86,7 @@ class FcmnotificationProvider with ChangeNotifier {
         "Token": fcmDeviceTokenPostAnonymous,
         "ApplicationId": applicationId,
       });
+      print("hello");
 
       final response = await http.post(
         url,

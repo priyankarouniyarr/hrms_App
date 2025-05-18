@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 Future<void> showSocketErrorDialog({
   required BuildContext context,
-  required VoidCallback onRetry,
+  required Future<void> Function() onRetry,
 }) async {
   await showDialog(
     barrierDismissible: false,
@@ -14,9 +15,18 @@ Future<void> showSocketErrorDialog({
             const Text("Unable to connect to the server. Please try again."),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              onRetry();
+            onPressed: () async {
+              Navigator.of(context).pop(); // Close the dialog first
+              final connectivityResult =
+                  await Connectivity().checkConnectivity();
+              final hasConnection =
+                  connectivityResult != ConnectivityResult.none;
+              if (hasConnection) {
+                await onRetry(); // Retry if internet is back
+              } else {
+                // Show dialog again if still no connection
+                await showSocketErrorDialog(context: context, onRetry: onRetry);
+              }
             },
             child: const Text("Retry"),
           ),

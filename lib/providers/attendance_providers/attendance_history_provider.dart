@@ -79,6 +79,14 @@ class AttendanceDetailsProvider with ChangeNotifier {
         _errorMessage =
             'Failed to load attendance summary: ${response.statusCode}';
       }
+    } on SocketException catch (e) {
+      if (e.osError != null && e.osError!.errorCode == 101) {
+        _errorMessage =
+            'Network is unreachable. Please check your internet connection.';
+      } else {
+        _errorMessage = 'Network error: ${e.message}';
+      }
+      print("SocketException: $_errorMessage");
     } catch (error) {
       _errorMessage = 'Error: $error';
     }

@@ -1,10 +1,14 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/splash_scren.dart';
 import 'package:hrms_app/notifications.dart';
 import 'package:hrms_app/firebase_options.dart';
+import 'package:hrms_app/push_notification.dart';
+import 'package:hrms_app/utlis/connectivity.dart';
+import 'package:hrms_app/localnotifications.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:hrms_app/providers/payroll/payroll_provider.dart';
 import 'package:hrms_app/providers/notices_provider/notices_provider.dart';
 import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
@@ -30,14 +34,15 @@ import 'package:hrms_app/providers/leaves_provider/leaves_history%20_contract%20
 import 'package:hrms_app/providers/works_Summary_provider/summary_details/my_ticket_get_summary_provider.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await LocalNotificationService().initialize();
+  await PushNotificationManager.initializeApp();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -48,41 +53,60 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  late ConnectivityHandler connectivityHandler;
+
+  @override
+  void initState() {
+    super.initState();
+    connectivityHandler = ConnectivityHandler(navigatorKey: navigatorKey);
+    connectivityHandler.init(setState, () {});
+  }
+
+  @override
+  void dispose() {
+    connectivityHandler.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => HospitalCodeProvider()),
-        ChangeNotifierProvider(create: (context) => AuthProvider()),
-        ChangeNotifierProvider(create: (context) => BranchProvider()),
-        ChangeNotifierProvider(create: (context) => FiscalYearProvider()),
-        ChangeNotifierProvider(create: (context) => CheckInProvider()),
-        ChangeNotifierProvider(create: (context) => HolidayProvider()),
-        ChangeNotifierProvider(create: (context) => NoticesProvider()),
-        ChangeNotifierProvider(create: (context) => AttendanceProvider()),
+        ChangeNotifierProvider(create: (_) => HospitalCodeProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => BranchProvider()),
+        ChangeNotifierProvider(create: (_) => FiscalYearProvider()),
+        ChangeNotifierProvider(create: (_) => CheckInProvider()),
+        ChangeNotifierProvider(create: (_) => HolidayProvider()),
+        ChangeNotifierProvider(create: (_) => NoticesProvider()),
+        ChangeNotifierProvider(create: (_) => AttendanceProvider()),
+        ChangeNotifierProvider(create: (_) => AttendanceDetailsProvider()),
+        ChangeNotifierProvider(create: (_) => EmployeeProvider()),
+        ChangeNotifierProvider(create: (_) => EmployeeContractProvider()),
+        ChangeNotifierProvider(create: (_) => LoanAndAdvanceProvider()),
+        ChangeNotifierProvider(create: (_) => LeaveProvider()),
         ChangeNotifierProvider(
-            create: (context) => AttendanceDetailsProvider()),
-        ChangeNotifierProvider(create: (context) => EmployeeProvider()),
-        ChangeNotifierProvider(create: (context) => EmployeeContractProvider()),
-        ChangeNotifierProvider(create: (context) => LoanAndAdvanceProvider()),
-        ChangeNotifierProvider(create: (context) => LeaveProvider()),
-        ChangeNotifierProvider(
-            create: (context) => LeaveContractandFiscalYearProvider()),
-        ChangeNotifierProvider(create: (context) => SalaryProvider()),
-        ChangeNotifierProvider(
-            create: (context) => MyTicketGetSummaryProvider()),
-        ChangeNotifierProvider(create: (context) => AssignByMeTicketProvider()),
-        ChangeNotifierProvider(create: (context) => NewTicketProvider()),
-        ChangeNotifierProvider(create: (context) => TicketProvider()),
-        ChangeNotifierProvider(create: (context) => LeaveRequestProvider()),
-        ChangeNotifierProvider(create: (context) => TicketWorkFlowProvider()),
-        ChangeNotifierProvider(create: (context) => ShareliveLocation()),
-        ChangeNotifierProvider(create: (context) => FcmnotificationProvider()),
+            create: (_) => LeaveContractandFiscalYearProvider()),
+        ChangeNotifierProvider(create: (_) => SalaryProvider()),
+        ChangeNotifierProvider(create: (_) => MyTicketGetSummaryProvider()),
+        ChangeNotifierProvider(create: (_) => AssignByMeTicketProvider()),
+        ChangeNotifierProvider(create: (_) => NewTicketProvider()),
+        ChangeNotifierProvider(create: (_) => TicketProvider()),
+        ChangeNotifierProvider(create: (_) => LeaveRequestProvider()),
+        ChangeNotifierProvider(create: (_) => TicketWorkFlowProvider()),
+        ChangeNotifierProvider(create: (_) => ShareliveLocation()),
+        ChangeNotifierProvider(create: (_) => FcmnotificationProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         navigatorKey: navigatorKey,
-        home: SplashScreen(),
+        home: Builder(builder: (BuildContext context) {
+          if (connectivityHandler.isCheckingConnected) {
+            return const Center(child: CircularProgressIndicator());
+          } else {
+            return SplashScreen();
+          }
+        }),
       ),
     );
   }
