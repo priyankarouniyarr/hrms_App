@@ -15,7 +15,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
     super.initState();
     Future.microtask(() async {
       await Provider.of<AttendanceProvider>(context, listen: false)
-          .fetchAttendanceData(context);
+          .fetchAttendanceData();
     });
   }
 
@@ -31,12 +31,19 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       );
     }
 
-    // Show error message if there was an issue fetching the data
     if (attendanceProvider.errorMessage.isNotEmpty) {
       return Scaffold(
         backgroundColor: cardBackgroundColor,
         appBar: const CustomAppBarProfile(title: "View Attendance"),
-        body: Center(child: Text(attendanceProvider.errorMessage)),
+        body: Center(
+            child: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Text(attendanceProvider.errorMessage,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.red,
+              )),
+        )),
       );
     }
 

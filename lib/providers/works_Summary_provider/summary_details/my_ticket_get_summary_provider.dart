@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -28,12 +29,10 @@ class MyTicketGetSummaryProvider with ChangeNotifier {
       String? fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
 
-      // Check if required data is available
       if (token == null || branchId == null || fiscalYear == null) {
         throw Exception("Missing authentication data.");
       }
 
-      // Define the API URL
       final url =
           Uri.parse('http://45.117.153.90:5004/api/Ticket/GetMyTicketSummary');
 
@@ -48,19 +47,25 @@ class MyTicketGetSummaryProvider with ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
-        // Parse the response and update the _myTicketSummary variable
         _myTicketSummary = TaskData.fromJson(json.decode(response.body));
         _errorMessage = '';
         notifyListeners();
       } else {
         _errorMessage = 'Failed to load ticket summary';
       }
+    } on SocketException catch (e) {
+      if (e.osError != null && e.osError!.errorCode == 101) {
+        _errorMessage =
+            'Network is unreachable. Please check your internet connection.';
+      } else {
+        _errorMessage = 'Network error: ${e.message}';
+      }
+      print("SocketException: $_errorMessage");
     } catch (e) {
-      _errorMessage =
-          'An error occurred: ${e.toString()}'; // Improved error message handling
+      _errorMessage = 'An error occurred: ${e.toString()}';
     } finally {
       _isLoading = false;
-      notifyListeners(); // Notify listeners about the changes
+      notifyListeners();
     }
   }
 }

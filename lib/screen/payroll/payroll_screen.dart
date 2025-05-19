@@ -155,6 +155,10 @@ class _PayrollScreenState extends State<PayrollScreen> {
               ),
               if (salaryProvider.monthSalary?.monthlySalaryData.isEmpty == true)
                 _buildNoDataMessage('No salary data available')
+              else if (salaryProvider.isLoading)
+                const Center(child: CircularProgressIndicator())
+              else if (salaryProvider.errorMessage.isNotEmpty)
+                _buildNoDataMessage(salaryProvider.errorMessage)
               else ...[
                 _buildSalaryItems(salaryProvider),
                 const Padding(
@@ -252,7 +256,16 @@ class _PayrollScreenState extends State<PayrollScreen> {
             if (provider.isLoading)
               const Center(child: CircularProgressIndicator())
             else if (provider.errorMessage.isNotEmpty)
-              Center(child: Text(provider.errorMessage))
+              Center(
+                  child: Text(
+                provider.errorMessage,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: accentColor,
+                ),
+                textAlign: TextAlign.justify,
+              ))
             else if (provider.salaryDeductions.isEmpty)
               _buildNoDataMessage('No tax data available')
             else
@@ -380,7 +393,15 @@ class _PayrollScreenState extends State<PayrollScreen> {
             if (provider.isLoading)
               const Center(child: CircularProgressIndicator())
             else if (provider.errorMessage.isNotEmpty)
-              Center(child: Text(provider.errorMessage))
+              Center(
+                  child: Text(
+                provider.errorMessage,
+                style: TextStyle(
+                    fontSize: 14,
+                    color: accentColor,
+                    fontWeight: FontWeight.w400),
+                textAlign: TextAlign.justify,
+              ))
             else if (provider.loanAndAdvanceModel == null)
               _buildNoDataMessage('No loan and advance data available')
             else
@@ -487,10 +508,11 @@ class _PayrollScreenState extends State<PayrollScreen> {
         child: Text(
           message,
           style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
             color: accentColor,
           ),
+          textAlign: TextAlign.justify,
         ),
       ),
     );

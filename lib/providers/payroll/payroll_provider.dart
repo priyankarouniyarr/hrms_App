@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:hrms_app/utlis/socket_handle.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/payrolls_models/loan_and_advance_data.dart';
 import 'package:hrms_app/models/payrolls_models/salary_deduction_models.dart';
@@ -59,18 +58,12 @@ class LoanAndAdvanceProvider with ChangeNotifier {
         final data = jsonDecode(response.body);
         _loanAndAdvanceModel = LoanAndAdvanceModel.fromJson(data);
       } else {
-        _errorMessage = 'Failed to fetch loan and advances: ${response.body}';
+        _errorMessage = 'Failed to load notices';
       }
-      print("try block");
-      // } on SocketException catch (_) {
-      //   print("hlo");
-      //   showSocketErrorDialog(
-      //     context: context,
-      //     onRetry: () => fetchLoanAndAdvances(context),
-      //   );
-      //   print("socket block");
-      // }
-    } catch (e) {}
+    } catch (error) {
+      _errorMessage = 'Error: $error';
+      print("Error: $error");
+    }
 
     _isLoading = false;
     notifyListeners();
@@ -112,14 +105,17 @@ class LoanAndAdvanceProvider with ChangeNotifier {
       } else {
         _errorMessage = 'Failed to fetch taxes: ${response.body}';
       }
-      // } on SocketException catch (_) {
-      //   await showSocketErrorDialog(
-      //     context: context,
-      //     onRetry: () => fetchMyTaxes(context),
-      //   );
-      // }
-    } catch (e) {
-      _errorMessage = 'Error: $e';
+    } on SocketException catch (e) {
+      if (e.osError != null && e.osError!.errorCode == 101) {
+        _errorMessage =
+            'Network is unreachable. Please check your internet connection.';
+      } else {
+        _errorMessage = 'Network error: ${e.message}';
+      }
+      print("SocketException: $_errorMessage");
+    } catch (error) {
+      _errorMessage = 'Error: $error';
+      print("Error: $error");
     }
 
     _isLoading = false;

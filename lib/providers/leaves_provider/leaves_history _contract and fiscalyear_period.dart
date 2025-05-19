@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:hrms_app/utlis/socket_handle.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/leaves/leave_history_models.dart';
 
@@ -120,6 +119,14 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
       } else {
         _errorMessage = "Failed to fetch fiscal year data";
       }
+    } on SocketException catch (e) {
+      if (e.osError != null && e.osError!.errorCode == 101) {
+        _errorMessage =
+            'Network is unreachable. Please check your internet connection.';
+      } else {
+        _errorMessage = 'Network error: ${e.message}';
+      }
+      print("SocketException: $_errorMessage");
     } catch (error) {
       _errorMessage = "Error fetching fiscal year: $error";
     } finally {
@@ -128,7 +135,7 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
     }
   }
 
-  //// Fetch Fiscal Year by passing the contractId and fiscalYearId
+  // Fetch Fiscal Year by passing the contractId and fiscalYearId
   Future<void> fetchFiscalYearByContractIdandFiscalYearId({
     required int contractId,
     required int fiscalYearId,

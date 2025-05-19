@@ -287,8 +287,14 @@ class _WorkflowViewState extends State<WorkflowView> {
                         SizedBox(
                           height: 300,
                           child: Center(
-                            child: Text(provider.errormessage!,
-                                style: TextStyle(color: Colors.red)),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Text(
+                                provider.errormessage!,
+                                style: TextStyle(color: accentColor),
+                                textAlign: TextAlign.justify,
+                              ),
+                            ),
                           ),
                         )
                       else

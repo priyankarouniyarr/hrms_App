@@ -1,14 +1,9 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/splash_scren.dart';
-import 'package:hrms_app/notifications.dart';
 import 'package:hrms_app/firebase_options.dart';
-import 'package:hrms_app/push_notification.dart';
 import 'package:hrms_app/utlis/connectivity.dart';
-import 'package:hrms_app/localnotifications.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:hrms_app/providers/payroll/payroll_provider.dart';
 import 'package:hrms_app/providers/notices_provider/notices_provider.dart';
 import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
@@ -28,6 +23,8 @@ import 'package:hrms_app/providers/fiscal_year_provider/fiscal_year_provider.dar
 import 'package:hrms_app/providers/payroll/payroll_monthly_salarayy_provider.dart';
 import 'package:hrms_app/providers/profile_providers/employee_contract_provider.dart';
 import 'package:hrms_app/providers/hosptial_code_provider/hosptial_code_provider.dart';
+import 'package:hrms_app/screen/homescreen/notifications_screen/push_notification.dart';
+import 'package:hrms_app/screen/homescreen/notifications_screen/localnotifications.dart';
 import 'package:hrms_app/providers/attendance_providers/attendance_history_provider.dart';
 import 'package:hrms_app/providers/works_Summary_provider/summary_details/assign_by_me_ticket_provider.dart';
 import 'package:hrms_app/providers/leaves_provider/leaves_history%20_contract%20and%20fiscalyear_period.dart';

@@ -1,10 +1,8 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:hrms_app/utlis/socket_handle.dart' show showSocketErrorDialog;
 import 'package:hrms_app/providers/check-in_provider/sharelive%20_location.dart';
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
 

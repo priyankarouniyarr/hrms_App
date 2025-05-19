@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
@@ -205,6 +206,14 @@ class EmployeeProvider with ChangeNotifier {
         print('Failed to load employee details: ${response.statusCode}');
         errorMessage = 'Failed to load employee details';
       }
+    } on SocketException catch (e) {
+      if (e.osError != null && e.osError!.errorCode == 101) {
+        errorMessage =
+            'Network is unreachable. Please check your internet connection.';
+      } else {
+        errorMessage = 'Network error: ${e.message}';
+      }
+      print("SocketException: $errorMessage");
     } catch (e) {
       errorMessage = 'Error: $e';
     } finally {

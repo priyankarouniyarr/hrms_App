@@ -2,15 +2,15 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:hrms_app/utlis/socket_handle.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/notices_models/notices_models.dart';
 
 class NoticesProvider with ChangeNotifier {
   List<Notices> _notices = [];
-
+  String _errorMessage = '';
   List<Notices> get notices => _notices;
 
+  String get errorMessage => _errorMessage;
   final SecureStorageService _secureStorageService = SecureStorageService();
 
   Future<void> fetchNotice() async {
@@ -39,10 +39,11 @@ class NoticesProvider with ChangeNotifier {
         _notices = noticedata.map((data) => Notices.fromJson(data)).toList();
         notifyListeners();
       } else {
-        throw Exception('Failed to load notices');
+        _errorMessage = 'Failed to load notices';
       }
-    } catch (e) {
-      throw Exception('Error loading notices: $e');
+    } catch (error) {
+      _errorMessage = 'Error: $error';
+      print("Error: $error");
     }
   }
 
@@ -73,10 +74,11 @@ class NoticesProvider with ChangeNotifier {
         _notices = holidayData.map((data) => Notices.fromJson(data)).toList();
         notifyListeners();
       } else {
-        throw Exception('Failed to load notices ');
+        _errorMessage = 'Failed to load notices';
       }
-    } catch (e) {
-      throw Exception('Error loading notice by ID: $e');
+    } catch (error) {
+      _errorMessage = 'Error: $error';
+      print("Error: $error");
     }
   }
 }

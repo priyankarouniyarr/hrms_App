@@ -213,12 +213,12 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
                             provider.summaryAttendance == null ||
                             provider.summaryAttendance.isEmpty)
                         ? Text(
-                            "No attendance details found",
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.black.withOpacity(0.5),
-                            ),
-                          )
+                            // provider.errorMessage,
+                            // style: TextStyle(
+                            //   fontSize: 18,
+                            //   color: Colors.red.withOpacity(0.5),
+                            // ),
+                            " ")
                         : Wrap(
                             spacing: 10,
                             runSpacing: 10,
@@ -234,7 +234,7 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
                             provider.detailsAttendance == null ||
                             provider.detailsAttendance.isEmpty)
                         ? Text(
-                            "No attendance details found",
+                            provider.errorMessage,
                             style: TextStyle(
                               fontSize: 18,
                               color: accentColor,

@@ -85,15 +85,14 @@ class _CommentDialogState extends State<CommentDialog> {
 
           Navigator.of(context).pop(); // Close comment dialog
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                commentProvider.errormessage!,
-                style: const TextStyle(color: Colors.red),
-              ),
-              backgroundColor: cardBackgroundColor,
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+              commentProvider.errormessage!,
+              style: const TextStyle(color: accentColor),
+              textAlign: TextAlign.justify,
             ),
-          );
+            backgroundColor: cardBackgroundColor,
+          ));
         }
       } catch (e) {
         Navigator.of(context).pop(); // Close loading dialog

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -8,10 +9,10 @@ class EmployeeContractProvider with ChangeNotifier {
   List<EmployeeContract> _contracts = [];
   bool _isLoading = false;
   final SecureStorageService secureStorageService = SecureStorageService();
-
+  String _errorMessage = '';
+  String get errorMessage => _errorMessage;
   List<EmployeeContract> get contracts => _contracts;
   bool get isLoading => _isLoading;
-  String? errorMessage;
 
   Future<void> fetchEmployeeContracts() async {
     _isLoading = true;
@@ -28,7 +29,7 @@ class EmployeeContractProvider with ChangeNotifier {
       print("fiscalYear: $fiscalYear");
       print("token: $token");
       if (token == null || branchId == null || fiscalYear == null) {
-        errorMessage = 'Token or BranchId is missing';
+        _errorMessage = 'Token or BranchId is missing';
         _isLoading = false;
         print(errorMessage);
         notifyListeners(); // Notify listeners when an error occurs
@@ -51,11 +52,19 @@ class EmployeeContractProvider with ChangeNotifier {
         _contracts =
             jsonResponse.map((e) => EmployeeContract.fromJson(e)).toList();
       } else {
-        throw Exception(
-            "Failed to load contracts. Status Code: ${response.statusCode}");
+        _errorMessage = 'Failed to load notices';
       }
-    } catch (e) {
-      print("Error fetching contracts: $e");
+    } on SocketException catch (e) {
+      if (e.osError != null && e.osError!.errorCode == 101) {
+        _errorMessage =
+            'Network is unreachable. Please check your internet connection.';
+      } else {
+        _errorMessage = 'Network error: ${e.message}';
+      }
+      print("SocketException: $_errorMessage");
+    } catch (error) {
+      _errorMessage = 'Error: $error';
+      print("Error: $error");
     }
 
     _isLoading = false;

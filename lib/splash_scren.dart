@@ -1,17 +1,17 @@
-import 'dart:io';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:hrms_app/utlis/socket_handle.dart';
+import 'package:hrms_app/location%20.dart';
 import 'package:hrms_app/screen/onboardscreen.dart';
 import 'package:hrms_app/storage/token_storage.dart';
 import 'package:hrms_app/screen/app_main_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:hrms_app/storage/hosptial_code_storage.dart';
 import 'package:hrms_app/providers/notifications/notification_provider.dart';
 import 'package:hrms_app/providers/login_screen_provider/auth_provider.dart';
 import 'package:hrms_app/providers/branch_id_providers/branch_id_provider.dart';
 import 'package:hrms_app/providers/fiscal_year_provider/fiscal_year_provider.dart';
+import 'package:hrms_app/screen/homescreen/notifications_screen/push_notification.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -27,66 +27,20 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // NotificationService.initalizeNotifications();
 
-    // FirebaseMessaging.onBackgroundMessage(
-    //   NotificationService.firebaseMessagingBackgroundHandler,
-    // );
-    // PushNotificationManager.sendNotification(
-    //     deviceToken:
-    //         "cE_PpNlJQXufWn9SI8ZI73:APA91bE9NO3eXbt_xDTKx2wOSDvKNlgEJ2XESD6EQkbdCjWbQc4hN9-TfQAqDpkIvxIFxNPKRqu60dN-zoAbrXyySjJDn2zUkfwUT_QA0oA-OIRZJ7qpEOc",
-    //     message: "Hello from Flutter");
-
+    PushNotificationManager.sendNotification(
+        deviceToken:
+            "fXHE28MqRWKBzpIDY46zFz:APA91bHgb4IeJiJuthr5J-Fb_wfnvp6Fm6wOJ5rCKTEq32vxMeEZO-6Vytgf0VZnqDn1ui7xoKa56401zetEhNUgUgPBEJrHM04LcfeSC0puPrGdFQ9O2Ks",
+        message: "Hello from Flutter");
     _initApp();
   }
 
   Future<void> _initApp() async {
-    await handleLocationPermission();
+    await LocationService.handleLocationPermission();
     await _checkLoginState();
   }
 
 //
-
-  Future<void> handleLocationPermission() async {
-    bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
-
-    if (!isLocationServiceEnabled) {
-      print(
-          "Location service is OFF. You can prompt the user to enable it if needed.");
-    } else {
-      print("Location service is ON");
-    }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    print("Initial permission: $permission");
-
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      print("Permission after request: $permission");
-
-      if (permission == LocationPermission.denied) {
-        print("Permission denied. App will continue without location access.");
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      print(
-          "Permission permanently denied. App will continue without location access.");
-    }
-
-    if (permission == LocationPermission.always ||
-        permission == LocationPermission.whileInUse) {
-      try {
-        Position position = await Geolocator.getCurrentPosition();
-        print('Location: ${position.latitude}, ${position.longitude}');
-      } catch (e) {
-        print("Error getting location: $e");
-      }
-    } else {
-      print(
-          "Location permission denied or not granted. App will continue without location access.");
-    }
-  }
 
   Future<void> _checkLoginState() async {
     try {
@@ -101,8 +55,8 @@ class _SplashScreenState extends State<SplashScreen> {
       await authProvider.loadRefreshToken();
       String? fcmToken = await FirebaseMessaging.instance.getToken();
       print("FCM Token: $fcmToken");
-      final tokenStorage = TokenStorage();
-      String? applicationId = await tokenStorage.getHospitalCode();
+      final hosptialcode = HosptialCodeStorage();
+      String? applicationId = await hosptialcode.getHospitalCode();
       print("Application ID: $applicationId");
       bool isLoggedIn = false;
       if (authProvider.token != null) {
@@ -114,11 +68,9 @@ class _SplashScreenState extends State<SplashScreen> {
             print("isTokenExpired:$isTokenExpired");
             await authProvider.refreshAccessToken(context);
             isLoggedIn = true;
-          } on SocketException catch (_) {
-            await showSocketErrorDialog(
-              context: context,
-              onRetry: _checkLoginState,
-            );
+          } catch (e) {
+            print("Error refreshing token: $e");
+
             return;
           }
         } else {
@@ -127,11 +79,11 @@ class _SplashScreenState extends State<SplashScreen> {
       }
 
       if (isLoggedIn) {
-        print("isLoggedIn:$isLoggedIn");
-        if (fcmToken != null && applicationId != null) {
-          await fcmNotificationProvider.sendFcmTokenToServer(
-              fcmToken, applicationId);
-        }
+        print("isLoggedIn: $isLoggedIn");
+        // if (fcmToken != null && applicationId != null) {
+        //  await fcmNotificationProvider.sendFcmTokenToServer(
+        //   fcmToken, applicationId);
+        // }
 
         try {
           final branchid = Provider.of<BranchProvider>(context, listen: false);
@@ -143,24 +95,18 @@ class _SplashScreenState extends State<SplashScreen> {
           await fiscalyear.fetchFiscalYears(
             int.parse(branchid.branches.first.branchId.toString()),
           );
-        } on SocketException catch (_) {
-          await showSocketErrorDialog(
-            context: context,
-            onRetry: _checkLoginState,
-          );
-          return;
         } catch (e) {
-          print("your no internet");
+          print("Error: $e");
 
           return;
         }
       } else {
         print(isLoggedIn);
         // ✅ Send FCM token as anonymous (not logged in)
-        if (fcmToken != null && applicationId == null) {
-          await fcmNotificationProvider.sendFcmDeviceTokenPostAnonymous(
-              fcmToken, applicationId ?? '');
-        }
+        //  if (fcmToken != null && applicationId == null) {
+        //    await fcmNotificationProvider.sendFcmDeviceTokenPostAnonymous(
+        //        fcmToken, applicationId ?? '');
+        //  }
       }
 
       Navigator.pushReplacement(
@@ -169,13 +115,14 @@ class _SplashScreenState extends State<SplashScreen> {
           builder: (context) => isLoggedIn ? AppMainScreen() : OnboardScreen(),
         ),
       );
-    } on SocketException catch (_) {
-      await showSocketErrorDialog(
-        context: context,
-        onRetry: _checkLoginState,
-      );
-      return;
-    } catch (e) {
+    }
+    // on SocketException catch (_) {
+    //   await showSocketErrorDialog(
+    //     context: context,
+    //     onRetry: _checkLoginState,
+    //   );
+    //  return;
+    catch (e) {
       print("Error : $e");
     }
   }

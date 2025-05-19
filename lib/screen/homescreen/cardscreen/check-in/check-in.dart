@@ -72,7 +72,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
                     Expanded(
                       child: GestureDetector(
                         onTap: () async {
-                          await checkInProvider.getcurrentlocation(context);
+                          await checkInProvider.getcurrentlocation();
                           await checkInProvider.punchPost();
                           await _loadPunches();
 

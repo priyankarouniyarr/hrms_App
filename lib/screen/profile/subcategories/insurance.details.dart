@@ -2,7 +2,6 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
-
 import 'package:hrms_app/models/profile_models/profiles.models.dart';
 import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
@@ -45,7 +44,7 @@ class _InsuranceDetailsState extends State<InsuranceDetails> {
         child: insuranceProvider.isLoading
             ? const Center(child: CircularProgressIndicator())
             : insuranceProvider.insurance.isEmpty
-                ? const Center(child: Text(""))
+                ? const Center(child: Text("No insurance details available"))
                 : ListView.builder(
                     itemCount: insuranceProvider.insurance.length,
                     itemBuilder: (context, index) {

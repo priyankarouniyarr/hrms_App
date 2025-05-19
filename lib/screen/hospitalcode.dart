@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/storage/token_storage.dart';
 import 'package:hrms_app/screen/login%20screen.dart';
+import 'package:hrms_app/storage/hosptial_code_storage.dart';
 import 'package:hrms_app/providers/hosptial_code_provider/hosptial_code_provider.dart';
 
 class HospitalCodeScreen extends StatefulWidget {
@@ -26,8 +27,8 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
       print("Entered Code: $enteredCode");
       if (provider.baseUrl.isNotEmpty) {
         // Store the hospital code
-        final tokenStorage = TokenStorage();
-        await tokenStorage.storeHospitalCode(enteredCode);
+        final hosptialcode = HosptialCodeStorage();
+        await hosptialcode.storeHospitalCode(enteredCode);
 
         Navigator.pushAndRemoveUntil(
           context,

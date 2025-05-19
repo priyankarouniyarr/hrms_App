@@ -62,14 +62,17 @@ class ConnectivityHandler {
             barrierColor: Colors.black54,
             barrierDismissible: false,
             context: navigatorKey.currentContext!,
-            builder: (context) => AlertDialog(
-              title: Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: const Text('No Internet Connection'),
+            builder: (context) => PopScope(
+              canPop: false,
+              child: AlertDialog(
+                title: Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: const Text('No Internet Connection'),
+                ),
+                content: const Text(
+                    'Please check your internet connection and try again.'),
+                actions: const [],
               ),
-              content: const Text(
-                  'Please check your internet connection and try again.'),
-              actions: const [],
             ),
           );
         }

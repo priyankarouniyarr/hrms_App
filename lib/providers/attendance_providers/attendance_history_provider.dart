@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:hrms_app/utlis/socket_handle.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/attendance%20_models/attendance_details_models.dart';
 
@@ -79,14 +78,6 @@ class AttendanceDetailsProvider with ChangeNotifier {
         _errorMessage =
             'Failed to load attendance summary: ${response.statusCode}';
       }
-    } on SocketException catch (e) {
-      if (e.osError != null && e.osError!.errorCode == 101) {
-        _errorMessage =
-            'Network is unreachable. Please check your internet connection.';
-      } else {
-        _errorMessage = 'Network error: ${e.message}';
-      }
-      print("SocketException: $_errorMessage");
     } catch (error) {
       _errorMessage = 'Error: $error';
     }

@@ -86,9 +86,7 @@ class _CreateTicketScreenState extends State<CreateTicketScreen> {
         final ticketProvider =
             Provider.of<TicketProvider>(context, listen: false);
         final success = await ticketProvider.createTicket(ticketRequest);
-        //  print("success ${success}");
 
-        // Hide loading indicator
         Navigator.of(context).pop();
 
         if (success) {
@@ -108,7 +106,8 @@ class _CreateTicketScreenState extends State<CreateTicketScreen> {
             SnackBar(
               content: Text(
                 ticketProvider.errorMessage,
-                style: const TextStyle(color: Colors.red),
+                style: const TextStyle(color: accentColor),
+                textAlign: TextAlign.center,
               ),
               backgroundColor: cardBackgroundColor,
             ),
@@ -179,20 +178,16 @@ class _CreateTicketScreenState extends State<CreateTicketScreen> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  provider.isLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : provider.errorMessage.isNotEmpty
-                          ? Center(child: Text(provider.errorMessage))
-                          : CustomDropdown2(
-                              value: _selectedCategoriesType,
-                              items: categories,
-                              hintText: 'Select Category',
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedCategoriesType = value;
-                                });
-                              },
-                            ),
+                  CustomDropdown2(
+                    value: _selectedCategoriesType,
+                    items: categories,
+                    hintText: 'Select Category',
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedCategoriesType = value;
+                      });
+                    },
+                  ),
                   const SizedBox(height: 10),
                   //ticket Subject
                   const Text(

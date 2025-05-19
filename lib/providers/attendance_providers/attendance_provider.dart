@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -24,9 +23,7 @@ class AttendanceProvider with ChangeNotifier {
 
   get attendanceReport => null;
 
-  Future<void> fetchAttendanceData(
-    BuildContext context,
-  ) async {
+  Future<void> fetchAttendanceData() async {
     _branchId =
         await _secureStorageService.readData('selected_workingbranchId');
     _token = await _secureStorageService.readData('auth_token');
@@ -77,29 +74,9 @@ class AttendanceProvider with ChangeNotifier {
       } else {
         _errorMessage = 'Failed to load data.';
       }
-    } on SocketException catch (e) {
-      String errorMessage;
-      if (e.osError != null && e.osError!.errorCode == 101) {
-        errorMessage =
-            'Network is unreachable. Please check your internet connection.';
-      } else {
-        errorMessage = 'Network error: ${e.message}';
-      }
-
-      print("SocketException: $errorMessage");
-
-      await showErrorDialog(
-        context: context,
-        title: "Connection Error",
-        message: errorMessage,
-      );
     } catch (error) {
-      String errorMessage = 'Error: $error';
-      await showErrorDialog(
-        context: context,
-        title: "Error",
-        message: errorMessage,
-      );
+      _errorMessage = 'Error: $error';
+      print("Error: $error");
     }
 
     _isLoading = false;
@@ -108,23 +85,4 @@ class AttendanceProvider with ChangeNotifier {
 
   void fetchAttendanceSummary(
       DateTime dateTime, DateTime dateTime2, String s) {}
-  Future<void> showErrorDialog({
-    required BuildContext context,
-    required String title,
-    required String message,
-  }) async {
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: Text(message),
-        actions: [
-          TextButton(
-            child: const Text("OK"),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ],
-      ),
-    );
-  }
 }

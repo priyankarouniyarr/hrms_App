@@ -135,6 +135,14 @@ class TicketWorkFlowProvider with ChangeNotifier {
       } else {
         _errormessage = 'Failed to load tickets: ${response.statusCode}';
       }
+    } on SocketException catch (e) {
+      if (e.osError != null && e.osError!.errorCode == 101) {
+        _errormessage =
+            'Network is unreachable. Please check your internet connection.';
+      } else {
+        _errormessage = 'Network error: ${e.message}';
+      }
+      print("SocketException: $_errormessage");
     } catch (e) {
       _errormessage = 'Error fetching tickets : $e';
       print(_errormessage);
@@ -181,6 +189,14 @@ class TicketWorkFlowProvider with ChangeNotifier {
       } else {
         _errormessage = 'Failed to load ticket summary';
       }
+    } on SocketException catch (e) {
+      if (e.osError != null && e.osError!.errorCode == 101) {
+        _errormessage =
+            'Network is unreachable. Please check your internet connection.';
+      } else {
+        _errormessage = 'Network error: ${e.message}';
+      }
+      print("SocketException: $_errormessage");
     } catch (e) {
       _errormessage = 'An error occurred: ${e.toString()}';
       print(_errormessage);
@@ -239,6 +255,15 @@ class TicketWorkFlowProvider with ChangeNotifier {
         print(_errormessage);
         return false;
       }
+    } on SocketException catch (e) {
+      if (e.osError != null && e.osError!.errorCode == 101) {
+        _errormessage =
+            'Network is unreachable. Please check your internet connection.';
+      } else {
+        _errormessage = 'Network error: ${e.message}';
+      }
+      print("SocketException: $_errormessage");
+      return false;
     } catch (e) {
       _errormessage = 'An error occurred: ${e.toString()}';
       print(_errormessage);
@@ -297,9 +322,19 @@ class TicketWorkFlowProvider with ChangeNotifier {
         print(_errormessage);
         return false;
       }
+    } on SocketException catch (e) {
+      if (e.osError != null && e.osError!.errorCode == 101) {
+        _errormessage =
+            'Network is unreachable. Please check your internet connection.';
+      } else {
+        _errormessage = 'Network error: ${e.message}';
+      }
+      print("SocketException: $_errormessage");
+      return false;
     } catch (e) {
       _errormessage = 'An error occurred: ${e.toString()}';
       print(_errormessage);
+
       return false;
     } finally {
       _isLoading = false;
@@ -359,6 +394,15 @@ class TicketWorkFlowProvider with ChangeNotifier {
         print(_errormessage);
         return false;
       }
+    } on SocketException catch (e) {
+      if (e.osError != null && e.osError!.errorCode == 101) {
+        _errormessage =
+            'Network is unreachable. Please check your internet connection.';
+      } else {
+        _errormessage = 'Network error: ${e.message}';
+      }
+      print("SocketException: $_errormessage");
+      return false;
     } catch (e) {
       _errormessage = 'An error occurred: ${e.toString()}';
       print(_errormessage);
@@ -422,6 +466,15 @@ class TicketWorkFlowProvider with ChangeNotifier {
         print(_errormessage);
         return false;
       }
+    } on SocketException catch (e) {
+      if (e.osError != null && e.osError!.errorCode == 101) {
+        _errormessage =
+            'Network is unreachable. Please check your internet connection.';
+      } else {
+        _errormessage = 'Network error: ${e.message}';
+      }
+      print("SocketException: $_errormessage");
+      return false;
     } catch (e) {
       _errormessage = 'An error occurred: ${e.toString()}';
       print(_errormessage);
@@ -484,6 +537,15 @@ class TicketWorkFlowProvider with ChangeNotifier {
         print(_errormessage);
         return false;
       }
+    } on SocketException catch (e) {
+      if (e.osError != null && e.osError!.errorCode == 101) {
+        _errormessage =
+            'Network is unreachable. Please check your internet connection.';
+      } else {
+        _errormessage = 'Network error: ${e.message}';
+      }
+      print("SocketException: $_errormessage");
+      return false; // <-- ADD THIS
     } catch (e) {
       _errormessage = 'An error occurred: ${e.toString()}';
       print(_errormessage);
@@ -518,7 +580,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
 
       // Initialize Dio with custom options
       final dio = Dio(BaseOptions(
-        validateStatus: (status) => status! < 500, // Don't throw for 4xx errors
+        validateStatus: (status) => status! < 500,
       ));
 
       dio.options.headers = {
@@ -613,6 +675,15 @@ class TicketWorkFlowProvider with ChangeNotifier {
         _errormessage = "Network error: ${error.message}";
       }
       return false;
+    } on SocketException catch (e) {
+      if (e.osError != null && e.osError!.errorCode == 101) {
+        _errormessage =
+            'Network is unreachable. Please check your internet connection.';
+      } else {
+        _errormessage = 'Network error: ${e.message}';
+      }
+      print("SocketException: $_errormessage");
+      return false; // <-- ADD THIS
     } catch (error) {
       _errormessage = "Unexpected error: $error";
       return false;

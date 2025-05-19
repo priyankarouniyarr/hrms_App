@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:hrms_app/utlis/socket_handle.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/payrolls_models/monthly_salary_models.dart';
 
@@ -54,15 +53,11 @@ class SalaryProvider with ChangeNotifier {
             GetMyCurrentMonthSalary.fromJson(json.decode(response.body));
         notifyListeners();
       } else {
-        _errorMessage = 'Failed to load current month salary';
+        _errorMessage = 'Failed to load notices';
       }
-      // } on SocketException catch (_) {
-      //   await showSocketErrorDialog(
-      //     context: context,
-      //     onRetry: () => fetchCurrentMonthSalary(
-      //         context), // Pass the filter and context for retry
-    } catch (e) {
-      _errorMessage = 'An error occurred: $e';
+    } catch (error) {
+      _errorMessage = 'Error: $error';
+      print("Error: $error");
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -105,16 +100,11 @@ class SalaryProvider with ChangeNotifier {
         _monthSalary = GetMyMonthSalary.fromJson(json.decode(response.body));
         notifyListeners();
       } else {
-        _errorMessage = 'Failed to load month salary';
+        _errorMessage = 'Failed to load notices';
       }
-      // } on SocketException catch (_) {
-      //   await showSocketErrorDialog(
-      //     context: context,
-      //     onRetry: () => fetchMonthSalary(month, year, context),
-      //   );
-      // }
-    } catch (e) {
-      _errorMessage = 'An error occurred: $e';
+    } catch (error) {
+      _errorMessage = 'Error: $error';
+      print("Error: $error");
     } finally {
       _isLoading = false;
       notifyListeners();

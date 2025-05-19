@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:hrms_app/utlis/socket_handle.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/check_in_models/check_in_history%20.dart';
 
@@ -93,6 +92,14 @@ class CheckInProvider with ChangeNotifier {
         _setErrorMessage(
             "Failed to submit: ${response.statusCode}\n ${response.body}");
       }
+    } on SocketException catch (e) {
+      if (e.osError != null && e.osError!.errorCode == 101) {
+        _errorMessage =
+            'Network is unreachable. Please check your internet connection.';
+      } else {
+        _errorMessage = 'Network error: ${e.message}';
+      }
+      print("SocketException: $_errorMessage");
     } catch (e) {
       _setErrorMessage("Error: $e");
     } finally {
@@ -100,7 +107,7 @@ class CheckInProvider with ChangeNotifier {
     }
   }
 
-  Future<void> getcurrentlocation(BuildContext context) async {
+  Future<void> getcurrentlocation() async {
     _setLoading(true);
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -133,11 +140,14 @@ class CheckInProvider with ChangeNotifier {
         _address =
             '${placemarks[0].name}, ${placemarks[0].locality}, ${placemarks[0].administrativeArea}';
       }
-    } on SocketException catch (_) {
-      await showSocketErrorDialog(
-        context: context,
-        onRetry: () => getcurrentlocation(context),
-      );
+    } on SocketException catch (e) {
+      if (e.osError != null && e.osError!.errorCode == 101) {
+        _errorMessage =
+            'Network is unreachable. Please check your internet connection.';
+      } else {
+        _errorMessage = 'Network error: ${e.message}';
+      }
+      print("SocketException: $_errorMessage");
     } catch (e) {
       _setErrorMessage("Failed to get location: $e");
     } finally {
@@ -179,11 +189,14 @@ class CheckInProvider with ChangeNotifier {
       } else {
         _errorMessage = "Failed to fetch punch data: ${response.statusCode}";
       }
-    } on SocketException catch (_) {
-      await showSocketErrorDialog(
-        context: context,
-        onRetry: () => getpunches(context),
-      );
+    } on SocketException catch (e) {
+      if (e.osError != null && e.osError!.errorCode == 101) {
+        _errorMessage =
+            'Network is unreachable. Please check your internet connection.';
+      } else {
+        _errorMessage = 'Network error: ${e.message}';
+      }
+      print("SocketException: $_errorMessage");
     } catch (error) {
       _errorMessage = "Error fetching punch data: $error";
     } finally {

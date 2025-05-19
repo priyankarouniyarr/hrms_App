@@ -4,6 +4,11 @@ import 'package:http/http.dart' as http;
 import 'package:hrms_app/screen/branch_id.dart';
 import 'package:hrms_app/screen/hospitalcode.dart';
 import 'package:hrms_app/storage/token_storage.dart';
+import 'package:hrms_app/storage/username_storage.dart';
+import 'package:hrms_app/storage/hosptial_code_storage.dart';
+import 'package:hrms_app/storage/refresh_token_storage.dart';
+import 'package:hrms_app/storage/expirationtime_storage.dart';
+import 'package:hrms_app/storage/branchid_fiscalyear_storage.dart';
 import 'package:provider/provider.dart'; // Import the TokenStorage
 import 'package:hrms_app/models/login_screen_models/loginscreen_models.dart';
 import 'package:hrms_app/providers/branch_id_providers/branch_id_provider.dart';
@@ -18,7 +23,12 @@ class AuthProvider with ChangeNotifier {
   DateTime? _expirationTime;
 
   final TokenStorage _tokenStorage = TokenStorage();
-
+  final BranchidFiscalyearStorage _branchidFiscalyearStorage =
+      BranchidFiscalyearStorage();
+  final HosptialCodeStorage _hosptialcode = HosptialCodeStorage();
+  final UsernameStorage _usernameStorage = UsernameStorage();
+  final ExpirationtimeStorage _expirationtimeStorage = ExpirationtimeStorage();
+  final RefreshTokenStorage _refreshtokenStorage = RefreshTokenStorage();
   bool get loading => _loading;
   String get errorMessage => _errorMessage;
   String? get token => _token;
@@ -52,15 +62,15 @@ class AuthProvider with ChangeNotifier {
         final token = responseData['token'];
         final refreshToken = responseData['refreshToken'];
         _expirationTime = DateTime.parse(responseData['expiration'].toString());
-        // _expirationTime = DateTime.now().add(const Duration(minutes: 1));
+
         print("new expiration: $_expirationTime");
 
         _username = username;
 
         await _tokenStorage.storeToken(token);
-        await _tokenStorage.storeUsername(username);
-        await _tokenStorage.storeRefreshToken(refreshToken);
-        await _tokenStorage.storeExpiationTime(_expirationTime!);
+        await _usernameStorage.storeUsername(username);
+        await _refreshtokenStorage.storeRefreshToken(refreshToken);
+        await _expirationtimeStorage.storeExpiationTime(_expirationTime!);
 
         _token = token;
         notifyListeners();
@@ -92,22 +102,24 @@ class AuthProvider with ChangeNotifier {
 //token
   Future<void> loadToken() async {
     _token = await _tokenStorage.getToken();
-    print(_token);
+    print("Token:$_token");
   }
 //username
 
   Future<void> loadUsername() async {
-    _username = await _tokenStorage.getUsername();
+    _username = await _usernameStorage.getUsername();
 
-    print(_username);
+    print("Username:$_username");
   }
 
   // Load refresh token securely
   Future<void> loadRefreshToken() async {
-    String? refreshToken = await _tokenStorage.getRefreshToken();
+    String? refreshToken = await _refreshtokenStorage.getRefreshToken();
+    print("refreshToken: $refreshToken");
+    DateTime? expirationtime = await _expirationtimeStorage.getExpirationtime();
+    print("expiration time: $expirationtime");
+    _expirationTime = expirationtime?.toLocal();
 
-    DateTime? expirationtime = await _tokenStorage.getExpirationtime();
-    _expirationTime = expirationtime;
     print("expirytime loaded :$expirationtime");
     if (refreshToken != null) {
       print("Loaded Refresh Token: $refreshToken");
@@ -117,7 +129,7 @@ class AuthProvider with ChangeNotifier {
   // Refresh the access token using the refresh token
   Future<void> refreshAccessToken(BuildContext context) async {
     if (isTokenExpired()) {
-      String? refreshToken = await _tokenStorage.getRefreshToken();
+      String? refreshToken = await _refreshtokenStorage.getRefreshToken();
       print("refreshToken :$refreshToken");
       if (refreshToken != null) {
         final response = await http.post(
@@ -139,8 +151,8 @@ class AuthProvider with ChangeNotifier {
 
           print("new expiration: $_expirationTime");
           await _tokenStorage.storeToken(newToken);
-          await _tokenStorage.storeExpiationTime(_expirationTime!);
-          await _tokenStorage.storeRefreshToken(newRefreshToken);
+          await _expirationtimeStorage.storeExpiationTime(_expirationTime!);
+          await _refreshtokenStorage.storeRefreshToken(newRefreshToken);
           _token = newToken;
           print("brek2");
           print("Refresh Token: $newRefreshToken");
@@ -167,12 +179,12 @@ class AuthProvider with ChangeNotifier {
 // Logout and remove both access and refresh tokens
   Future<void> logout(BuildContext context) async {
     await _tokenStorage.removeToken();
-    await _tokenStorage.removeUsername();
-    await _tokenStorage.removeRefreshToken();
-    await _tokenStorage.removeExpirationTime();
-    await _tokenStorage.removeBranchIdAndFiscalYearId();
-    await _tokenStorage.removeBranchId();
-    await _tokenStorage.removeHospitalCode();
+    await _usernameStorage.removeUsername();
+    await _refreshtokenStorage.removeRefreshToken();
+    await _expirationtimeStorage.removeExpirationTime();
+    await _branchidFiscalyearStorage.removeBranchIdAndFiscalYearId();
+    await _branchidFiscalyearStorage.removeBranchId();
+    await _hosptialcode.removeHospitalCode();
     Provider.of<BranchProvider>(context, listen: false).reset();
     Provider.of<FiscalYearProvider>(context, listen: false).reset();
   }

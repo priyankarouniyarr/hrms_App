@@ -127,7 +127,12 @@ class _AssignedByMeState extends State<AssignedByMe> {
     }
 
     if (provider.errorMessage.isNotEmpty) {
-      return Center(child: Text(provider.errorMessage));
+      return Center(
+          child: Text(provider.errorMessage,
+              style: const TextStyle(
+                  fontSize: 16,
+                  color: accentColor,
+                  fontWeight: FontWeight.w500)));
     }
 
     return SafeArea(
