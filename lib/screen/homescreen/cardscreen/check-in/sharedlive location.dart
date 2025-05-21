@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:hrms_app/constants/colors.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hrms_app/providers/check-in_provider/sharelive%20_location.dart';
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
@@ -63,8 +64,7 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
   }
 
   void _shareLocation(double latitude, double longitude) {
-    String googleMapsUrl =
-        "https://www.google.com/maps/search/?api=1&query=$latitude,$longitude";
+    String googleMapsUrl = "${dotenv.env['location_url']}$latitude,$longitude";
     Share.share(googleMapsUrl);
   }
 
