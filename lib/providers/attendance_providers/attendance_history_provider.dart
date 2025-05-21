@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/attendance%20_models/attendance_details_models.dart';
 
@@ -44,7 +45,7 @@ class AttendanceDetailsProvider with ChangeNotifier {
     try {
       final response = await http.post(
         Uri.parse(
-            'http://45.117.153.90:5004/api/EmployeeAttendance/GetMyAttendanceSummary'),
+            '${dotenv.env['base_url']}api/EmployeeAttendance/GetMyAttendanceSummary'),
         headers: {
           'Authorization': 'Bearer $_token',
           'Content-Type': 'application/json',
