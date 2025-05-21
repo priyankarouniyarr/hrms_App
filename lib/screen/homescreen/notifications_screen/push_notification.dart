@@ -9,8 +9,6 @@ import 'package:googleapis_auth/auth_io.dart' as auth;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:hrms_app/screen/homescreen/notifications_screen/localnotifications.dart';
 
-//import 'package:push_notification_v2/local_notification_service.dart';
-
 @immutable
 final class PushNotificationManager {
   const PushNotificationManager._();
@@ -49,7 +47,6 @@ final class PushNotificationManager {
   static Future<void> _setupFCMToken() async {
     final token = await _messaging.getToken();
     log("📱 FCM Token: $token");
-    // Save this token in /Firestore for targeted push
   }
 
   /// Handle foreground messages

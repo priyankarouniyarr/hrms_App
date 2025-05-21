@@ -24,13 +24,12 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   void initState() {
-    //  print(dotenv.env['GOOGLE_API_KEY']);
     super.initState();
 
-    PushNotificationManager.sendNotification(
-        deviceToken:
-            "fXHE28MqRWKBzpIDY46zFz:APA91bHgb4IeJiJuthr5J-Fb_wfnvp6Fm6wOJ5rCKTEq32vxMeEZO-6Vytgf0VZnqDn1ui7xoKa56401zetEhNUgUgPBEJrHM04LcfeSC0puPrGdFQ9O2Ks",
-        message: "Hello from Flutter");
+    // PushNotificationManager.sendNotification(
+    //     deviceToken:
+    //         "fXHE28MqRWKBzpIDY46zFz:APA91bHgb4IeJiJuthr5J-Fb_wfnvp6Fm6wOJ5rCKTEq32vxMeEZO-6Vytgf0VZnqDn1ui7xoKa56401zetEhNUgUgPBEJrHM04LcfeSC0puPrGdFQ9O2Ks",
+    //     message: "Hello from Flutter");
     _initApp();
   }
 
@@ -50,10 +49,10 @@ class _SplashScreenState extends State<SplashScreen> {
       await authProvider.loadUsername();
       await authProvider.loadRefreshToken();
       String? fcmToken = await FirebaseMessaging.instance.getToken();
-      //   print("FCM Token: $fcmToken");
+      print("FCM Token: $fcmToken");
       final hosptialcode = HosptialCodeStorage();
       String? applicationId = await hosptialcode.getHospitalCode();
-      //  print("Application ID: $applicationId");
+
       bool isLoggedIn = false;
       if (authProvider.token != null) {
         bool isTokenExpired = authProvider.isTokenExpired();
