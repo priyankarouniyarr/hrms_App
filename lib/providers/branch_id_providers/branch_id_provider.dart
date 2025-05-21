@@ -64,7 +64,12 @@ class BranchProvider with ChangeNotifier {
 
         notifyListeners();
       } else {
-        _setErrorMessage("");
+        _setErrorMessage(" Failed to load branches");
+
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => OnboardScreen()),
+        // );
       }
     } catch (e) {
       _setErrorMessage("Error: $e");
@@ -90,10 +95,10 @@ class BranchProvider with ChangeNotifier {
     }
   }
 
-  void reset() {
-    _branches = [];
-    _selectedBranchId = null;
-    _setErrorMessage("");
-    notifyListeners();
-  }
+  // void reset() {
+  //   _branches = [];
+  //   _selectedBranchId = null;
+  //   _setErrorMessage("");
+  //   notifyListeners();
+  // }
 }

@@ -1,15 +1,16 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:hrms_app/screen/branch_id.dart';
 import 'package:hrms_app/screen/hospitalcode.dart';
+import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/storage/token_storage.dart';
 import 'package:hrms_app/storage/username_storage.dart';
 import 'package:hrms_app/storage/hosptial_code_storage.dart';
 import 'package:hrms_app/storage/refresh_token_storage.dart';
 import 'package:hrms_app/storage/expirationtime_storage.dart';
 import 'package:hrms_app/storage/branchid_fiscalyear_storage.dart';
-import 'package:provider/provider.dart'; // Import the TokenStorage
 import 'package:hrms_app/models/login_screen_models/loginscreen_models.dart';
 import 'package:hrms_app/providers/branch_id_providers/branch_id_provider.dart';
 import 'package:hrms_app/providers/fiscal_year_provider/fiscal_year_provider.dart'
@@ -21,7 +22,7 @@ class AuthProvider with ChangeNotifier {
   String? _token;
   String? _username;
   DateTime? _expirationTime;
-
+  final SecureStorageService _secureStorageService = SecureStorageService();
   final TokenStorage _tokenStorage = TokenStorage();
   final BranchidFiscalyearStorage _branchidFiscalyearStorage =
       BranchidFiscalyearStorage();
@@ -53,26 +54,35 @@ class AuthProvider with ChangeNotifier {
 
       final response = await http.post(
         Uri.parse('http://45.117.153.90:5004/Account/LoginUser'),
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: json.encode(loginModel.toJson()),
       );
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         final token = responseData['token'];
+        print(" 1st token:$token");
         final refreshToken = responseData['refreshToken'];
+        print(" 1st refresh token:$refreshToken");
         _expirationTime = DateTime.parse(responseData['expiration'].toString());
+        print(" 1st expiration time: $_expirationTime");
+        DateTime utcTime = _expirationTime!; // your UTC time
+        DateTime nepaliTime = utcTime.add(Duration(hours: 5, minutes: 45));
 
-        print("new expiration: $_expirationTime");
-
+        print("Nepali Time: $nepaliTime");
         _username = username;
+        print(" 1st username: $_username");
 
         await _tokenStorage.storeToken(token);
         await _usernameStorage.storeUsername(username);
+
         await _refreshtokenStorage.storeRefreshToken(refreshToken);
         await _expirationtimeStorage.storeExpiationTime(_expirationTime!);
 
         _token = token;
+        print(" 1st token: $_token");
         notifyListeners();
 
         Navigator.pushAndRemoveUntil(
@@ -96,81 +106,104 @@ class AuthProvider with ChangeNotifier {
     if (_expirationTime == null) return true;
     final currentTime = DateTime.now();
     print("current time: $currentTime");
-    return currentTime.isAfter(_expirationTime!);
+    // return currentTime.isAfter(_expirationTime!);
+    final time =
+        DateTime.now().isBefore(_expirationTime!.add(Duration(seconds: 15)));
+    print("time: $time");
+    return time;
   }
 
-//token
   Future<void> loadToken() async {
     _token = await _tokenStorage.getToken();
-    print("Token:$_token");
   }
-//username
 
   Future<void> loadUsername() async {
     _username = await _usernameStorage.getUsername();
-
-    print("Username:$_username");
   }
 
   // Load refresh token securely
   Future<void> loadRefreshToken() async {
     String? refreshToken = await _refreshtokenStorage.getRefreshToken();
-    print("refreshToken: $refreshToken");
+    print("refreshToken1: $refreshToken");
     DateTime? expirationtime = await _expirationtimeStorage.getExpirationtime();
     print("expiration time: $expirationtime");
-    _expirationTime = expirationtime?.toLocal();
+    _expirationTime = expirationtime;
+    ;
 
-    print("expirytime loaded :$expirationtime");
+    print("expirytime loaded :$_expirationTime");
     if (refreshToken != null) {
       print("Loaded Refresh Token: $refreshToken");
     }
   }
 
   // Refresh the access token using the refresh token
-  Future<void> refreshAccessToken(BuildContext context) async {
+  Future<void> refreshAccessToken(
+    BuildContext context,
+  ) async {
     if (isTokenExpired()) {
+      _setLoading(true);
       String? refreshToken = await _refreshtokenStorage.getRefreshToken();
+
       print("refreshToken :$refreshToken");
+
       if (refreshToken != null) {
-        final response = await http.post(
-          Uri.parse('http://45.117.153.90:5004/Account/RefreshToken/refresh'),
-          headers: {"Content-Type": "application/json"},
-          body: json.encode({"RefreshToken": refreshToken}),
-        );
+        try {
+          final branchId =
+              await _secureStorageService.readData('selected_workingbranchId');
 
-        if (response.statusCode == 200) {
-          final responseData = json.decode(response.body);
+          final token = await _secureStorageService.readData('auth_token');
+          final fiscalYear =
+              await _secureStorageService.readData('selected_fiscal_year');
 
-          final newToken = responseData['token'];
-          print("newtoken:$newToken");
-          final newRefreshToken = responseData['refreshToken'];
-          print("newrefreshToken:$newRefreshToken");
+          if (branchId == null || token == null || fiscalYear == null) {
+            throw Exception('No branchId or token found');
+          }
 
-          _expirationTime =
-              DateTime.parse(responseData['expiration'].toString());
-
-          print("new expiration: $_expirationTime");
-          await _tokenStorage.storeToken(newToken);
-          await _expirationtimeStorage.storeExpiationTime(_expirationTime!);
-          await _refreshtokenStorage.storeRefreshToken(newRefreshToken);
-          _token = newToken;
-          print("brek2");
-          print("Refresh Token: $newRefreshToken");
-        } else {
-          _setErrorMessage(" Error refreshing token: ${response.statusCode}");
-
-          // Clear tokens and navigate to login screen if token refresh fails
-          await logout(
-            context,
+          final response = await http.post(
+            Uri.parse('http://45.117.153.90:5004/Account/RefreshToken/refresh'),
+            headers: {
+              "Content-Type": "application/json",
+              'Authorization': 'Bearer $token',
+              "workingBranchId": branchId,
+              "workingFinancialId": fiscalYear,
+            },
+            body: json.encode({"RefreshToken": refreshToken}),
           );
 
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => HospitalCodeScreen()),
-          );
+          print("refresh token status code: ${response.statusCode}");
+          if (response.statusCode == 200) {
+            final responseData = json.decode(response.body);
 
+            final newToken = responseData['token'];
+            print("newtoken:$newToken");
+            final newRefreshToken = responseData['refreshToken'];
+            print("newrefreshToken:$newRefreshToken");
+
+            _expirationTime =
+                DateTime.parse(responseData['expiration'].toString());
+
+            print("new expiration: $_expirationTime");
+            await _tokenStorage.storeToken(newToken);
+            await _expirationtimeStorage.storeExpiationTime(_expirationTime!);
+            await _refreshtokenStorage.storeRefreshToken(newRefreshToken);
+            _token = newToken;
+            print("brek2");
+            print("Refresh Token: $newRefreshToken");
+          } else {
+            _setErrorMessage(" Error refreshing token: ${response.statusCode}");
+
+            await logout(
+              context,
+            );
+
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HospitalCodeScreen()),
+            );
+          }
+        } catch (e) {
           print(
-              "Error refreshing token: ${response.statusCode} ${response.body}");
+              "Error refreshing token: $e"); // Handle any errors that occur during the refresh
         }
       }
     }
@@ -185,8 +218,8 @@ class AuthProvider with ChangeNotifier {
     await _branchidFiscalyearStorage.removeBranchIdAndFiscalYearId();
     await _branchidFiscalyearStorage.removeBranchId();
     await _hosptialcode.removeHospitalCode();
-    Provider.of<BranchProvider>(context, listen: false).reset();
-    Provider.of<FiscalYearProvider>(context, listen: false).reset();
+    // Provider.of<BranchProvider>(context, listen: false).reset();
+    // Provider.of<FiscalYearProvider>(context, listen: false).reset();
   }
 
   void _setLoading(bool value) {

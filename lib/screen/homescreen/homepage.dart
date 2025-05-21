@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
+import 'package:hrms_app/screen/onboardscreen.dart';
+import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/screen/homescreen/Shifting.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/works/works.dart';
 import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
@@ -55,12 +57,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   size: 28,
                 ),
                 onPressed: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) => NoticesScreen()),
-                  // );
-                  print(Provider.of<AuthProvider>(context, listen: false)
-                      .username);
+                  // print(Provider.of<AuthProvider>(context, listen: false)
+                  //     .username);
                 },
                 splashRadius: 24,
               ),
@@ -70,7 +68,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          //    physics: const NeverScrollableScrollPhysics(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

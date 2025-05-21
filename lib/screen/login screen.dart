@@ -99,8 +99,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: TextStyle(color: primarySwatch[900], fontSize: 20),
               ),
               const SizedBox(height: 20),
-              // Show error message if available
-
               GestureDetector(
                 onTap: () async {
                   authProvider.login(

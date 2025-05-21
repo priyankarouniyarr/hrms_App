@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/location%20.dart';
 import 'package:hrms_app/screen/onboardscreen.dart';
-import 'package:hrms_app/storage/token_storage.dart';
+import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/screen/app_main_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:hrms_app/storage/hosptial_code_storage.dart';
@@ -11,7 +11,6 @@ import 'package:hrms_app/providers/notifications/notification_provider.dart';
 import 'package:hrms_app/providers/login_screen_provider/auth_provider.dart';
 import 'package:hrms_app/providers/branch_id_providers/branch_id_provider.dart';
 import 'package:hrms_app/providers/fiscal_year_provider/fiscal_year_provider.dart';
-import 'package:hrms_app/screen/homescreen/notifications_screen/push_notification.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -28,17 +27,40 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
-    PushNotificationManager.sendNotification(
-        deviceToken:
-            "fXHE28MqRWKBzpIDY46zFz:APA91bHgb4IeJiJuthr5J-Fb_wfnvp6Fm6wOJ5rCKTEq32vxMeEZO-6Vytgf0VZnqDn1ui7xoKa56401zetEhNUgUgPBEJrHM04LcfeSC0puPrGdFQ9O2Ks",
-        message: "Hello from Flutter");
+    // PushNotificationManager.sendNotification(
+    //     deviceToken:
+    //         "fXHE28MqRWKBzpIDY46zFz:APA91bHgb4IeJiJuthr5J-Fb_wfnvp6Fm6wOJ5rCKTEq32vxMeEZO-6Vytgf0VZnqDn1ui7xoKa56401zetEhNUgUgPBEJrHM04LcfeSC0puPrGdFQ9O2Ks",
+    //     message: "Hello from Flutter");
     _initApp();
   }
 
   Future<void> _initApp() async {
     await LocationService.handleLocationPermission();
+    // await _checkUserData();
     await _checkLoginState();
   }
+
+  // Future<void> _checkUserData() async {
+  //   final SecureStorageService _secureStorageService = SecureStorageService();
+  //   final branchId =
+  //       await _secureStorageService.readData('selected_workingbranchId');
+  //   print("branchId: $branchId");
+
+  //   final username = await _secureStorageService.readData('username');
+  //   print("username: $username");
+  //   final fiscalYear =
+  //       await _secureStorageService.readData('selected_fiscal_year');
+  //   print("fiscalYear: $fiscalYear");
+
+  //   if (username == null || branchId == null || fiscalYear == null) {
+  //     WidgetsBinding.instance.addPostFrameCallback((_) {
+  //       Navigator.pushReplacement(
+  //         context,
+  //         MaterialPageRoute(builder: (context) => OnboardScreen()),
+  //       );
+  //     });
+  //   }
+  // }
 
 //
 
@@ -49,15 +71,13 @@ class _SplashScreenState extends State<SplashScreen> {
           Provider.of<FcmnotificationProvider>(context, listen: false);
 
       await authProvider.loadToken();
-
       await authProvider.loadUsername();
-
       await authProvider.loadRefreshToken();
-      String? fcmToken = await FirebaseMessaging.instance.getToken();
-      print("FCM Token: $fcmToken");
+      // String? fcmToken = await FirebaseMessaging.instance.getToken();
+      // // print("FCM Token: $fcmToken");
       final hosptialcode = HosptialCodeStorage();
       String? applicationId = await hosptialcode.getHospitalCode();
-      print("Application ID: $applicationId");
+      //print("Application ID: $applicationId");
       bool isLoggedIn = false;
       if (authProvider.token != null) {
         bool isTokenExpired = authProvider.isTokenExpired();
@@ -65,8 +85,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
         if (isTokenExpired) {
           try {
-            print("isTokenExpired:$isTokenExpired");
-            await authProvider.refreshAccessToken(context);
+            print(" yes isTokenExpired: $isTokenExpired");
+            await authProvider.refreshAccessToken(
+              context,
+            );
             isLoggedIn = true;
           } catch (e) {
             print("Error refreshing token: $e");
@@ -79,34 +101,38 @@ class _SplashScreenState extends State<SplashScreen> {
       }
 
       if (isLoggedIn) {
-        print("isLoggedIn: $isLoggedIn");
+        print("isLoggedIn44: $isLoggedIn");
         // if (fcmToken != null && applicationId != null) {
-        //  await fcmNotificationProvider.sendFcmTokenToServer(
-        //   fcmToken, applicationId);
+        //   await fcmNotificationProvider.sendFcmTokenToServer(
+        //       fcmToken, applicationId);
         // }
 
         try {
-          final branchid = Provider.of<BranchProvider>(context, listen: false);
+          // final branchid = Provider.of<BranchProvider>(context, listen: false);
 
-          final fiscalyear =
-              Provider.of<FiscalYearProvider>(context, listen: false);
+          // final fiscalyear =
+          //     Provider.of<FiscalYearProvider>(context, listen: false);
 
-          await branchid.fetchUserBranches();
-          await fiscalyear.fetchFiscalYears(
-            int.parse(branchid.branches.first.branchId.toString()),
-          );
+          // await branchid.fetchUserBranches(
+
+          // );
+          // await fiscalyear.fetchFiscalYears(
+          //   int.parse(branchid.branches.first.branchId.toString()),
+          // );
         } catch (e) {
+          print("hello wrong");
           print("Error: $e");
 
           return;
         }
       } else {
-        print(isLoggedIn);
-        // ✅ Send FCM token as anonymous (not logged in)
-        //  if (fcmToken != null && applicationId == null) {
-        //    await fcmNotificationProvider.sendFcmDeviceTokenPostAnonymous(
-        //        fcmToken, applicationId ?? '');
-        //  }
+        print("not logged in");
+        print("isLoggedIn: $isLoggedIn");
+        //   ✅ Send FCM token as anonymous (not logged in)
+        // if (fcmToken != null && applicationId == null) {
+        //   await fcmNotificationProvider.sendFcmDeviceTokenPostAnonymous(
+        //       fcmToken, applicationId ?? '');
+        // }
       }
 
       Navigator.pushReplacement(
@@ -115,14 +141,7 @@ class _SplashScreenState extends State<SplashScreen> {
           builder: (context) => isLoggedIn ? AppMainScreen() : OnboardScreen(),
         ),
       );
-    }
-    // on SocketException catch (_) {
-    //   await showSocketErrorDialog(
-    //     context: context,
-    //     onRetry: _checkLoginState,
-    //   );
-    //  return;
-    catch (e) {
+    } catch (e) {
       print("Error : $e");
     }
   }

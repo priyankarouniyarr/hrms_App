@@ -10,6 +10,8 @@ class ExpirationtimeStorage {
   Future<void> storeExpiationTime(DateTime time) async {
     await _secureStorage.write(
         key: 'expiration_time', value: time.toLocal().toIso8601String());
+    print("expiration time1: $time");
+    print("Expiration time stored successfully");
   }
 
   // Retrieves the expiration time of the token securely with try-catch
@@ -17,8 +19,6 @@ class ExpirationtimeStorage {
     try {
       final response = await _secureStorage.read(key: 'expiration_time');
       if (response != null) {
-        print("getting expiration date");
-        print('response: $response');
         return DateTime.parse(response);
       }
     } catch (e) {
