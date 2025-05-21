@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/holidays/holidays_model.dart';
 
@@ -60,7 +61,7 @@ class HolidayProvider with ChangeNotifier {
 
       final response = await http.get(
         Uri.parse(
-            'http://45.117.153.90:5004/api/HolidayList/GetPastHolidayList'),
+            '${dotenv.env['base_url']}api/HolidayList/GetPastHolidayList'),
         headers: {
           'Authorization': 'Bearer $token',
           'workingBranchId': branchId,
@@ -98,7 +99,7 @@ class HolidayProvider with ChangeNotifier {
 
       final response = await http.get(
         Uri.parse(
-            'http://45.117.153.90:5004/api/HolidayList/GetUpcommingHolidayList'),
+            '${dotenv.env['base_url']}api/HolidayList/GetUpcommingHolidayList'),
         headers: {
           'Authorization': 'Bearer $token',
           'workingBranchId': branchId,
@@ -134,7 +135,7 @@ class HolidayProvider with ChangeNotifier {
       }
 
       final response = await http.get(
-        Uri.parse('http://45.117.153.90:5004/api/HolidayList/GetHolidayList'),
+        Uri.parse('${dotenv.env['base_url']}api/HolidayList/GetHolidayList'),
         headers: {
           'Authorization': 'Bearer $token',
           'workingBranchId': branchId,

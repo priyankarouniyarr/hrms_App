@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/payrolls_models/loan_and_advance_data.dart';
 import 'package:hrms_app/models/payrolls_models/salary_deduction_models.dart';
@@ -43,7 +44,7 @@ class LoanAndAdvanceProvider with ChangeNotifier {
       }
 
       final url = Uri.parse(
-          'http://45.117.153.90:5004/api/Payroll/GetMyLoanAndAdvances');
+          '${dotenv.env['base_url']}api/Payroll/GetMyLoanAndAdvances');
 
       final response = await http.get(
         url,
@@ -87,7 +88,7 @@ class LoanAndAdvanceProvider with ChangeNotifier {
         throw Exception("Token is missing.");
       }
 
-      final url = Uri.parse('http://45.117.153.90:5004/api/Payroll/GetMyTaxes');
+      final url = Uri.parse('${dotenv.env['base_url']}api/Payroll/GetMyTaxes');
 
       final response = await http.get(
         url,

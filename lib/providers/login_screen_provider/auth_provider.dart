@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
 import 'package:hrms_app/screen/branch_id.dart';
 import 'package:hrms_app/screen/hospitalcode.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/storage/token_storage.dart';
 import 'package:hrms_app/storage/username_storage.dart';
@@ -12,9 +12,6 @@ import 'package:hrms_app/storage/refresh_token_storage.dart';
 import 'package:hrms_app/storage/expirationtime_storage.dart';
 import 'package:hrms_app/storage/branchid_fiscalyear_storage.dart';
 import 'package:hrms_app/models/login_screen_models/loginscreen_models.dart';
-import 'package:hrms_app/providers/branch_id_providers/branch_id_provider.dart';
-import 'package:hrms_app/providers/fiscal_year_provider/fiscal_year_provider.dart'
-    show FiscalYearProvider;
 
 class AuthProvider with ChangeNotifier {
   bool _loading = false;
@@ -53,7 +50,7 @@ class AuthProvider with ChangeNotifier {
       );
 
       final response = await http.post(
-        Uri.parse('http://45.117.153.90:5004/Account/LoginUser'),
+        Uri.parse('${dotenv.env['base_url']}Account/LoginUser'),
         headers: {
           "Content-Type": "application/json",
         },
@@ -154,7 +151,7 @@ class AuthProvider with ChangeNotifier {
           }
 
           final response = await http.post(
-            Uri.parse('http://45.117.153.90:5004/Account/RefreshToken/refresh'),
+            Uri.parse('${dotenv.env['base_url']}Account/RefreshToken/refresh'),
             headers: {
               "Content-Type": "application/json",
               'Authorization': 'Bearer $token',
@@ -169,9 +166,8 @@ class AuthProvider with ChangeNotifier {
             final responseData = json.decode(response.body);
 
             final newToken = responseData['token'];
-            print("newtoken:$newToken");
+
             final newRefreshToken = responseData['refreshToken'];
-            print("newrefreshToken:$newRefreshToken");
 
             _expirationTime =
                 DateTime.parse(responseData['expiration'].toString());
@@ -181,8 +177,6 @@ class AuthProvider with ChangeNotifier {
             await _expirationtimeStorage.storeExpiationTime(_expirationTime!);
             await _refreshtokenStorage.storeRefreshToken(newRefreshToken);
             _token = newToken;
-            print("brek2");
-            print("Refresh Token: $newRefreshToken");
           } else {
             _setErrorMessage(" Error refreshing token: ${response.statusCode}");
 

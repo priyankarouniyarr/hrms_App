@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 
 class ShareliveLocation with ChangeNotifier {
@@ -38,7 +39,7 @@ class ShareliveLocation with ChangeNotifier {
 
       final response = await http.post(
         Uri.parse(
-            'http://45.117.153.90:5004/api/Employee/LiveLocationSharePost'),
+            '${dotenv.env['base_url']}api/Employee/LiveLocationSharePost'),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",

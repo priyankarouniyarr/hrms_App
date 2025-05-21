@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/leaves/leave_history_models.dart';
 
@@ -48,8 +49,8 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
         return;
       }
 
-      const String urlGetContracts =
-          "http://45.117.153.90:5004/api/LeaveApplication/GetContracts";
+      String urlGetContracts =
+          "${dotenv.env['base_url']}api/LeaveApplication/GetContracts";
 
       final headers = {
         'Authorization': 'Bearer $_token',
@@ -99,7 +100,7 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
       }
 
       final String urlFiscalYear =
-          "http://45.117.153.90:5004/api/LeaveApplication/GetContractFiscalYearByContctId/$contractId";
+          "${dotenv.env['base_url']}api/LeaveApplication/GetContractFiscalYearByContctId/$contractId";
 
       final headers = {
         'Authorization': 'Bearer $_token',
@@ -158,9 +159,9 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
       }
 
       final String urlContractandFiscalYear =
-          "http://45.117.153.90:5004/api/LeaveApplication/EmployeeLeaveHistoryByContractIdAndFiscalYearId/$contractId/$fiscalYearId"; //table to get
+          "${dotenv.env['base_url']}api/LeaveApplication/EmployeeLeaveHistoryByContractIdAndFiscalYearId/$contractId/$fiscalYearId"; //table to get
       final String employeeLeavesByContractIdAndFiscalYearId =
-          "http://45.117.153.90:5004/api/LeaveApplication/EmployeeLeavesByContractIdAndFiscalYearId/$contractId/$fiscalYearId"; //leave details
+          "${dotenv.env['base_url']}api/LeaveApplication/EmployeeLeavesByContractIdAndFiscalYearId/$contractId/$fiscalYearId"; //leave details
       final headers = {
         'Authorization': 'Bearer $_token',
         'workingBranchId': _branchId!,

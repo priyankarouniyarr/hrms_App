@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/works_models/comments_models.dart';
 import 'package:hrms_app/models/works_models/ticketdetails_with_id.dart';
@@ -56,7 +57,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
         return;
       }
 
-      const String url = 'http://45.117.153.90:5004/api/Ticket/MyTickets';
+      String url = '${dotenv.env['base_url']}api/Ticket/MyTickets';
 
       final response = await http.post(Uri.parse(url),
           headers: {
@@ -110,8 +111,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
         return;
       }
 
-      const String url =
-          'http://45.117.153.90:5004/api/Ticket/TicketsAssignedToMe';
+      String url = '${dotenv.env['base_url']}api/Ticket/TicketsAssignedToMe';
 
       final response = await http.post(Uri.parse(url),
           headers: {
@@ -171,7 +171,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
       //print("hello");
 
       final url = Uri.parse(
-          'http://45.117.153.90:5004/api/Ticket/GetTicketDetailById/$ticket');
+          '${dotenv.env['base_url']}api/Ticket/GetTicketDetailById/$ticket');
 
       final response = await http.get(
         url,
@@ -227,7 +227,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
       }
 
       final url = Uri.parse(
-          'http://45.117.153.90:5004/api/Ticket/CloseTicket/$ticketId');
+          '${dotenv.env['base_url']}api/Ticket/CloseTicket/$ticketId');
       print(ticketId);
       final response = await http.post(
         url,
@@ -295,7 +295,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
       }
 
       final url = Uri.parse(
-          'http://45.117.153.90:5004/api/Ticket/ReopenTicket/$ticketId');
+          '${dotenv.env['base_url']}api/Ticket/ReopenTicket/$ticketId');
       final response = await http.post(
         url,
         headers: {
@@ -359,8 +359,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
         throw Exception("Missing authentication data.");
       }
 
-      final url =
-          Uri.parse('http://45.117.153.90:5004/api/Ticket/EditSeverity');
+      final url = Uri.parse('${dotenv.env['base_url']}api/Ticket/EditSeverity');
       final response = await http.post(
         url,
         headers: {
@@ -432,8 +431,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
         throw Exception("Missing authentication data.");
       }
 
-      final url =
-          Uri.parse('http://45.117.153.90:5004/api/Ticket/EditPriority');
+      final url = Uri.parse('${dotenv.env['base_url']}api/Ticket/EditPriority');
       final response = await http.post(
         url,
         headers: {
@@ -503,7 +501,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
       }
 
       final url =
-          Uri.parse('http://45.117.153.90:5004/api/Ticket/EditAssignedTo');
+          Uri.parse('${dotenv.env['base_url']}api/Ticket/EditAssignedTo');
       final response = await http.post(
         url,
         headers: {
@@ -629,7 +627,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
       print('Sending ticket creation request: ${request.toJson()}');
 
       final response = await dio.post(
-        "http://45.117.153.90:5004/api/Ticket/CommentPost/${request.ticketId}",
+        "${dotenv.env['base_url']}api/Ticket/CommentPost/${request.ticketId}",
         data: formData,
       );
 

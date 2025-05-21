@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/branches_models/branch_id_models.dart';
 
@@ -45,7 +46,7 @@ class BranchProvider with ChangeNotifier {
       }
 
       final response = await http.get(
-        Uri.parse('http://45.117.153.90:5004/Account/GetUserBranches'),
+        Uri.parse('${dotenv.env['base_url']}Account/GetUserBranches'),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",

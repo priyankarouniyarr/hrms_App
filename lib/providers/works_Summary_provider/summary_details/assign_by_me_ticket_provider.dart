@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/works_models/getMyTicketSummary.model.dart';
 
@@ -37,7 +38,7 @@ class AssignByMeTicketProvider with ChangeNotifier {
 
       // Define the API URL
       final url = Uri.parse(
-          'http://45.117.153.90:5004/api/Ticket/GetTicketAssignedToMeSummary');
+          '${dotenv.env['base_url']}api/Ticket/GetTicketAssignedToMeSummary');
 
       // Send GET request
       final response = await http.get(

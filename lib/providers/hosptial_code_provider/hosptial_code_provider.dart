@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/models/hosptial_code_models/hospital_code.dart';
 
 class HospitalCodeProvider with ChangeNotifier {
@@ -22,8 +23,7 @@ class HospitalCodeProvider with ChangeNotifier {
 
     try {
       final response = await http.get(
-          Uri.parse('http://45.117.153.90:5005/api/CodeUrl/$hosptialcode'));
-      // print(response.body);
+          Uri.parse('${dotenv.env['parent_url']}api/CodeUrl/$hosptialcode'));
 
       if (response.statusCode == 200) {
         final decodedResponse = json.decode(response.body);

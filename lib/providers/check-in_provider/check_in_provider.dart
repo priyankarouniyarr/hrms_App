@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/check_in_models/check_in_history%20.dart';
 
@@ -73,7 +74,7 @@ class CheckInProvider with ChangeNotifier {
       }
 
       final response = await http.post(
-        Uri.parse('http://45.117.153.90:5004/api/Employee/PunchPost'),
+        Uri.parse('${dotenv.env['base_url']}api/Employee/PunchPost'),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
@@ -175,7 +176,7 @@ class CheckInProvider with ChangeNotifier {
       }
 
       final response = await http.get(
-        Uri.parse('http://45.117.153.90:5004/api/Employee/GetTodayPunches'),
+        Uri.parse('${dotenv.env['base_url']}api/Employee/GetTodayPunches'),
         headers: {
           'Authorization': 'Bearer $_token',
           'workingBranchId': _branchId,

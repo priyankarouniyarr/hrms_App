@@ -57,6 +57,7 @@ dependencies:
   flutter_polyline_points: ^2.1.0
  
   connectivity_plus: ^6.1.4
+  flutter_dotenv: ^5.2.1
 
  
   
@@ -100,6 +101,7 @@ flutter:
 
   
   assets:
+    - .env
     - assets/images/
     - assets/logo/
 

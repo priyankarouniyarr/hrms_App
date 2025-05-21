@@ -1,7 +1,7 @@
-import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/notices_models/notices_models.dart';
 
@@ -27,7 +27,7 @@ class NoticesProvider with ChangeNotifier {
       }
 
       final response = await http.get(
-        Uri.parse('http://45.117.153.90:5004/api/Notice/GetAllNotices'),
+        Uri.parse('${dotenv.env['base_url']}api/Notice/GetAllNotices'),
         headers: {
           'Authorization': 'Bearer $token',
           "workingBranchId": branchId,
@@ -60,7 +60,7 @@ class NoticesProvider with ChangeNotifier {
       }
 
       final response = await http.get(
-        Uri.parse('http://45.117.153.90:5004/api/Notice/GetNoticeById/1'),
+        Uri.parse('${dotenv.env['base_url']}api/Notice/GetNoticeById/1'),
         headers: {
           'Authorization': 'Bearer $token',
           "workingBranchId": branchId,

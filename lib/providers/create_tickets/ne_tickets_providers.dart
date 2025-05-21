@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/createtickets/new_tickets_models.dart';
 
@@ -43,7 +44,7 @@ class NewTicketProvider extends ChangeNotifier {
 
       // Make the GET request
       final response = await http.get(
-        Uri.parse('http://45.117.153.90:5004/api/Ticket/GetTicketCategories'),
+        Uri.parse('${dotenv.env['base_url']}api/Ticket/GetTicketCategories'),
         headers: {
           'Authorization': 'Bearer $_token',
           'workingBranchId': _branchId!,
@@ -51,7 +52,7 @@ class NewTicketProvider extends ChangeNotifier {
         },
       );
       final response1 = await http.get(
-        Uri.parse('http://45.117.153.90:5004/api/Ticket/GetUserList'),
+        Uri.parse('${dotenv.env['base_url']}api/Ticket/GetUserList'),
         headers: {
           'Authorization': 'Bearer $_token',
           'workingBranchId': _branchId!,

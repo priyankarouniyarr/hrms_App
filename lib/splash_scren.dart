@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/location%20.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/screen/onboardscreen.dart';
 import 'package:hrms_app/screen/app_main_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -23,11 +24,12 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   void initState() {
+    //  print(dotenv.env['GOOGLE_API_KEY']);
     super.initState();
 
     PushNotificationManager.sendNotification(
         deviceToken:
-            " fXHE28MqRWKBzpIDY46zFz:APA91bHgb4IeJiJuthr5J-Fb_wfnvp6Fm6wOJ5rCKTEq32vxMeEZO-6Vytgf0VZnqDn1ui7xoKa56401zetEhNUgUgPBEJrHM04LcfeSC0puPrGdFQ9O2Ks",
+            "fXHE28MqRWKBzpIDY46zFz:APA91bHgb4IeJiJuthr5J-Fb_wfnvp6Fm6wOJ5rCKTEq32vxMeEZO-6Vytgf0VZnqDn1ui7xoKa56401zetEhNUgUgPBEJrHM04LcfeSC0puPrGdFQ9O2Ks",
         message: "Hello from Flutter");
     _initApp();
   }

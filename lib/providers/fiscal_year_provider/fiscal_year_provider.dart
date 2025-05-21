@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/fiscal_year_models/fiscalyear_id.dart';
 
@@ -29,7 +30,7 @@ class FiscalYearProvider with ChangeNotifier {
       }
 
       final response = await http.get(
-        Uri.parse('http://45.117.153.90:5004/Account/GetUserFinancialYear'),
+        Uri.parse('${dotenv.env['base_url']}Account/GetUserFinancialYear'),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",

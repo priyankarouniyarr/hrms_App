@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/createtickets/new_tickets_creation_model.dart';
 
@@ -103,7 +104,7 @@ class TicketProvider with ChangeNotifier {
       print('Sending ticket creation request: ${request.toJson()}');
 
       final response = await dio.post(
-        'http://45.117.153.90:5004/api/Ticket/CreateTicketPost',
+        '${dotenv.env['base_url']}api/Ticket/CreateTicketPost',
         data: formData,
       );
 

@@ -4,6 +4,7 @@ import 'package:hrms_app/splash_scren.dart';
 import 'package:hrms_app/firebase_options.dart';
 import 'package:hrms_app/utlis/connectivity.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/providers/payroll/payroll_provider.dart';
 import 'package:hrms_app/providers/notices_provider/notices_provider.dart';
 import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
@@ -34,6 +35,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   await LocalNotificationService().initialize();
   await PushNotificationManager.initializeApp();
   await Firebase.initializeApp(

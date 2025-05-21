@@ -1,7 +1,7 @@
-import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/leaves/apply_leave.dart';
 import 'package:hrms_app/models/leaves/leave_request_models.dart';
@@ -43,13 +43,13 @@ class LeaveRequestProvider extends ChangeNotifier {
         return;
       }
 
-      const String leaveType =
-          "http://45.117.153.90:5004/api/LeaveApplication/GetLeaveTypes";
-      const String extendedtype =
-          "http://45.117.153.90:5004/api/LeaveApplication/GetExtendedLeaveTypes";
+      String leaveType =
+          "${dotenv.env['base_url']}api/LeaveApplication/GetLeaveTypes";
+      String extendedtype =
+          "${dotenv.env['base_url']}api/LeaveApplication/GetExtendedLeaveTypes";
 
-      const String substitutionEmployee =
-          "http://45.117.153.90:5004/api/LeaveApplication/GetSubstitutionEmployee";
+      String substitutionEmployee =
+          "${dotenv.env['base_url']}api/LeaveApplication/GetSubstitutionEmployee";
       final headers = {
         'Authorization': 'Bearer $_token',
         'workingBranchId': _branchId!,
@@ -110,8 +110,8 @@ class LeaveRequestProvider extends ChangeNotifier {
         return;
       }
 
-      const String employeeLeaves =
-          "http://45.117.153.90:5004/api/LeaveApplication/EmployeeLeaves";
+      String employeeLeaves =
+          "${dotenv.env['base_url']}api/LeaveApplication/EmployeeLeaves";
       final headers = {
         'Authorization': 'Bearer $_token',
         'workingBranchId': _branchId!,
@@ -161,7 +161,7 @@ class LeaveRequestProvider extends ChangeNotifier {
       }
 
       final url = Uri.parse(
-          'http://45.117.153.90:5004/api/LeaveApplication/LeaveApplicationPost');
+          '${dotenv.env['base_url']}api/LeaveApplication/LeaveApplicationPost');
       final headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $_token',

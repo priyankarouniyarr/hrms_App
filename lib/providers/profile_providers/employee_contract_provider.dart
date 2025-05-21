@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import '../../models/profile_models/employee_contract.dart';
 
@@ -37,7 +38,7 @@ class EmployeeContractProvider with ChangeNotifier {
         return;
       }
       final url = Uri.parse(
-          'http://45.117.153.90:5004/api/EmployeeContract/GetEmployeeContracts');
+          '${dotenv.env['base_url']}api/EmployeeContract/GetEmployeeContracts');
 
       final response = await http.get(
         url,

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 
 class FcmnotificationProvider with ChangeNotifier {
@@ -31,7 +32,7 @@ class FcmnotificationProvider with ChangeNotifier {
       }
 
       final url = Uri.parse(
-          'http://45.117.153.90:5004/api/FcmDeviceToken/DeviceTokenPost');
+          '${dotenv.env['base_url']}api/FcmDeviceToken/DeviceTokenPost');
 
       final headers = {
         'Content-Type': 'application/json',
@@ -76,11 +77,10 @@ class FcmnotificationProvider with ChangeNotifier {
       notifyListeners();
 
       final url = Uri.parse(
-          'http://45.117.153.90:5004/api/FcmDeviceToken/DeviceTokenPostAnonymous');
+          '${dotenv.env['base_url']}api/FcmDeviceToken/DeviceTokenPostAnonymous');
 
       final headers = {
         'Content-Type': 'application/json',
-        
       };
 
       final body = jsonEncode({

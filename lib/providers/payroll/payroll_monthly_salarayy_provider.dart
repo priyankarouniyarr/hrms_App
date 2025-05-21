@@ -1,7 +1,7 @@
-import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/payrolls_models/monthly_salary_models.dart';
 
@@ -37,7 +37,7 @@ class SalaryProvider with ChangeNotifier {
       }
 
       final url = Uri.parse(
-          'http://45.117.153.90:5004/api/Payroll/GetMyCurrentMonthSalary');
+          '${dotenv.env['base_url']}api/Payroll/GetMyCurrentMonthSalary');
 
       final response = await http.get(
         url,
@@ -86,7 +86,7 @@ class SalaryProvider with ChangeNotifier {
 
       final request = GetMyMonthSalaryRequest(month: month, year: year);
       final response = await http.post(
-        Uri.parse('http://45.117.153.90:5004/api/Payroll/GetMyMonthSalary'),
+        Uri.parse('${dotenv.env['base_url']}api/Payroll/GetMyMonthSalary'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
