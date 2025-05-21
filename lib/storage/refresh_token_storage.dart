@@ -13,7 +13,6 @@ class RefreshTokenStorage {
   // Store refresh token securely
   Future<void> storeRefreshToken(String refreshToken) async {
     await _secureStorage.write(key: 'refresh_token', value: refreshToken);
-    print("refreshToken1: $refreshToken");
   }
 
   // Remove refresh token securely

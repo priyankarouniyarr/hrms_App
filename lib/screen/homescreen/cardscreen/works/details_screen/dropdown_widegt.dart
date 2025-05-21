@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hrms_app/constants/colors.dart';
-import 'package:hrms_app/screen/leaves/dropdown_custom.dart';
+import 'package:hrms_app/widget/dropdown_custom.dart';
 
 Widget buildDropdown(String title, String? value, List<String> items,
     ValueChanged<String?> onChanged) {

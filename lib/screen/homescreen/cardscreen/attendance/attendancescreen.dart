@@ -6,11 +6,14 @@ import 'package:hrms_app/screen/homescreen/cardscreen/attendance/attendancehisto
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
 
 class AttendanceScreen extends StatefulWidget {
+  const AttendanceScreen({super.key});
+
   @override
   _AttendanceScreenState createState() => _AttendanceScreenState();
 }
 
 class _AttendanceScreenState extends State<AttendanceScreen> {
+  @override
   void initState() {
     super.initState();
     Future.microtask(() async {

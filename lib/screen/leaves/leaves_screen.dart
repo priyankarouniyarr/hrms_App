@@ -2,7 +2,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
-import 'package:hrms_app/screen/custom_appbar.dart';
+import 'package:hrms_app/widget/custom_appbar.dart';
 import 'package:hrms_app/screen/leaves/leavehistorypage.dart';
 import 'package:hrms_app/screen/leaves/leaves_requestscreen.dart';
 import 'package:hrms_app/providers/leaves_provider/leavehistory_provider.dart';

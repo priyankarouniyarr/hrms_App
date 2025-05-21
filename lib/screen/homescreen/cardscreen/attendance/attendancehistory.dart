@@ -2,8 +2,8 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
-import 'package:hrms_app/screen/leaves/dropdown_custom.dart';
-import 'package:hrms_app/screen/leaves/customtextfieldform.dart';
+import 'package:hrms_app/widget/dropdown_custom.dart';
+import 'package:hrms_app/widget/customtextfieldform.dart';
 import 'package:hrms_app/models/attendance%20_models/attendance_details_models.dart';
 import 'package:hrms_app/providers/attendance_providers/attendance_history_provider.dart';
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
@@ -18,12 +18,11 @@ class AttendanceDetailsScreen extends StatefulWidget {
 
 class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
   String? _selectedShiftValue;
-  TextEditingController _startdatecontroller = TextEditingController();
-  TextEditingController _enddatecontroller = TextEditingController();
+  final TextEditingController _startdatecontroller = TextEditingController();
+  final TextEditingController _enddatecontroller = TextEditingController();
   DateTime? _startDate;
   DateTime? _endDate;
-  bool _showAttendanceDetails =
-      false; // Flag to control attendance details display
+  bool _showAttendanceDetails = false;
 
   @override
   void initState() {
@@ -213,12 +212,12 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
                             provider.summaryAttendance == null ||
                             provider.summaryAttendance.isEmpty)
                         ? Text(
-                            // provider.errorMessage,
-                            // style: TextStyle(
-                            //   fontSize: 18,
-                            //   color: Colors.red.withOpacity(0.5),
-                            // ),
-                            " ")
+                            provider.errorMessage,
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.red.withOpacity(0.5),
+                            ),
+                          )
                         : Wrap(
                             spacing: 10,
                             runSpacing: 10,

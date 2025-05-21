@@ -183,7 +183,7 @@ class LeaveRequestProvider extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         if (response.body.toLowerCase() == 'true') {
-          _errorMessage = '';
+          _errorMessage = 'yes';
           return true;
         } else if (response.body.toLowerCase() == 'false') {
           _errorMessage = 'Server rejected the leave application';
@@ -193,22 +193,27 @@ class LeaveRequestProvider extends ChangeNotifier {
           try {
             final responseData = json.decode(response.body);
             if (responseData['success'] == true) {
+              print("success");
               return true;
             } else {
+              print("yes");
               _errorMessage =
                   responseData['message'] ?? 'Leave application failed';
               return false;
             }
           } catch (e) {
+            print("no");
             _errorMessage = 'Unexpected response format: ${response.body}';
             return false;
           }
         }
       } else {
+        print("no23");
         _errorMessage = 'Request failed with status ${response.statusCode}';
         return false;
       }
     } catch (error) {
+      print("no45");
       _errorMessage = "Error creating leave application: $error";
       return false;
     } finally {

@@ -23,7 +23,7 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
       final provider =
           Provider.of<HospitalCodeProvider>(context, listen: false);
       await provider.fetchBaseUrl(enteredCode);
-      print("Entered Code: $enteredCode");
+
       if (provider.baseUrl.isNotEmpty) {
         // Store the hospital code
         final hosptialcode = HosptialCodeStorage();

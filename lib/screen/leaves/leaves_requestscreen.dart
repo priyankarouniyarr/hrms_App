@@ -1,12 +1,12 @@
 import 'package:intl/intl.dart';
-import 'customtextfieldform.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:dotted_line/dotted_line.dart';
+import '../../widget/customtextfieldform.dart';
 import 'package:nepali_utils/nepali_utils.dart';
 import 'package:hrms_app/constants/colors.dart';
+import 'package:hrms_app/widget/dropdown_custom.dart';
 import 'package:hrms_app/models/leaves/apply_leave.dart';
-import 'package:hrms_app/screen/leaves/dropdown_custom.dart';
 import 'package:hrms_app/providers/leaves_provider/leavehistory_provider.dart';
 import 'package:hrms_app/providers/leaves_provider/leave_request_provider.dart';
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
@@ -83,9 +83,11 @@ class _LeavesRequestscreenState extends State<LeavesRequestscreen> {
   }
 
   void _submitForm() async {
+    final parentContext = context; // ✅ Safe context before async
+
     if (_formKey.currentState!.validate()) {
       if (!_validateForm()) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(parentContext).showSnackBar(
           const SnackBar(
             content: Text(
               'Please fill all required fields correctly',
@@ -96,19 +98,17 @@ class _LeavesRequestscreenState extends State<LeavesRequestscreen> {
         );
         return;
       }
-//final extendedTotalLeaveDays = calculateTotalExtendedLeaveDays(_extendedDate!, _extendedEndDate!);
+
       final totalLeaveDays = calculateTotalLeaveDays(_startDate!, _endDate!);
-      final fromDateNp = convertToNepaliDate(_startDate!);
-      final formattedDate = fromDateNp.replaceAll('-', '/');
-      final toDateNp = convertToNepaliDate(_endDate!);
-      final formattedEndDate = toDateNp.replaceAll('-', '/');
+      final fromDateNp = convertToNepaliDate(_startDate!).replaceAll('-', '/');
+      final toDateNp = convertToNepaliDate(_endDate!).replaceAll('-', '/');
 
       final leaveRequest = LeaveApplicationRequest(
         leaveTypeId: _selectedPrimaryleaveType!,
         fromDate: DateFormat('MM/dd/yyyy').format(_startDate!),
         toDate: DateFormat('MM/dd/yyyy').format(_endDate!),
-        fromDateNp: formattedDate,
-        toDateNp: formattedEndDate,
+        fromDateNp: fromDateNp,
+        toDateNp: toDateNp,
         totalLeaveDays: totalLeaveDays,
         reason:
             _reasoncontroller.text.isNotEmpty ? _reasoncontroller.text : null,
@@ -126,58 +126,56 @@ class _LeavesRequestscreenState extends State<LeavesRequestscreen> {
         extendedToDateNp: _extendedEndDate != null
             ? convertToNepaliDate(_extendedEndDate!).replaceAll('-', '/')
             : null,
-        //  extendedTotalLeaveDays: extendedTotalLeaveDays.toDouble(),
         halfDayStatus: _selectedhalfday,
-        isHalfDay: _selectedhalfday == 'Both' || _selectedhalfday == 'On Start'
-            ? true
-            : false,
+        isHalfDay: _selectedhalfday == 'Both' || _selectedhalfday == 'On Start',
       );
 
       showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
+        context: parentContext,
+        builder: (_) => AlertDialog(
           title: const Text('Confirm Leave Request'),
           content: const Text('Are you sure you want to apply for leave?'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Navigator.of(parentContext).pop(),
               child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () async {
-                Navigator.of(context).pop(); // Close the dialog first
+                Navigator.of(parentContext).pop(); // Close confirm dialog
 
-                final success = await Provider.of<LeaveRequestProvider>(context,
-                        listen: false)
-                    .leaveApplyEmployee(leaveRequest);
+                final success = await Provider.of<LeaveRequestProvider>(
+                  parentContext,
+                  listen: false,
+                ).leaveApplyEmployee(leaveRequest);
+
+                if (!parentContext.mounted) return; // ✅ Optional safety check
 
                 if (success) {
                   showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text("Success"),
-                        content: const Text(
-                          "Leave Applied Successfully!",
-                          style: TextStyle(fontSize: 18, color: Colors.green),
+                    context: parentContext,
+                    builder: (_) => AlertDialog(
+                      title: const Text("Success"),
+                      content: const Text(
+                        "Leave Applied Successfully!",
+                        style: TextStyle(fontSize: 18, color: Colors.green),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(parentContext).pop(); // Close dialog
+                            _resetForm(); // Reset form
+                          },
+                          child: const Text("OK"),
                         ),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop(); // Close dialog
-                              _resetForm(); // Reset the form
-                            },
-                            child: const Text("OK"),
-                          ),
-                        ],
-                      );
-                    },
+                      ],
+                    ),
                   );
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  ScaffoldMessenger.of(parentContext).showSnackBar(
                     SnackBar(
                       content: Text(
-                        'Failed to apply leave: ${Provider.of<LeaveRequestProvider>(context, listen: false).errorMessage}',
+                        'Failed to apply leave: ${Provider.of<LeaveRequestProvider>(parentContext, listen: false).errorMessage}',
                         style: const TextStyle(color: Colors.red, fontSize: 20),
                       ),
                       backgroundColor: cardBackgroundColor,

@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -7,6 +8,8 @@ import 'package:hrms_app/providers/check-in_provider/sharelive%20_location.dart'
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
 
 class ShareLiveLocationScreen extends StatefulWidget {
+  const ShareLiveLocationScreen({super.key});
+
   @override
   State<ShareLiveLocationScreen> createState() =>
       _ShareLiveLocationScreenState();
@@ -89,7 +92,7 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
         ? LatLng(
             double.parse(provider.latitude!), double.parse(provider.longitude!))
         : null;
-    print(userLocation);
+    log(userLocation.toString());
 
     return Scaffold(
       appBar: CustomAppBarProfile(title: "Live Location"),
@@ -132,10 +135,10 @@ class _ShareLiveLocationScreenState extends State<ShareLiveLocationScreen>
                           Text("Location unavailable"),
                           ElevatedButton(
                             onPressed: _retryLocation,
-                            child: Text("Retry"),
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: primarySwatch,
                                 foregroundColor: Colors.white),
+                            child: Text("Retry"),
                           ),
                         ],
                       ),

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hrms_app/storage/securestorage.dart';
@@ -61,7 +62,7 @@ class EmployeeContractProvider with ChangeNotifier {
       } else {
         _errorMessage = 'Network error: ${e.message}';
       }
-      print("SocketException: $_errorMessage");
+      log("SocketException: $_errorMessage");
     } catch (error) {
       _errorMessage = 'Error: $error';
       print("Error: $error");

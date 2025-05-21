@@ -15,6 +15,7 @@ class EmployeeProvider with ChangeNotifier {
   String? _designation;
   String? _joiningDate;
   String? _fullname;
+  String? _firstname;
   String? _email;
   String? _phone;
   String? _gender;
@@ -41,6 +42,7 @@ class EmployeeProvider with ChangeNotifier {
 
   List<EmployeeEmergencyContact> _emergencyContact = [];
   List<EmployeeInsuranceDetail> _insuranceDetail = [];
+  String? get firstname => _firstname;
   String get email => _email ?? '';
   String get phone => _phone ?? '';
   String get gender => _gender ?? '';
@@ -111,7 +113,7 @@ class EmployeeProvider with ChangeNotifier {
         headers: {
           'Authorization': 'Bearer $token',
           'selected_workingbranchId': branchId,
-          'selected_fiscal_year': fiscalYear ?? '',
+          'selected_fiscal_year': fiscalYear,
         },
       );
 
@@ -142,6 +144,7 @@ class EmployeeProvider with ChangeNotifier {
         _email = data['homeEmail'] ?? 'null';
         _phone = data['mobileNumber'] ?? 'null';
         _gender = data['gender'] ?? 'null';
+        _firstname = data['firstName'] ?? 'null';
         _maritalStatus = data['maritalStatus'] ?? 'null';
         _bloodGroup = data['bloodGroup'] ?? 'null';
 

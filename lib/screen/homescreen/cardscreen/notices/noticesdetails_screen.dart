@@ -7,7 +7,7 @@ import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20cat
 class NoticeDetailScreen extends StatefulWidget {
   final Notices notice;
 
-  const NoticeDetailScreen({required this.notice});
+  const NoticeDetailScreen({super.key, required this.notice});
 
   @override
   State<NoticeDetailScreen> createState() => _NoticeDetailScreenState();
@@ -95,11 +95,11 @@ class _NoticeDetailScreenState extends State<NoticeDetailScreen> {
                       Row(
                         children: [
                           const Icon(Icons.access_time,
-                              size: 18, color: Colors.blue), // Time Icon
+                              size: 18, color: Colors.blue),
                           const SizedBox(width: 6),
                           Text(
-                            DateFormat('HH:mm:ss').format(
-                                widget.notice.publishedTime!), // Only time
+                            DateFormat('HH:mm:ss')
+                                .format(widget.notice.publishedTime!),
                             style: TextStyle(
                               fontSize: 16,
                               color: Colors.grey[900],

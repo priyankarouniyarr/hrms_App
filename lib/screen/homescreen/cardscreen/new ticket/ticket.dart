@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:hrms_app/constants/colors.dart';
-import 'package:hrms_app/screen/leaves/dropdown_custom.dart';
+import 'package:hrms_app/widget/dropdown_custom.dart';
 import 'package:hrms_app/providers/create_tickets/ne_tickets_providers.dart';
 import 'package:hrms_app/providers/create_tickets/new_tickets_provider.dart';
 import 'package:hrms_app/models/createtickets/new_tickets_creation_model.dart';

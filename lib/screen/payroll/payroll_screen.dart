@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:dotted_line/dotted_line.dart';
 import 'package:nepali_utils/nepali_utils.dart';
 import 'package:hrms_app/constants/colors.dart';
-import 'package:hrms_app/screen/custom_appbar.dart';
+import 'package:hrms_app/widget/custom_appbar.dart';
 import 'package:hrms_app/providers/payroll/payroll_provider.dart';
 import 'package:hrms_app/providers/payroll/payroll_monthly_salarayy_provider.dart';
 

@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 import 'subcategories/emergency_conatct.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/hospitalcode.dart';
-import 'package:hrms_app/screen/custom_appbar.dart';
-import 'package:hrms_app/screen/profile/profilemenuitem.dart';
+import 'package:hrms_app/widget/custom_appbar.dart';
+import 'package:hrms_app/widget/profilemenuitem.dart';
 import 'package:hrms_app/screen/profile/subcategories/documents.dart';
 import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
 import 'package:hrms_app/screen/profile/subcategories/insurance.details.dart';
@@ -51,7 +51,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             CircleAvatar(
               radius: 40,
               backgroundColor: Color.fromARGB(255, 226, 232, 251),
-              child: employeeProvider.imagepath?.isNotEmpty == true
+              child: employeeProvider.imagepath.isNotEmpty == true
                   ? ClipOval(
                       child: Image.network(
                         "http://45.117.153.90:5001/uploads/users/${employeeProvider.imagepath}",

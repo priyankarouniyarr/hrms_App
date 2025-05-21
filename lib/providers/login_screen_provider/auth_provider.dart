@@ -63,17 +63,12 @@ class AuthProvider with ChangeNotifier {
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         final token = responseData['token'];
-        print(" 1st token:$token");
-        final refreshToken = responseData['refreshToken'];
-        print(" 1st refresh token:$refreshToken");
-        _expirationTime = DateTime.parse(responseData['expiration'].toString());
-        print(" 1st expiration time: $_expirationTime");
-        DateTime utcTime = _expirationTime!; // your UTC time
-        DateTime nepaliTime = utcTime.add(Duration(hours: 5, minutes: 45));
 
-        print("Nepali Time: $nepaliTime");
+        final refreshToken = responseData['refreshToken'];
+
+        _expirationTime = DateTime.parse(responseData['expiration'].toString());
+
         _username = username;
-        print(" 1st username: $_username");
 
         await _tokenStorage.storeToken(token);
         await _usernameStorage.storeUsername(username);
@@ -128,7 +123,6 @@ class AuthProvider with ChangeNotifier {
     DateTime? expirationtime = await _expirationtimeStorage.getExpirationtime();
     print("expiration time: $expirationtime");
     _expirationTime = expirationtime;
-    ;
 
     print("expirytime loaded :$_expirationTime");
     if (refreshToken != null) {
@@ -218,8 +212,6 @@ class AuthProvider with ChangeNotifier {
     await _branchidFiscalyearStorage.removeBranchIdAndFiscalYearId();
     await _branchidFiscalyearStorage.removeBranchId();
     await _hosptialcode.removeHospitalCode();
-    // Provider.of<BranchProvider>(context, listen: false).reset();
-    // Provider.of<FiscalYearProvider>(context, listen: false).reset();
   }
 
   void _setLoading(bool value) {

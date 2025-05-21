@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
+import 'package:hrms_app/widget/custom_summary_card.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/works/workflow_view.dart';
-import 'package:hrms_app/screen/homescreen/cardscreen/works/custom_summary_card.dart';
 import 'package:hrms_app/providers/works_Summary_provider/summary_details/assign_by_me_ticket_provider.dart';
 
 class AssignedByMe extends StatefulWidget {

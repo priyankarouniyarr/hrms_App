@@ -8,6 +8,8 @@ import 'package:hrms_app/screen/homescreen/cardscreen/check-in/sharedlive locati
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen categories/customprofile_appbar.dart';
 
 class CheckInScreen extends StatefulWidget {
+  const CheckInScreen({super.key});
+
   @override
   State<CheckInScreen> createState() => _CheckInScreenState();
 }

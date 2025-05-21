@@ -3,11 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/onboardscreen.dart';
 import 'package:hrms_app/storage/securestorage.dart';
-import 'package:hrms_app/screen/homescreen/Shifting.dart';
+import 'package:hrms_app/screen/shifting/Shifting.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/works/works.dart';
 import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/notices/notices.dart';
-import 'package:hrms_app/providers/login_screen_provider/auth_provider.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/check-in/check-in.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/new%20ticket/ticket.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/holiday.dart/holiday.dart';
@@ -32,11 +31,39 @@ class _HomeScreenState extends State<HomeScreen> {
     {'label': 'Check In', 'icon': Icons.location_on, 'color': Colors.teal},
   ];
 
+  Future<void> _checkUserData() async {
+    final SecureStorageService secureStorageService = SecureStorageService();
+
+    final branchId =
+        await secureStorageService.readData('selected_workingbranchId');
+
+    final username = await secureStorageService.readData('username');
+
+    final fiscalYear =
+        await secureStorageService.readData('selected_fiscal_year');
+
+    if (username == null || branchId == null || fiscalYear == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => OnboardScreen()),
+        );
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    _checkUserData();
+    super.initState();
+  }
+
+//
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
     final provider = Provider.of<EmployeeProvider>(context);
-    String username = authProvider.username ?? "User";
+    String username = provider.firstname ?? '';
 
     return Scaffold(
       backgroundColor: primarySwatch[900],
@@ -56,10 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: secondaryColor,
                   size: 28,
                 ),
-                onPressed: () {
-                  // print(Provider.of<AuthProvider>(context, listen: false)
-                  //     .username);
-                },
+                onPressed: () {},
                 splashRadius: 24,
               ),
             ),
