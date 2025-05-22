@@ -9,7 +9,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:hrms_app/storage/hosptial_code_storage.dart';
 import 'package:hrms_app/providers/notifications/notification_provider.dart';
 import 'package:hrms_app/providers/login_screen_provider/auth_provider.dart';
-import 'package:hrms_app/screen/homescreen/notifications_screen/push_notification.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -56,9 +55,10 @@ class _SplashScreenState extends State<SplashScreen> {
       bool isLoggedIn = false;
       if (authProvider.token != null) {
         bool isTokenExpired = authProvider.isTokenExpired();
-        //   print("Token expired: $isTokenExpired");
+        print("Token expired: $isTokenExpired");
 
         if (isTokenExpired) {
+          print("isTokenExpired: $isTokenExpired");
           try {
             await authProvider.refreshAccessToken(
               context,

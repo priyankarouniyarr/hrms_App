@@ -79,8 +79,8 @@ class _HomeScreenState extends State<HomeScreen> {
               radius: 30,
               child: IconButton(
                 icon: Icon(
-                  Icons.notifications_active_outlined,
-                  color: secondaryColor,
+                  Icons.notifications_active,
+                  color: Colors.blue,
                   size: 28,
                 ),
                 onPressed: () {},

@@ -90,7 +90,7 @@ class FcmnotificationProvider with ChangeNotifier {
       print('Response status: ${response.statusCode}');
 
       if (response.statusCode == 200) {
-        print('FCM token sent successfully: $fcmToken');
+        print('FCM token sent successfully');
         _isLoading = false;
         notifyListeners();
       } else {
@@ -134,8 +134,7 @@ class FcmnotificationProvider with ChangeNotifier {
       print('Response status: ${response.statusCode}');
 
       if (response.statusCode == 200) {
-        print(
-            'FCMDeviceTokenPostAnonymous token sent successfully: $fcmDeviceTokenPostAnonymous');
+        print('FCMDeviceTokenPostAnonymous token sent successfully');
         _isLoading = false;
         notifyListeners();
       } else {

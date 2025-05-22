@@ -25,7 +25,9 @@ import 'package:hrms_app/providers/fiscal_year_provider/fiscal_year_provider.dar
 import 'package:hrms_app/providers/payroll/payroll_monthly_salarayy_provider.dart';
 import 'package:hrms_app/providers/profile_providers/employee_contract_provider.dart';
 import 'package:hrms_app/providers/hosptial_code_provider/hosptial_code_provider.dart';
+import 'package:hrms_app/screen/homescreen/notifications_screen/localnotifications.dart';
 import 'package:hrms_app/providers/attendance_providers/attendance_history_provider.dart';
+import 'package:hrms_app/screen/homescreen/notifications_screen/notification_firebase.dart';
 import 'package:hrms_app/providers/works_Summary_provider/summary_details/assign_by_me_ticket_provider.dart';
 import 'package:hrms_app/providers/leaves_provider/leaves_history%20_contract%20and%20fiscalyear_period.dart';
 import 'package:hrms_app/providers/works_Summary_provider/summary_details/my_ticket_get_summary_provider.dart';
@@ -35,28 +37,13 @@ final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-  // await LocalNotificationService().initialize();
-  // await PushNotificationManager.initializeApp();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await _requestPermission();
+
+  await NotificationFirebase.instance.initialize();
+
   runApp(const MyApp());
-}
-
-/// Request notification permission
-Future<void> _requestPermission() async {
-  final settings = await _firebaseMessaging.requestPermission(
-    alert: true,
-    badge: true,
-    sound: true,
-  );
-
-  if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-    print("✅ Notification permission granted");
-  } else {
-    print("❌ Notification permission denied");
-  }
 }
 
 class MyApp extends StatefulWidget {

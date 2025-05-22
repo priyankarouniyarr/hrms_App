@@ -98,11 +98,11 @@ class AuthProvider with ChangeNotifier {
     if (_expirationTime == null) return true;
     final currentTime = DateTime.now();
     print("current time: $currentTime");
-    // return currentTime.isAfter(_expirationTime!);
-    final time =
-        DateTime.now().isBefore(_expirationTime!.add(Duration(seconds: 15)));
-    print("time: $time");
-    return time;
+    return currentTime.isAfter(_expirationTime!);
+    // final time =
+    //     DateTime.now().isBefore(_expirationTime!.add(Duration(seconds: 15)));
+    // print("time: $time");
+    // return time;
   }
 
   Future<void> loadToken() async {
@@ -164,8 +164,10 @@ class AuthProvider with ChangeNotifier {
           print("refresh token status code: ${response.statusCode}");
           if (response.statusCode == 200) {
             final responseData = json.decode(response.body);
+            print(responseData);
 
             final newToken = responseData['token'];
+            print("new token: $newToken");
 
             final newRefreshToken = responseData['refreshToken'];
 
