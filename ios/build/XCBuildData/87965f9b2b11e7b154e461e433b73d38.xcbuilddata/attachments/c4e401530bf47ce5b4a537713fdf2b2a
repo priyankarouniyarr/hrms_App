@@ -1,0 +1,23 @@
+{
+  "version": 0,
+  "use-external-names": false,
+  "case-sensitive": false,
+  "roots": [{
+    "type": "directory",
+    "name": "/Users/priyankarouniyar/StudioProjects/hrms_app/ios/build/Release-iphoneos/app_settings/app_settings.framework/Modules",
+    "contents": [{
+      "type": "file",
+      "name": "module.modulemap",
+      "external-contents": "/Users/priyankarouniyar/StudioProjects/hrms_app/ios/build/Pods.build/Release-iphoneos/app_settings.build/unextended-module.modulemap",
+    }]
+    },
+    {
+    "type": "directory",
+    "name": "/Users/priyankarouniyar/StudioProjects/hrms_app/ios/build/Release-iphoneos/app_settings/app_settings.framework/Headers",
+    "contents": [{
+      "type": "file",
+      "name": "app_settings-Swift.h",
+      "external-contents": "/Users/priyankarouniyar/StudioProjects/hrms_app/ios/build/Pods.build/Release-iphoneos/app_settings.build/unextended-interface-header.h",
+    }]
+  }]
+}

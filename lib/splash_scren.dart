@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/location%20.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/screen/onboardscreen.dart';
 import 'package:hrms_app/screen/app_main_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -75,7 +74,7 @@ class _SplashScreenState extends State<SplashScreen> {
       }
 
       if (isLoggedIn) {
-        //   print("isLoggedIn44: $isLoggedIn");
+        print("isLoggedIn44: $isLoggedIn");
         if (fcmToken != null && applicationId != null) {
           await fcmNotificationProvider.sendFcmTokenToServer(
               fcmToken, applicationId);

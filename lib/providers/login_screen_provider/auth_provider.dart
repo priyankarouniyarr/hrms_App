@@ -100,7 +100,7 @@ class AuthProvider with ChangeNotifier {
     print("current time: $currentTime");
     return currentTime.isAfter(_expirationTime!);
     // final time =
-    //     DateTime.now().isBefore(_expirationTime!.add(Duration(seconds: 15)));
+    //     DateTime.now().isBefore(_expirationTime!.add(Duration(seconds: 20)));
     // print("time: $time");
     // return time;
   }

@@ -5,7 +5,6 @@ import 'package:hrms_app/firebase_options.dart';
 import 'package:hrms_app/utlis/connectivity.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:hrms_app/providers/payroll/payroll_provider.dart';
 import 'package:hrms_app/providers/notices_provider/notices_provider.dart';
 import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
@@ -25,7 +24,6 @@ import 'package:hrms_app/providers/fiscal_year_provider/fiscal_year_provider.dar
 import 'package:hrms_app/providers/payroll/payroll_monthly_salarayy_provider.dart';
 import 'package:hrms_app/providers/profile_providers/employee_contract_provider.dart';
 import 'package:hrms_app/providers/hosptial_code_provider/hosptial_code_provider.dart';
-import 'package:hrms_app/screen/homescreen/notifications_screen/localnotifications.dart';
 import 'package:hrms_app/providers/attendance_providers/attendance_history_provider.dart';
 import 'package:hrms_app/screen/homescreen/notifications_screen/notification_firebase.dart';
 import 'package:hrms_app/providers/works_Summary_provider/summary_details/assign_by_me_ticket_provider.dart';
@@ -33,7 +31,7 @@ import 'package:hrms_app/providers/leaves_provider/leaves_history%20_contract%20
 import 'package:hrms_app/providers/works_Summary_provider/summary_details/my_ticket_get_summary_provider.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");

@@ -1,0 +1,5 @@
+
+module app_settings.Swift {
+  header "app_settings-Swift.h"
+  requires objc
+}

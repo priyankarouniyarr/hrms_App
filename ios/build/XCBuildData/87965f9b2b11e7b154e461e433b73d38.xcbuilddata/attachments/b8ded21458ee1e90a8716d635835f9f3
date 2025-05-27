@@ -1,0 +1,15 @@
+{
+  "" : {
+    "const-values" : "/Users/priyankarouniyar/StudioProjects/hrms_app/ios/build/Pods.build/Release-iphoneos/app_settings.build/Objects-normal/arm64/app_settings-master.swiftconstvalues",
+    "dependencies" : "/Users/priyankarouniyar/StudioProjects/hrms_app/ios/build/Pods.build/Release-iphoneos/app_settings.build/Objects-normal/arm64/app_settings-master.d",
+    "diagnostics" : "/Users/priyankarouniyar/StudioProjects/hrms_app/ios/build/Pods.build/Release-iphoneos/app_settings.build/Objects-normal/arm64/app_settings-master.dia",
+    "emit-module-dependencies" : "/Users/priyankarouniyar/StudioProjects/hrms_app/ios/build/Pods.build/Release-iphoneos/app_settings.build/Objects-normal/arm64/app_settings-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/priyankarouniyar/StudioProjects/hrms_app/ios/build/Pods.build/Release-iphoneos/app_settings.build/Objects-normal/arm64/app_settings-master-emit-module.dia",
+    "swift-dependencies" : "/Users/priyankarouniyar/StudioProjects/hrms_app/ios/build/Pods.build/Release-iphoneos/app_settings.build/Objects-normal/arm64/app_settings-master.swiftdeps"
+  },
+  "/Users/priyankarouniyar/.pub-cache/hosted/pub.dev/app_settings-6.1.1/ios/app_settings/Sources/app_settings/AppSettingsPlugin.swift" : {
+    "index-unit-output-path" : "/Pods.build/Release-iphoneos/app_settings.build/Objects-normal/arm64/AppSettingsPlugin.o",
+    "llvm-bc" : "/Users/priyankarouniyar/StudioProjects/hrms_app/ios/build/Pods.build/Release-iphoneos/app_settings.build/Objects-normal/arm64/AppSettingsPlugin.bc",
+    "object" : "/Users/priyankarouniyar/StudioProjects/hrms_app/ios/build/Pods.build/Release-iphoneos/app_settings.build/Objects-normal/arm64/AppSettingsPlugin.o"
+  }
+}
