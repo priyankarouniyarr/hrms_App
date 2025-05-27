@@ -7,12 +7,12 @@ import 'package:hrms_app/models/hosptial_code_models/hospital_code.dart';
 class HospitalCodeProvider with ChangeNotifier {
   String _baseUrl = '';
   String _errorMessage = '';
-  String _applicationId = '';
+  final String _applicationId = '';
   bool _isLoading = false;
   String get applicationId => _applicationId;
   String get baseUrl => _baseUrl;
   String get errorMessage => _errorMessage;
-  String _hospitalCode = '';
+  final String _hospitalCode = '';
   String get hospitalCode => _hospitalCode;
 
   bool get isLoading => _isLoading;
