@@ -4,6 +4,8 @@ import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/onboardscreen.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/screen/shifting/Shifting.dart';
+import 'package:hrms_app/screen/profile/profile_screen.dart';
+import 'package:googleapis/mybusinessbusinessinformation/v1.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/works/works.dart';
 import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/notices/notices.dart';
@@ -69,19 +71,19 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: primarySwatch[900],
       appBar: AppBar(
         backgroundColor: primarySwatch[900],
+        iconTheme: IconThemeData(color: Colors.white),
         toolbarHeight: 80,
-        automaticallyImplyLeading: false,
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: CircleAvatar(
               backgroundColor: cardBackgroundColor,
-              radius: 30,
+              radius: 21,
               child: IconButton(
                 icon: Icon(
                   Icons.notifications_active,
                   color: Colors.blue,
-                  size: 28,
+                  size: 20,
                 ),
                 onPressed: () {},
                 splashRadius: 24,
@@ -89,6 +91,12 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ],
+      ),
+      drawer: Drawer(
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          child: ProfileScreen(),
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -120,9 +128,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-
-              // Shifting screen
-              // ignore: unnecessary_null_comparison
               provider.currentShift == null
                   ? SizedBox.shrink()
                   : Padding(

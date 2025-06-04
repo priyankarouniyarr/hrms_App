@@ -12,7 +12,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: cardBackgroundColor,
       title: Text(
         title,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
       ),
       centerTitle: true,
       automaticallyImplyLeading: false,

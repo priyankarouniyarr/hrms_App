@@ -85,6 +85,7 @@ class Employee {
     required this.employeeInsuranceDetails,
     required this.employeeDocuments,
     required this.employeeCurrentShift,
+    required List<dynamic> employeeWorkExperienceContacts,
   });
 
   // Method to create an instance from JSON
@@ -124,6 +125,10 @@ class Employee {
       bankName: json['bankName'],
       bankAccountNumber: json['bankAccountNumber'],
       bankAccountType: json['bankAccountType'],
+      employeeWorkExperienceContacts:
+          (json['employeeWorkExperienceContacts'] as List)
+              .map((e) => EmployeeWorkExperience.fromJson(e))
+              .toList(),
       employeeEducations: (json['employeeEducations'] as List)
           .map((e) => EmployeeEducation.fromJson(e))
           .toList(),
@@ -150,18 +155,116 @@ class Employee {
 }
 
 class EmployeeEducation {
+  final int id;
+  final int employeeId;
   final String school;
   final String qualification;
+  final String level;
+  final String yearOfPassing;
+  final String yearOfPassingNp;
+  final String percentageOrGrade;
+  final String majorOptionalSubject;
+  final String? comment;
+  final String? attachments;
+  final bool isSponsored;
+  final String? sponsoredBy;
+  final String division;
 
   EmployeeEducation({
+    required this.id,
+    required this.employeeId,
     required this.school,
     required this.qualification,
+    required this.level,
+    required this.yearOfPassing,
+    required this.yearOfPassingNp,
+    required this.percentageOrGrade,
+    required this.majorOptionalSubject,
+    this.comment,
+    this.attachments,
+    required this.isSponsored,
+    this.sponsoredBy,
+    required this.division,
   });
 
   factory EmployeeEducation.fromJson(Map<String, dynamic> json) {
     return EmployeeEducation(
+      id: json['id'] ?? '',
+      employeeId: json['employeeId'] ?? '',
       school: json['school'] ?? '',
       qualification: json['qualification'] ?? '',
+      level: json['level'] ?? '',
+      yearOfPassing: json['yearOfPassing'] ?? '',
+      yearOfPassingNp: json['yearOfPassingNp'] ?? '',
+      percentageOrGrade: json['percentageOrGrade'] ?? '',
+      majorOptionalSubject: json['majorOptionalSubject'] ?? '',
+      comment: json['comment'] ?? '',
+      attachments: json['attachments'] ?? '',
+      isSponsored: json['isSponsored'] ?? '',
+      sponsoredBy: json['sponsoredBy'] ?? '',
+      division: json['division'] ?? '',
+    );
+  }
+}
+
+class EmployeeTraining {
+  final int id;
+  final int employeeId;
+  final String title;
+  final String fromDate;
+  final String toDate;
+  final String fromDateNp;
+  final String toDateNp;
+  final String institute;
+  final String country;
+  final String majorSubject;
+  final bool isSponsored;
+  final String? sponsoredBy;
+  final String? employeeName;
+  final String remarks;
+  final String participationType;
+  final String? employeeCode;
+  final String? attachments;
+
+  EmployeeTraining({
+    required this.id,
+    required this.employeeId,
+    required this.title,
+    required this.fromDate,
+    required this.toDate,
+    required this.fromDateNp,
+    required this.toDateNp,
+    required this.institute,
+    required this.country,
+    required this.majorSubject,
+    required this.isSponsored,
+    this.sponsoredBy,
+    this.employeeName,
+    required this.remarks,
+    required this.participationType,
+    this.employeeCode,
+    this.attachments,
+  });
+
+  factory EmployeeTraining.fromJson(Map<String, dynamic> json) {
+    return EmployeeTraining(
+      id: json['id'] ?? '',
+      employeeId: json['employeeId'] ?? '',
+      title: json['title'] ?? '',
+      fromDate: json['fromDate'] ?? '',
+      toDate: json['toDate'] ?? '',
+      fromDateNp: json['fromDateNp'] ?? '',
+      toDateNp: json['toDateNp'] ?? '',
+      institute: json['institute'] ?? '',
+      country: json['country'] ?? '',
+      majorSubject: json['majorSubject'] ?? '',
+      isSponsored: json['isSponsored'] ?? '',
+      sponsoredBy: json['sponsoredBy'] ?? '',
+      employeeName: json['employeeName'] ?? '',
+      remarks: json['remarks'] ?? '',
+      participationType: json['participationType'] ?? '',
+      employeeCode: json['employeeCode'] ?? '',
+      attachments: json['attachments'] ?? '',
     );
   }
 }
@@ -494,6 +597,114 @@ class EmployeeCurrentShift {
       'hasBreak': hasBreak,
       'isFlexibleBreak': isFlexibleBreak,
       'primaryBreakDuration': primaryBreakDuration,
+    };
+  }
+}
+
+class EmployeeWorkExperience {
+  final int id;
+  final int employeeId;
+  final String company;
+  final String designation;
+  final String salary;
+  final String address;
+  final String department;
+  final String contact;
+  final DateTime joiningDate;
+  final DateTime leavingDate;
+  final String joiningDateNp;
+  final String leavingDateNp;
+  final String totalExperience;
+  final String referencePerson;
+  final String referenceContact;
+  final String referencePersonEmail;
+  final String reasonToLeave;
+  final String? employeeName;
+  final String? level;
+  final int hrmLevelId;
+  final String jobSummary;
+  final String? employeeCode;
+  final String? attachments;
+
+  EmployeeWorkExperience({
+    required this.id,
+    required this.employeeId,
+    required this.company,
+    required this.designation,
+    required this.salary,
+    required this.address,
+    required this.department,
+    required this.contact,
+    required this.joiningDate,
+    required this.leavingDate,
+    required this.joiningDateNp,
+    required this.leavingDateNp,
+    required this.totalExperience,
+    required this.referencePerson,
+    required this.referenceContact,
+    required this.referencePersonEmail,
+    required this.reasonToLeave,
+    this.employeeName,
+    this.level,
+    required this.hrmLevelId,
+    required this.jobSummary,
+    this.employeeCode,
+    this.attachments,
+  });
+
+  factory EmployeeWorkExperience.fromJson(Map<String, dynamic> json) {
+    return EmployeeWorkExperience(
+      id: json['id'],
+      employeeId: json['employeeId'],
+      company: json['company'],
+      designation: json['designation'],
+      salary: json['salary'],
+      address: json['address'],
+      department: json['department'],
+      contact: json['contact'],
+      joiningDate: DateTime.parse(json['joiningDate']),
+      leavingDate: DateTime.parse(json['leavingDate']),
+      joiningDateNp: json['joiningDateNp'],
+      leavingDateNp: json['leavingDateNp'],
+      totalExperience: json['totalExperience'],
+      referencePerson: json['referencePerson'],
+      referenceContact: json['referenceContact'],
+      referencePersonEmail: json['referencePersonEmail'],
+      reasonToLeave: json['reasonToLeave'],
+      employeeName: json['employeeName'],
+      level: json['level'],
+      hrmLevelId: json['hrmLevelId'],
+      jobSummary: json['jobSummary'],
+      employeeCode: json['employeeCode'],
+      attachments: json['attachments'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'employeeId': employeeId,
+      'company': company,
+      'designation': designation,
+      'salary': salary,
+      'address': address,
+      'department': department,
+      'contact': contact,
+      'joiningDate': joiningDate.toIso8601String(),
+      'leavingDate': leavingDate.toIso8601String(),
+      'joiningDateNp': joiningDateNp,
+      'leavingDateNp': leavingDateNp,
+      'totalExperience': totalExperience,
+      'referencePerson': referencePerson,
+      'referenceContact': referenceContact,
+      'referencePersonEmail': referencePersonEmail,
+      'reasonToLeave': reasonToLeave,
+      'employeeName': employeeName,
+      'level': level,
+      'hrmLevelId': hrmLevelId,
+      'jobSummary': jobSummary,
+      'employeeCode': employeeCode,
+      'attachments': attachments,
     };
   }
 }

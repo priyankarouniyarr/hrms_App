@@ -175,7 +175,7 @@ class _LeavesRequestscreenState extends State<LeavesRequestscreen> {
                   ScaffoldMessenger.of(parentContext).showSnackBar(
                     SnackBar(
                       content: Text(
-                        'Failed to apply leave: ${Provider.of<LeaveRequestProvider>(parentContext, listen: false).errorMessage}',
+                        ' ${Provider.of<LeaveRequestProvider>(parentContext, listen: false).errorMessage}',
                         style: const TextStyle(color: Colors.red, fontSize: 20),
                       ),
                       backgroundColor: cardBackgroundColor,

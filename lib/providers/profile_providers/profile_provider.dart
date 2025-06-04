@@ -8,6 +8,7 @@ import 'package:hrms_app/models/profile_models/profiles.models.dart';
 
 class EmployeeProvider with ChangeNotifier {
   final SecureStorageService secureStorageService = SecureStorageService();
+
   final List<Employee> _employees = [];
   bool isLoading = false;
   String? _branch;
@@ -15,6 +16,11 @@ class EmployeeProvider with ChangeNotifier {
   String? _designation;
   String? _joiningDate;
   String? _fullname;
+  String? _managerTitle;
+  String? _coachTitle;
+  String? _expenseApproverTitle;
+  String? _timeoffApproverTitle;
+
   String? _firstname;
   String? _email;
   String? _phone;
@@ -29,6 +35,10 @@ class EmployeeProvider with ChangeNotifier {
   String? _imagepath;
   EmployeeCurrentShift? _currentShift;
   List<EmployeeDocument> _document = [];
+  List<EmployeeEducation> _qualification = [];
+  List<EmployeeTraining> _training = [];
+  List<EmployeeWorkExperience> _experience = [];
+
   String formatToPascalCase(String text) {
     return text
         .replaceAll(RegExp(r'[_\s]+'), ' ')
@@ -42,6 +52,10 @@ class EmployeeProvider with ChangeNotifier {
 
   List<EmployeeEmergencyContact> _emergencyContact = [];
   List<EmployeeInsuranceDetail> _insuranceDetail = [];
+  String get managerTitle => _managerTitle ?? '';
+  String get coachTitle => _coachTitle ?? '';
+  String get expenseApproverTitle => _expenseApproverTitle ?? '';
+  String get timeoffApproverTitle => _timeoffApproverTitle ?? '';
   String? get firstname => _firstname;
   String get email => _email ?? '';
   String get phone => _phone ?? '';
@@ -55,9 +69,11 @@ class EmployeeProvider with ChangeNotifier {
   String get bloodGroup => _bloodGroup ?? '';
   String get fullname => _fullname ?? '';
   String get devnagariName => _devnagariName ?? '';
+  List<EmployeeTraining> get traning => _training;
   List<EmployeeEmergencyContact> get emergenecycontact => _emergencyContact;
   String get imagepath => _imagepath ?? '';
   List<EmployeeDocument> get documents => _document;
+  List<EmployeeWorkExperience> get experience => _experience;
   EmployeeCurrentShift get currentShift =>
       _currentShift ??
       EmployeeCurrentShift(
@@ -72,6 +88,7 @@ class EmployeeProvider with ChangeNotifier {
         breakStartTime: '',
       );
   List<EmployeeInsuranceDetail> get insurance => _insuranceDetail;
+  List<EmployeeEducation> get quailfication => _qualification;
 
   EmployeePermanentAddress get permanentAddress =>
       _permanentAddress ??
@@ -131,18 +148,42 @@ class EmployeeProvider with ChangeNotifier {
             .toList();
         List<dynamic> jsonResponse2 =
             data['employeeEmergencyContacts'] ?? 'null';
+
         _emergencyContact = jsonResponse2
             .map((e) => EmployeeEmergencyContact.fromJson(e))
             .toList();
+
+        List<dynamic> jsonResponse3 = data['employeeEducations'] ?? 'null';
+
+        _qualification = jsonResponse3
+            .map((e) => EmployeeEducation.fromJson(e as Map<String, dynamic>))
+            .toList();
+        List<dynamic> jsonResponse4 = data['employeeTrainings'] ?? 'null';
+
+        _training = jsonResponse4
+            .map((e) => EmployeeTraining.fromJson(e as Map<String, dynamic>))
+            .toList();
+        List<dynamic> jsonResponse5 =
+            data['employeeWorkExperienceContacts'] ?? 'null';
+
+        _experience = jsonResponse5
+            .map((e) =>
+                EmployeeWorkExperience.fromJson(e as Map<String, dynamic>))
+            .toList();
+
         _imagepath = data['imagePath'] ?? 'null';
         _fullname = data['employeeFullName'] ?? 'null';
-        _designation = data['designationTitle'] ?? 'null';
-        _branch = data['workBranchTitle'] ?? 'null';
+        _designation = data['designationTitle'] ?? '-';
+        _branch = data['workBranchTitle'] ?? '-';
         _joiningDate = data['joiningDateNp'] ?? 'null';
-        _department = data['departmentTitle'] ?? 'null';
+        _department = data['departmentTitle'] ?? '-';
         _devnagariName = data['devnagariName'] ?? 'null';
         _email = data['homeEmail'] ?? 'null';
         _phone = data['mobileNumber'] ?? 'null';
+        _managerTitle = data['managerTitle'] ?? '-';
+        _coachTitle = data['coachTitle'] ?? '-';
+        _expenseApproverTitle = data['expenseApproverTitle'] ?? '-';
+        _timeoffApproverTitle = data['timeOffApproverTitle'] ?? '-';
         _gender = data['gender'] ?? 'null';
         _firstname = data['firstName'] ?? 'null';
         _maritalStatus = data['maritalStatus'] ?? 'null';

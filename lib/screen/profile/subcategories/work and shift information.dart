@@ -26,8 +26,6 @@ class _WorkshiftinformationState extends State<Workshiftinformation> {
   Widget build(BuildContext context) {
     final employeeProvider = Provider.of<EmployeeProvider>(context);
 
-// Helper method to format the time as "HH:mm"
-
     if (employeeProvider.isLoading) {
       return Scaffold(
         backgroundColor: cardBackgroundColor,
@@ -39,94 +37,127 @@ class _WorkshiftinformationState extends State<Workshiftinformation> {
     return Scaffold(
       backgroundColor: cardBackgroundColor,
       appBar: CustomAppBarProfile(title: "Work and Shift Information"),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Shift Information
-            Padding(
-              padding: EdgeInsets.only(left: 16.0),
-              child: Text(
-                "Shift Information",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-            ),
-            SizedBox(height: 15),
-            // Work Details Card
-            Padding(
-              padding: EdgeInsets.only(left: 16.0, right: 16.0),
-              child: Card(
-                elevation: 4.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Shift Information
+              Padding(
+                padding: EdgeInsets.only(left: 16.0),
+                child: Text(
+                  "Shift Information",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                color: cardBackgroundColor,
-                child: Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildInfoRow(
-                          "Primary ShiftName",
-                          employeeProvider.currentShift.primaryShiftName ??
-                              "N/A"),
-                      _buildInfoRow("Primary Shift Time",
-                          "${_formatTime(employeeProvider.currentShift.primaryShiftStart)} - ${_formatTime(employeeProvider.currentShift.primaryShiftEnd)}"),
-                      if (employeeProvider.currentShift.hasMultiShift ==
-                          true) ...[
+              ),
+              SizedBox(height: 15),
+              // Work Details Card
+              Padding(
+                padding: EdgeInsets.only(left: 16.0, right: 16.0),
+                child: Card(
+                  elevation: 4.0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  color: cardBackgroundColor,
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         _buildInfoRow(
-                            "ExtendedShift Name",
-                            employeeProvider.currentShift.extendedShiftName ??
+                            "Primary ShiftName",
+                            employeeProvider.currentShift.primaryShiftName ??
                                 "N/A"),
-                        _buildInfoRow("ExtendedShift Time",
-                            "${_formatTime(employeeProvider.currentShift.extendedShiftStart)} - ${_formatTime(employeeProvider.currentShift.extendedShiftEnd)}"),
+                        _buildInfoRow("Primary Shift Time",
+                            "${_formatTime(employeeProvider.currentShift.primaryShiftStart)} - ${_formatTime(employeeProvider.currentShift.primaryShiftEnd)}"),
+                        if (employeeProvider.currentShift.hasMultiShift ==
+                            true) ...[
+                          _buildInfoRow(
+                              "ExtendedShift Name",
+                              employeeProvider.currentShift.extendedShiftName ??
+                                  "N/A"),
+                          _buildInfoRow("ExtendedShift Time",
+                              "${_formatTime(employeeProvider.currentShift.extendedShiftStart)} - ${_formatTime(employeeProvider.currentShift.extendedShiftEnd)}"),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
 
-            SizedBox(height: 15),
-            Padding(
-              padding: EdgeInsets.only(left: 16.0),
-              child: Text(
-                "Work Details",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-            ),
-            SizedBox(height: 15),
-            // Work Details Card
-            Padding(
-              padding: EdgeInsets.only(left: 16.0, right: 16.0),
-              child: Card(
-                elevation: 4.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
+              SizedBox(height: 15),
+              Padding(
+                padding: EdgeInsets.only(left: 16.0),
+                child: Text(
+                  "Work Details",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                color: cardBackgroundColor,
-                child: Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildInfoRow("Branch", employeeProvider.branch),
-                        _buildInfoRow(
-                            "Department", employeeProvider.department),
-                        _buildInfoRow(
-                            "Designation", employeeProvider.desgination),
-                        _buildInfoRow(
-                            "Date of Joining", employeeProvider.dateOfJoining),
-                        if (employeeProvider.phone != null) ...[
+              ),
+              SizedBox(height: 15),
+              // Work Details Card
+              Padding(
+                padding: EdgeInsets.only(left: 16.0, right: 16.0),
+                child: Card(
+                  elevation: 4.0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  color: cardBackgroundColor,
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildInfoRow("Branch", employeeProvider.branch),
+                          _buildInfoRow(
+                              "Department", employeeProvider.department),
+                          _buildInfoRow(
+                              "Designation", employeeProvider.desgination),
+                          _buildInfoRow("Date of Joining",
+                              employeeProvider.dateOfJoining),
                           _buildInfoRow("Phone Number", employeeProvider.phone),
-                        ],
-                        _buildInfoRow("Email", employeeProvider.email),
-                      ]),
+                          _buildInfoRow("Email", employeeProvider.email),
+                        ]),
+                  ),
                 ),
               ),
-            ),
-          ],
+              SizedBox(height: 15),
+              Padding(
+                padding: EdgeInsets.only(left: 16.0),
+                child: Text(
+                  "Authorities",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ),
+              SizedBox(height: 15),
+              Padding(
+                padding: EdgeInsets.only(left: 16.0, right: 16.0),
+                child: Card(
+                  elevation: 4.0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  color: cardBackgroundColor,
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildInfoRow(
+                              "Supervisor", employeeProvider.managerTitle),
+                          _buildInfoRow("Expense Approver",
+                              employeeProvider.expenseApproverTitle),
+                          _buildInfoRow("Time off Approver",
+                              employeeProvider.timeoffApproverTitle),
+                          _buildInfoRow("Coach", employeeProvider.coachTitle),
+                        ]),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -154,11 +185,18 @@ class _WorkshiftinformationState extends State<Workshiftinformation> {
             "$label",
             style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
           ),
+          SizedBox(width: 30),
           Flexible(
-            child: Text(
-              value,
-              style: TextStyle(fontSize: 14),
-              overflow: TextOverflow.ellipsis,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 15.0, right: 8.0),
+              child: Text(
+                value,
+                style: TextStyle(fontSize: 14),
+                softWrap: true,
+                // overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.end,
+                // Aligns text to the right
+              ),
             ),
           ),
         ],

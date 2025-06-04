@@ -31,16 +31,16 @@ class ProfileMenuItem extends StatelessWidget {
             ],
           ),
           child: Center(
-            child: Icon(icon, color: primarySwatch[900], size: 24),
+            child: Icon(icon, color: primarySwatch[900], size: 18),
           ),
         ),
         title: Text(
           title,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         ),
         trailing: const Icon(
           Icons.arrow_forward_ios,
-          size: 20,
+          size: 19,
           color: primaryTextColor,
         ),
         onTap: onTap, // Correctly using onTap here

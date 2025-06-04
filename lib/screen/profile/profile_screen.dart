@@ -5,12 +5,15 @@ import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/hospitalcode.dart';
 import 'package:hrms_app/widget/custom_appbar.dart';
 import 'package:hrms_app/widget/profilemenuitem.dart';
+import 'package:hrms_app/screen/profile/workingexperience.dart';
+import 'package:hrms_app/screen/profile/subcategories/traning.dart';
 import 'package:hrms_app/screen/profile/subcategories/documents.dart';
 import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
 import 'package:hrms_app/screen/profile/subcategories/insurance.details.dart';
 import 'package:hrms_app/screen/profile/subcategories/employement_contracts.dart';
 import 'package:hrms_app/screen/profile/subcategories/personal_information%20.dart';
 import 'package:hrms_app/screen/profile/subcategories/work%20and%20shift%20information.dart';
+import 'package:hrms_app/screen/profile/subcategories/qualifications%20and%20experiences.dart';
 import 'package:hrms_app/providers/login_screen_provider/auth_provider.dart'; // Import the AuthProvider
 
 class ProfileScreen extends StatefulWidget {
@@ -49,7 +52,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           children: [
             CircleAvatar(
-              radius: 40,
+              radius: 30,
               backgroundColor: Color.fromARGB(255, 226, 232, 251),
               child: employeeProvider.imagepath.isNotEmpty == true
                   ? ClipOval(
@@ -71,7 +74,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 10),
             Text(
               employeeProvider.fullname,
-              style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
             Text(
@@ -109,6 +112,51 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16),
                       child: Divider(),
+                    ),
+                    ProfileMenuItem(
+                      icon: Icons.cast_for_education_rounded,
+                      title: "Qualifications and Experience",
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => QualificationExpericence()),
+                        );
+                      },
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Divider(),
+                    ),
+                    ProfileMenuItem(
+                      icon: Icons.model_training_rounded,
+                      title: "Tranings and Certifications",
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => Training()),
+                        );
+                      },
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Divider(),
+                    ),
+                    ProfileMenuItem(
+                      icon: Icons.work_outline,
+                      title: "Working Experience",
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => WorkingExperience()),
+                        );
+                      },
+                    ),
+
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Divider(),
                     ), // Horizontal Line
                     ProfileMenuItem(
                       icon: Icons.contact_emergency,
@@ -136,6 +184,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         );
                       },
                     ),
+
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16),
                       child: Divider(),

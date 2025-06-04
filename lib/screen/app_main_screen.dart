@@ -61,12 +61,6 @@ class _AppMainScreenState extends State<AppMainScreen> {
             ),
             label: "Leaves",
           ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              _selectedIndex == 3 ? Icons.person : Icons.person_outlined,
-            ),
-            label: "Profile",
-          ),
         ],
       ),
       body: pages[_selectedIndex], // Display selected page

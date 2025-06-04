@@ -302,7 +302,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
                               ),
                             ),
                             Text(
-                              "${punch.systemDtl}",
+                              formatLatLong(punch.systemDtl),
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Color.fromARGB(255, 30, 146, 0),
@@ -345,6 +345,30 @@ class _CheckInScreenState extends State<CheckInScreen> {
         );
       },
     );
+  }
+
+  String formatLatLong(String input) {
+    try {
+      // Remove unnecessary spaces
+      input = input.replaceAll(" ", "");
+
+      // Extract the latitude and longitude parts
+      final parts = input.split(',');
+
+      // Parse the latitude
+      final latPart = parts[0].split(':')[1];
+      final lat = double.parse(latPart);
+
+      // Parse the longitude
+      final longPart = parts[1].split(':')[1];
+      final long = double.parse(longPart);
+
+      // Format to two decimal places
+      return 'Lat: ${lat.toStringAsFixed(2)}, Long: ${long.toStringAsFixed(2)}';
+    } catch (e) {
+      // If there’s any issue, return the original string
+      return input;
+    }
   }
 
   void _showDialog(CheckInProvider checkInProvider) {
