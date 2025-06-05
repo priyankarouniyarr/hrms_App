@@ -5,7 +5,6 @@ import 'package:hrms_app/screen/onboardscreen.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/screen/shifting/Shifting.dart';
 import 'package:hrms_app/screen/profile/profile_screen.dart';
-import 'package:googleapis/mybusinessbusinessinformation/v1.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/works/works.dart';
 import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
 import 'package:hrms_app/screen/homescreen/cardscreen/notices/notices.dart';
@@ -90,11 +89,36 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: CircleAvatar(
+              backgroundColor: cardBackgroundColor,
+              radius: 21,
+              child: Consumer<EmployeeProvider>(
+                builder: (context, employeeProvider, _) {
+                  return employeeProvider.imagepath.isNotEmpty
+                      ? ClipOval(
+                          child: Image.network(
+                            "http://45.117.153.90:5001/uploads/users/${employeeProvider.imagepath}",
+                            fit: BoxFit.cover,
+                            width: 42,
+                            height: 42,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Icon(Icons.person,
+                                  size: 20,
+                                  color: const Color.fromARGB(255, 8, 96, 168));
+                            },
+                          ),
+                        )
+                      : Icon(Icons.person, size: 20, color: Colors.grey);
+                },
+              ),
+            ),
+          )
         ],
       ),
       drawer: Drawer(
         child: Container(
-          width: MediaQuery.of(context).size.width,
           child: ProfileScreen(),
         ),
       ),

@@ -23,7 +23,8 @@ class HospitalCodeProvider with ChangeNotifier {
 
     try {
       final response = await http.get(
-          Uri.parse('${dotenv.env['parent_url']}api/CodeUrl/$hosptialcode'));
+          // Uri.parse('http://45.117.153.90:5005/api/CodeUrl/$hosptialcode')
+          Uri.parse('${dotenv.env['parent_url']}/api/CodeUrl/$hosptialcode'));
 
       if (response.statusCode == 200) {
         final decodedResponse = json.decode(response.body);

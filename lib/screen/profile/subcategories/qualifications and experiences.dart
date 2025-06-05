@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
+import 'package:hrms_app/screen/profile/workingexperience.dart';
 import 'package:hrms_app/models/profile_models/profiles.models.dart';
 import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
 import 'package:hrms_app/screen/profile/subcategories/appbar_profilescreen%20categories/customprofile_appbar.dart';
@@ -78,6 +79,7 @@ class _QualificationExpericenceState extends State<QualificationExpericence> {
                     },
                   ),
       ),
+      // Removed incorrect usage of WorkingExperience
     );
   }
   // Function to format date

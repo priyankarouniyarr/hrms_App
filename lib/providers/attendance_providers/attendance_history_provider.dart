@@ -15,6 +15,12 @@ class AttendanceDetailsProvider with ChangeNotifier {
   String? _token;
   String? _fiscalYear;
   List<String> _shiftTypes = ["Primary", "Extended"];
+  List<String> _status = [
+    "Week End",
+    "Late Checked In - Early CheckOut",
+    "Absent",
+    "Do Not Log Off"
+  ];
   List<AttendanceSummary> _summaryAttendance = [];
   List<AttendanceDetails> _detsilsAttendance = [];
 
@@ -22,6 +28,8 @@ class AttendanceDetailsProvider with ChangeNotifier {
   String get errorMessage => _errorMessage;
   AttendanceReport? get attendanceReport => _attendanceReport;
   List<String> get shiftTypes => _shiftTypes;
+  List<String> get status => _status;
+
   List<AttendanceSummary> get summaryAttendance => _summaryAttendance;
   List<AttendanceDetails> get detailsAttendance =>
       _detsilsAttendance; // Details attendance

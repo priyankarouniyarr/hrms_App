@@ -19,8 +19,8 @@ class ProfileMenuItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 16),
       child: ListTile(
         leading: Container(
-          width: 40,
-          height: 40,
+          width: 30,
+          height: 30,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: lightColor,
@@ -40,8 +40,8 @@ class ProfileMenuItem extends StatelessWidget {
         ),
         trailing: const Icon(
           Icons.arrow_forward_ios,
-          size: 19,
-          color: primaryTextColor,
+          size: 15,
+          color: primarySwatch,
         ),
         onTap: onTap, // Correctly using onTap here
       ),

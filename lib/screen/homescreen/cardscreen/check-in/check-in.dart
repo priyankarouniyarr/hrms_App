@@ -72,7 +72,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: GestureDetector(
+                      child: InkWell(
                         onTap: () async {
                           await checkInProvider.getcurrentlocation();
                           await checkInProvider.punchPost();

@@ -9,10 +9,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: cardBackgroundColor,
+      backgroundColor: primarySwatch,
       title: Text(
         title,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+        style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            color: cardBackgroundColor),
       ),
       centerTitle: true,
       automaticallyImplyLeading: false,
