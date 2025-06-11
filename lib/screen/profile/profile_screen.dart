@@ -51,7 +51,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           children: [
             Container(
-              color: primarySwatch,
+              color: primarySwatch[50],
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 20),
               child: Column(

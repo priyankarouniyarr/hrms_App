@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/login%20screen.dart';
 import 'package:hrms_app/storage/hosptial_code_storage.dart';
+import 'package:pin_code_fields/pin_code_fields.dart'; // Import pin_code_fields
 import 'package:hrms_app/providers/hosptial_code_provider/hosptial_code_provider.dart';
 
 class HospitalCodeScreen extends StatefulWidget {
@@ -12,10 +13,7 @@ class HospitalCodeScreen extends StatefulWidget {
 }
 
 class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
-  final List<TextEditingController> controllers =
-      List.generate(6, (_) => TextEditingController());
-  final List<FocusNode> focusNodes = List.generate(6, (_) => FocusNode());
-
+  final TextEditingController _pinController = TextEditingController();
   String enteredCode = '';
 
   void _validateAndSubmit() async {
@@ -41,31 +39,20 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
   void _clearOtpField() {
     setState(() {
       enteredCode = ''; // Reset OTP field
-
-      for (var i = 0; i < controllers.length; i++) {
-        controllers[i].clear();
-      }
+      _pinController.clear();
     });
-
-    FocusScope.of(context).requestFocus(focusNodes[0]);
     _clearErrorMessage(); // Clear any error messages
   }
 
-  //
   void _clearErrorMessage() {
     final provider = Provider.of<HospitalCodeProvider>(context, listen: false);
     provider.clearError();
   }
 
-  // Function to handle text input and move focus automatically
-  void _onChanged(String value, int index) {
-    setState(() {
-      enteredCode = controllers.map((controller) => controller.text).join();
-    });
-
-    if (value.isNotEmpty && index < 5) {
-      FocusScope.of(context).requestFocus(focusNodes[index + 1]);
-    }
+  @override
+  void dispose() {
+    _pinController.dispose();
+    super.dispose();
   }
 
   @override
@@ -97,56 +84,41 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
               ),
               const SizedBox(height: 30),
 
-              // OTP Input Field
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: List.generate(6, (index) {
-                  return SizedBox(
-                    width: 56,
-                    child: TextField(
-                      keyboardType: TextInputType.number,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                      ],
-                      controller: controllers[index],
-                      focusNode: focusNodes[index],
-                      cursorColor: primarySwatch[900],
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                      maxLength: 1,
-                      onChanged: (value) => _onChanged(value, index),
-                      onEditingComplete: () {
-                        if (index < 5 && controllers[index].text.isNotEmpty) {
-                          FocusScope.of(context)
-                              .requestFocus(focusNodes[index + 1]);
-                        }
-                      },
-                      onSubmitted: (value) {
-                        if (value.isEmpty && index > 0) {
-                          FocusScope.of(context)
-                              .requestFocus(focusNodes[index - 1]);
-                        }
-                      },
-                      decoration: InputDecoration(
-                        counterText: '', // Hide the length counter
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(
-                            color: lightColor,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            color: primarySwatch,
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                }),
+              // PIN Input Field using pin_code_fields
+              PinCodeTextField(
+                appContext: context,
+                length: 6,
+                controller: _pinController,
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                ],
+                autoFocus: true,
+                cursorColor: primarySwatch[900],
+                textStyle: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+                pinTheme: PinTheme(
+                  shape: PinCodeFieldShape.box,
+                  borderRadius: BorderRadius.circular(10),
+                  fieldHeight: 56,
+                  fieldWidth: 56,
+                  activeColor: primarySwatch[900],
+                  inactiveColor: lightColor,
+                  selectedColor: primarySwatch[900],
+                  activeFillColor: Colors.white,
+                  inactiveFillColor: Colors.white,
+                  selectedFillColor: Colors.white,
+                ),
+                enableActiveFill: true,
+                onChanged: (value) {
+                  setState(() {
+                    enteredCode = value;
+                  });
+                },
+                onCompleted: (value) {
+                  _validateAndSubmit();
+                },
               ),
               const SizedBox(height: 20),
               Row(
