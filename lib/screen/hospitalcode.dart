@@ -119,6 +119,8 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
                 onCompleted: (value) {
                   _validateAndSubmit();
                 },
+                onTap:
+                    _clearErrorMessage, // Clear error message when tapping the field
               ),
               const SizedBox(height: 20),
               Row(
@@ -174,7 +176,6 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
               const SizedBox(height: 20),
               if (hospitalProvider.isLoading)
                 const Center(child: CircularProgressIndicator()),
-
               if (hospitalProvider.errorMessage.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.all(8.0),
