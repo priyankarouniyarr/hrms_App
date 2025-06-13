@@ -125,7 +125,7 @@ class _CheckInScreenState extends State<CheckInScreen> {
                       child: GoogleMap(
                         initialCameraPosition: CameraPosition(
                           target: mapLocation!,
-                          zoom: 15,
+                          zoom: 14,
                         ),
                         markers: {
                           Marker(
