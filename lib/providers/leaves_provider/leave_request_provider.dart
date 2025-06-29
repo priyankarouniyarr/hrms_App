@@ -190,9 +190,20 @@ class LeaveRequestProvider extends ChangeNotifier {
         notifyListeners();
         return false;
       }
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errorMessage = 'Base URL not found. Please enter hospital code again.';
+        debugPrint(_errorMessage);
+        _isLoading = false;
+        notifyListeners();
 
-      final url = Uri.parse(
-          '${dotenv.env['base_url']}api/LeaveApplication/LeaveApplicationPost');
+        return false;
+      }
+
+      // Store the base URL to ensure it’s persisted
+      await _storeBaseUrl(baseUrl);
+      final url =
+          Uri.parse('$baseUrl/api/LeaveApplication/LeaveApplicationPost');
       final headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $_token',
