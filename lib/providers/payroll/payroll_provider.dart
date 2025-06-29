@@ -2,28 +2,37 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
+import 'package:hrms_app/storage/hosptial_code_storage.dart';
 import 'package:hrms_app/models/payrolls_models/loan_and_advance_data.dart';
 import 'package:hrms_app/models/payrolls_models/salary_deduction_models.dart';
 
 class LoanAndAdvanceProvider with ChangeNotifier {
   LoanAndAdvanceModel? _loanAndAdvanceModel;
   List<SalaryDeduction> _salaryDeductions = [];
-  int _currentTaxIndex = 0; // Track the current index
+  int _currentTaxIndex = 0;
 
   bool _isLoading = false;
   String _errorMessage = '';
   final SecureStorageService _secureStorageService = SecureStorageService();
-  int get currentTaxIndex => _currentTaxIndex;
+  final HosptialCodeStorage _hospitalCodeStorage = HosptialCodeStorage();
 
+  int get currentTaxIndex => _currentTaxIndex;
   LoanAndAdvanceModel? get loanAndAdvanceModel => _loanAndAdvanceModel;
   List<SalaryDeduction> get salaryDeductions => _salaryDeductions;
-
   SalaryDeduction? get currentTax =>
       _salaryDeductions.isNotEmpty ? _salaryDeductions[_currentTaxIndex] : null;
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
+
+  Future<String?> _getBaseUrl() async {
+    return await _hospitalCodeStorage.getBaseUrl();
+  }
+
+  Future<void> _storeBaseUrl(String baseUrl) async {
+    await _hospitalCodeStorage.storeBaseUrl(baseUrl);
+    debugPrint("Stored Base URL: $baseUrl");
+  }
 
   /// Fetch loan and advance data
   Future<void> fetchLoanAndAdvances() async {
@@ -38,32 +47,54 @@ class LoanAndAdvanceProvider with ChangeNotifier {
       String? fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
 
-      if (token == null && branchId == null && fiscalYear == null) {
-        print("Token or Branch ID is missing");
-        throw Exception("Token or Branch ID is missing.");
+      if (token == null || branchId == null || fiscalYear == null) {
+        _errorMessage = "Missing authentication data.";
+        debugPrint(_errorMessage);
+        _isLoading = false;
+        notifyListeners();
+        return;
       }
 
-      final url = Uri.parse(
-          '${dotenv.env['base_url']}api/Payroll/GetMyLoanAndAdvances');
+      debugPrint("Token: $token");
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errorMessage = 'Base URL not found. Please enter hospital code again.';
+        debugPrint(_errorMessage);
+        _isLoading = false;
+        notifyListeners();
+
+        return;
+      }
+
+      // Store the base URL to ensure it’s persisted
+      await _storeBaseUrl(baseUrl);
+      //debugPrint("Base URL: $baseUrl");
+
+      final url = Uri.parse('$baseUrl/api/Payroll/GetMyLoanAndAdvances');
 
       final response = await http.get(
         url,
         headers: {
           'Authorization': 'Bearer $token',
-          'selected_workingbranchId': branchId!,
-          'selected_fiscal_year': fiscalYear!,
+          'selected_workingbranchId': branchId,
+          'selected_fiscal_year': fiscalYear,
         },
       );
+
+      debugPrint("Response status: ${response.statusCode}");
+      debugPrint("Response body: ${response.body}");
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         _loanAndAdvanceModel = LoanAndAdvanceModel.fromJson(data);
+        debugPrint("LoanAndAdvanceModel: $_loanAndAdvanceModel");
       } else {
-        _errorMessage = 'Failed to load notices';
+        _errorMessage = 'Failed to load loan and advance data';
+        debugPrint(_errorMessage);
       }
     } catch (error) {
-      _errorMessage = 'Error: $error';
-      print("Error: $error");
+      _errorMessage = 'Error parsing loan and advance data: $error';
+      debugPrint(_errorMessage);
     }
 
     _isLoading = false;
@@ -83,19 +114,35 @@ class LoanAndAdvanceProvider with ChangeNotifier {
       String? fiscalYear =
           await _secureStorageService.readData('selected_fiscal_year');
 
-      if (token == null && branchId == null && fiscalYear == null) {
-        print("Token or Branch ID is missing");
-        throw Exception("Token is missing.");
+      if (token == null || branchId == null || fiscalYear == null) {
+        _errorMessage = "Missing authentication data.";
+        debugPrint(_errorMessage);
+        _isLoading = false;
+        notifyListeners();
+        return;
       }
 
-      final url = Uri.parse('${dotenv.env['base_url']}api/Payroll/GetMyTaxes');
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errorMessage = 'Base URL not found. Please enter hospital code again.';
+        debugPrint(_errorMessage);
+        _isLoading = false;
+        notifyListeners();
+
+        return;
+      }
+
+      // Store the base URL to ensure it’s persisted
+      await _storeBaseUrl(baseUrl);
+
+      final url = Uri.parse('$baseUrl/api/Payroll/GetMyTaxes');
 
       final response = await http.get(
         url,
         headers: {
           'Authorization': 'Bearer $token',
-          'selected_workingbranchId': branchId!,
-          'selected_fiscal_year': fiscalYear!,
+          'selected_workingbranchId': branchId,
+          'selected_fiscal_year': fiscalYear,
         },
       );
 
@@ -105,6 +152,7 @@ class LoanAndAdvanceProvider with ChangeNotifier {
             data.map((json) => SalaryDeduction.fromJson(json)).toList();
       } else {
         _errorMessage = 'Failed to fetch taxes: ${response.body}';
+        debugPrint(_errorMessage);
       }
     } on SocketException catch (e) {
       if (e.osError != null && e.osError!.errorCode == 101) {
@@ -113,10 +161,10 @@ class LoanAndAdvanceProvider with ChangeNotifier {
       } else {
         _errorMessage = 'Network error: ${e.message}';
       }
-      print("SocketException: $_errorMessage");
+      debugPrint("SocketException: $_errorMessage");
     } catch (error) {
       _errorMessage = 'Error: $error';
-      print("Error: $error");
+      debugPrint(_errorMessage);
     }
 
     _isLoading = false;
@@ -130,7 +178,6 @@ class LoanAndAdvanceProvider with ChangeNotifier {
     }
   }
 
-  // Move to the previous tax record
   void prevTax() {
     if (_currentTaxIndex > 0) {
       _currentTaxIndex--;

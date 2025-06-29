@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/leaves/apply_leave.dart';
+import 'package:hrms_app/storage/hosptial_code_storage.dart';
 import 'package:hrms_app/models/leaves/leave_request_models.dart';
 
 class LeaveRequestProvider extends ChangeNotifier {
@@ -14,6 +15,7 @@ class LeaveRequestProvider extends ChangeNotifier {
   bool _isLoading = false;
   String _errorMessage = '';
   final SecureStorageService _secureStorageService = SecureStorageService();
+  final HosptialCodeStorage _hospitalCodeStorage = HosptialCodeStorage();
   String? _branchId;
   String? _token;
   String? _fiscalYear;
@@ -24,6 +26,14 @@ class LeaveRequestProvider extends ChangeNotifier {
 
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
+  Future<String?> _getBaseUrl() async {
+    return await _hospitalCodeStorage.getBaseUrl();
+  }
+
+  Future<void> _storeBaseUrl(String baseUrl) async {
+    await _hospitalCodeStorage.storeBaseUrl(baseUrl);
+    debugPrint("Stored Base URL of payroll: $baseUrl");
+  }
 
   Future<void> fetchEmployeeLeaveApply() async {
     _isLoading = true;
@@ -42,14 +52,24 @@ class LeaveRequestProvider extends ChangeNotifier {
         notifyListeners();
         return;
       }
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errorMessage = 'Base URL not found. Please enter hospital code again.';
+        debugPrint(_errorMessage);
+        _isLoading = false;
+        notifyListeners();
 
-      String leaveType =
-          "${dotenv.env['base_url']}api/LeaveApplication/GetLeaveTypes";
+        return;
+      }
+
+      // Store the base URL to ensure it’s persisted
+      await _storeBaseUrl(baseUrl);
+      String leaveType = "$baseUrl/api/LeaveApplication/GetLeaveTypes";
       String extendedtype =
-          "${dotenv.env['base_url']}api/LeaveApplication/GetExtendedLeaveTypes";
+          "$baseUrl/api/LeaveApplication/GetExtendedLeaveTypes";
 
       String substitutionEmployee =
-          "${dotenv.env['base_url']}api/LeaveApplication/GetSubstitutionEmployee";
+          "$baseUrl/api/LeaveApplication/GetSubstitutionEmployee";
       final headers = {
         'Authorization': 'Bearer $_token',
         'workingBranchId': _branchId!,
@@ -109,9 +129,20 @@ class LeaveRequestProvider extends ChangeNotifier {
         notifyListeners();
         return;
       }
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errorMessage = 'Base URL not found. Please enter hospital code again.';
+        debugPrint(_errorMessage);
+        _isLoading = false;
+        notifyListeners();
 
-      String employeeLeaves =
-          "${dotenv.env['base_url']}api/LeaveApplication/EmployeeLeaves";
+        return;
+      }
+
+      // Store the base URL to ensure it’s persisted
+      await _storeBaseUrl(baseUrl);
+
+      String employeeLeaves = "$baseUrl/api/LeaveApplication/EmployeeLeaves";
       final headers = {
         'Authorization': 'Bearer $_token',
         'workingBranchId': _branchId!,

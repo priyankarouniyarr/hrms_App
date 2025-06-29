@@ -5,8 +5,8 @@ import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 import 'package:http_parser/http_parser.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
+import 'package:hrms_app/storage/hosptial_code_storage.dart';
 import 'package:hrms_app/models/works_models/comments_models.dart';
 import 'package:hrms_app/models/works_models/ticketdetails_with_id.dart';
 import 'package:hrms_app/models/works_models/reopen%20_ticket_models.dart';
@@ -18,6 +18,7 @@ class TicketWorkFlowProvider with ChangeNotifier {
   List<TicketMeAndAssignToMe> _myTicket = [];
   List<TicketMeAndAssignToMe> _myTicketAssignToMe = [];
   final SecureStorageService _secureStorageService = SecureStorageService();
+  final HosptialCodeStorage _hospitalCodeStorage = HosptialCodeStorage();
   String? _branchId;
   String? _token;
   String? _fiscalYear;
@@ -39,6 +40,15 @@ class TicketWorkFlowProvider with ChangeNotifier {
   List<String> get priority => _priority;
   List<String> _workflowType = ["Oldest", "Newest"];
   List<String> get workflowType => _workflowType;
+  Future<String?> _getBaseUrl() async {
+    return await _hospitalCodeStorage.getBaseUrl();
+  }
+
+  Future<void> _storeBaseUrl(String baseUrl) async {
+    await _hospitalCodeStorage.storeBaseUrl(baseUrl);
+    debugPrint("Stored Base URL: $baseUrl");
+  }
+
 //MYtICKETS
   Future<void> fetchTickets(MyticketPost requestticket) async {
     _isLoading = true;
@@ -56,8 +66,18 @@ class TicketWorkFlowProvider with ChangeNotifier {
         notifyListeners();
         return;
       }
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errormessage =
+            ('Base URL not found. Please enter hospital code again.');
+        notifyListeners();
 
-      String url = '${dotenv.env['base_url']}api/Ticket/MyTickets';
+        return;
+      }
+
+      await _storeBaseUrl(baseUrl);
+
+      String url = '$baseUrl/api/Ticket/MyTickets';
 
       final response = await http.post(Uri.parse(url),
           headers: {
@@ -70,13 +90,10 @@ class TicketWorkFlowProvider with ChangeNotifier {
 
       if (response.statusCode == 200) {
         final List<dynamic> responseData = json.decode(response.body);
-        ;
 
         _myTicket =
             responseData.map((e) => TicketMeAndAssignToMe.fromJson(e)).toList();
-        ;
 
-        ;
         _errormessage = null;
         notifyListeners();
       } else {
@@ -110,8 +127,18 @@ class TicketWorkFlowProvider with ChangeNotifier {
         notifyListeners();
         return;
       }
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errormessage =
+            ('Base URL not found. Please enter hospital code again.');
+        notifyListeners();
 
-      String url = '${dotenv.env['base_url']}api/Ticket/TicketsAssignedToMe';
+        return;
+      }
+
+      await _storeBaseUrl(baseUrl);
+
+      String url = '$baseUrl/api/Ticket/TicketsAssignedToMe';
 
       final response = await http.post(Uri.parse(url),
           headers: {
@@ -169,9 +196,18 @@ class TicketWorkFlowProvider with ChangeNotifier {
         throw Exception("Missing authentication data.");
       }
       //print("hello");
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errormessage =
+            ('Base URL not found. Please enter hospital code again.');
+        notifyListeners();
 
-      final url = Uri.parse(
-          '${dotenv.env['base_url']}api/Ticket/GetTicketDetailById/$ticket');
+        return;
+      }
+
+      await _storeBaseUrl(baseUrl);
+
+      final url = Uri.parse('$baseUrl/api/Ticket/GetTicketDetailById/$ticket');
 
       final response = await http.get(
         url,
@@ -225,9 +261,18 @@ class TicketWorkFlowProvider with ChangeNotifier {
       if (token == null || branchId == null || fiscalYear == null) {
         throw Exception("Missing authentication data.");
       }
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errormessage =
+            ('Base URL not found. Please enter hospital code again.');
+        notifyListeners();
 
-      final url = Uri.parse(
-          '${dotenv.env['base_url']}api/Ticket/CloseTicket/$ticketId');
+        return false;
+      }
+
+      await _storeBaseUrl(baseUrl);
+
+      final url = Uri.parse('$baseUrl/api/Ticket/CloseTicket/$ticketId');
       print(ticketId);
       final response = await http.post(
         url,
@@ -293,9 +338,18 @@ class TicketWorkFlowProvider with ChangeNotifier {
       if (token == null || branchId == null || fiscalYear == null) {
         throw Exception("Missing authentication data.");
       }
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errormessage =
+            ('Base URL not found. Please enter hospital code again.');
+        notifyListeners();
 
-      final url = Uri.parse(
-          '${dotenv.env['base_url']}api/Ticket/ReopenTicket/$ticketId');
+        return false;
+      }
+
+      await _storeBaseUrl(baseUrl);
+
+      final url = Uri.parse('$baseUrl/api/Ticket/ReopenTicket/$ticketId');
       final response = await http.post(
         url,
         headers: {
@@ -358,8 +412,18 @@ class TicketWorkFlowProvider with ChangeNotifier {
       if (token == null || branchId == null || fiscalYear == null) {
         throw Exception("Missing authentication data.");
       }
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errormessage =
+            ('Base URL not found. Please enter hospital code again.');
+        notifyListeners();
 
-      final url = Uri.parse('${dotenv.env['base_url']}api/Ticket/EditSeverity');
+        return false;
+      }
+
+      await _storeBaseUrl(baseUrl);
+
+      final url = Uri.parse('$baseUrl/api/Ticket/EditSeverity');
       final response = await http.post(
         url,
         headers: {
@@ -430,8 +494,18 @@ class TicketWorkFlowProvider with ChangeNotifier {
       if (token == null || branchId == null || fiscalYear == null) {
         throw Exception("Missing authentication data.");
       }
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errormessage =
+            ('Base URL not found. Please enter hospital code again.');
+        notifyListeners();
 
-      final url = Uri.parse('${dotenv.env['base_url']}api/Ticket/EditPriority');
+        return false;
+      }
+
+      await _storeBaseUrl(baseUrl);
+
+      final url = Uri.parse('$baseUrl/api/Ticket/EditPriority');
       final response = await http.post(
         url,
         headers: {
@@ -499,9 +573,18 @@ class TicketWorkFlowProvider with ChangeNotifier {
       if (token == null || branchId == null || fiscalYear == null) {
         throw Exception("Missing authentication data.");
       }
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errormessage =
+            ('Base URL not found. Please enter hospital code again.');
+        notifyListeners();
 
-      final url =
-          Uri.parse('${dotenv.env['base_url']}api/Ticket/EditAssignedTo');
+        return false;
+      }
+
+      await _storeBaseUrl(baseUrl);
+
+      final url = Uri.parse('$baseUrl/api/Ticket/EditAssignedTo');
       final response = await http.post(
         url,
         headers: {
@@ -625,9 +708,19 @@ class TicketWorkFlowProvider with ChangeNotifier {
 
       // Log the request payload for debugging
       print('Sending ticket creation request: ${request.toJson()}');
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errormessage =
+            ('Base URL not found. Please enter hospital code again.');
+        notifyListeners();
+
+        return false;
+      }
+
+      await _storeBaseUrl(baseUrl);
 
       final response = await dio.post(
-        "${dotenv.env['base_url']}api/Ticket/CommentPost/${request.ticketId}",
+        "$baseUrl/api/Ticket/CommentPost/${request.ticketId}",
         data: formData,
       );
 

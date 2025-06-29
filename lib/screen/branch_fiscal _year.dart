@@ -26,7 +26,9 @@ class _SelectFiscalYearScreenState extends State<SelectFiscalYearScreen> {
       if (branchProvider.branches.isNotEmpty) {
         int branchId = branchProvider.branches.first.branchId;
         Provider.of<FiscalYearProvider>(context, listen: false)
-            .fetchFiscalYears(branchId);
+            .fetchFiscalYears(
+          branchId,
+        );
       } else {
         print("No branch ID available.");
       }

@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
+import 'package:hrms_app/storage/hosptial_code_storage.dart';
 import 'package:hrms_app/models/createtickets/new_tickets_models.dart';
 
 // NewTicketProvider class
@@ -12,12 +12,21 @@ class NewTicketProvider extends ChangeNotifier {
   bool _isLoading = false;
   String _errorMessage = '';
   final SecureStorageService _secureStorageService = SecureStorageService();
+  final HosptialCodeStorage _hospitalCodeStorage = HosptialCodeStorage();
   String? _branchId;
   String? _token;
   String? _fiscalYear;
 
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
+  Future<String?> _getBaseUrl() async {
+    return await _hospitalCodeStorage.getBaseUrl();
+  }
+
+  Future<void> _storeBaseUrl(String baseUrl) async {
+    await _hospitalCodeStorage.storeBaseUrl(baseUrl);
+    debugPrint("Stored Base URL of payroll: $baseUrl");
+  }
 
   // Method to fetch ticket categories
   Future<void> fetchTicketCategories() async {
@@ -41,10 +50,18 @@ class NewTicketProvider extends ChangeNotifier {
         notifyListeners();
         return;
       }
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errorMessage = 'No base URL found';
+        notifyListeners();
+        return;
+      }
+      // Store the base URL to ensure it’s persisted
+      await _storeBaseUrl(baseUrl);
 
       // Make the GET request
       final response = await http.get(
-        Uri.parse('${dotenv.env['base_url']}api/Ticket/GetTicketCategories'),
+        Uri.parse('$baseUrl/api/Ticket/GetTicketCategories'),
         headers: {
           'Authorization': 'Bearer $_token',
           'workingBranchId': _branchId!,
@@ -52,7 +69,7 @@ class NewTicketProvider extends ChangeNotifier {
         },
       );
       final response1 = await http.get(
-        Uri.parse('${dotenv.env['base_url']}api/Ticket/GetUserList'),
+        Uri.parse('$baseUrl/api/Ticket/GetUserList'),
         headers: {
           'Authorization': 'Bearer $_token',
           'workingBranchId': _branchId!,

@@ -18,7 +18,7 @@ class _EmployementContractsState extends State<EmployementContracts> {
     super.initState();
     Future.microtask(() =>
         Provider.of<EmployeeContractProvider>(context, listen: false)
-            .fetchEmployeeContracts());
+            .fetchEmployeeContracts(context));
   }
 
   @override

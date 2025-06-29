@@ -4,14 +4,15 @@ import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
+import 'package:hrms_app/storage/hosptial_code_storage.dart';
 import 'package:hrms_app/models/createtickets/new_tickets_creation_model.dart';
 
 class TicketProvider with ChangeNotifier {
   bool _isLoading = false;
   String _errorMessage = '';
   final SecureStorageService _secureStorageService = SecureStorageService();
+  final HosptialCodeStorage _hospitalCodeStorage = HosptialCodeStorage();
   String? _branchId;
   String? _token;
   String? _fiscalYear;
@@ -20,6 +21,14 @@ class TicketProvider with ChangeNotifier {
 
   // Maximum file size in bytes (5MB)
   static const int maxFileSize = 5 * 1024 * 1024;
+  Future<String?> _getBaseUrl() async {
+    return await _hospitalCodeStorage.getBaseUrl();
+  }
+
+  Future<void> _storeBaseUrl(String baseUrl) async {
+    await _hospitalCodeStorage.storeBaseUrl(baseUrl);
+    debugPrint("Stored Base URL of payroll: $baseUrl");
+  }
 
   Future<bool> createTicket(TicketCreationRequest request) async {
     _isLoading = true;
@@ -102,9 +111,17 @@ class TicketProvider with ChangeNotifier {
 
       // Log the request payload for debugging
       print('Sending ticket creation request: ${request.toJson()}');
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errorMessage = 'No base URL found';
+        notifyListeners();
+        return false;
+      }
+      // Store the base URL to ensure it’s persisted
+      await _storeBaseUrl(baseUrl);
 
       final response = await dio.post(
-        '${dotenv.env['base_url']}api/Ticket/CreateTicketPost',
+        '$baseUrl/api/Ticket/CreateTicketPost',
         data: formData,
       );
 

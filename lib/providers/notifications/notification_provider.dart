@@ -1,18 +1,32 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:googleapis_auth/auth_io.dart' as auth;
+import 'package:hrms_app/storage/hosptial_code_storage.dart';
 import 'package:googleapis/servicecontrol/v1.dart' as servicecontrol;
 
 class FcmnotificationProvider with ChangeNotifier {
   String? _fcmToken;
   bool _isLoading = false;
+  String _errorMessage = '';
   bool get isLoading => _isLoading;
+  String get errorMessage => _errorMessage;
   String? get fcmToken => _fcmToken;
 
   final SecureStorageService _secureStorageService = SecureStorageService();
+  final HosptialCodeStorage _hospitalCodeStorage = HosptialCodeStorage();
+
+  Future<String?> _getBaseUrl() async {
+    return await _hospitalCodeStorage.getBaseUrl();
+  }
+
+  Future<void> _storeBaseUrl(String baseUrl) async {
+    await _hospitalCodeStorage.storeBaseUrl(baseUrl);
+    log("Stored Base URL of notifications_baseurl: $baseUrl");
+  }
 
   static Future<String> getAcessToken() async {
     final serviceAccountJson = {
@@ -34,7 +48,6 @@ class FcmnotificationProvider with ChangeNotifier {
       auth.ServiceAccountCredentials.fromJson(serviceAccountJson),
       scopes,
     );
-    //get the access token
     auth.AccessCredentials credentials =
         await auth.obtainAccessCredentialsViaServiceAccount(
       auth.ServiceAccountCredentials.fromJson(serviceAccountJson),
@@ -45,10 +58,21 @@ class FcmnotificationProvider with ChangeNotifier {
     return credentials.accessToken.data;
   }
 
+  // Clear error message
+  void clearError() {
+    _errorMessage = '';
+    notifyListeners();
+  }
+
+  // Set error message
+  void setErrorMessage(String message) {
+    _errorMessage = message;
+    notifyListeners();
+  }
+
   Future<void> sendFcmTokenToServer(
       String fcmToken, String applicationId) async {
     final String severkey = await getAcessToken();
-
     final Map<String, String> messagePayload = {
       'Token': fcmToken,
       'ApplicationId': applicationId,
@@ -56,6 +80,15 @@ class FcmnotificationProvider with ChangeNotifier {
     try {
       _isLoading = true;
       notifyListeners();
+
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errorMessage = 'Base URL not found. Please enter hospital code again.';
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
+      await _storeBaseUrl(baseUrl);
 
       final branchId =
           await _secureStorageService.readData('selected_workingbranchId');
@@ -65,15 +98,13 @@ class FcmnotificationProvider with ChangeNotifier {
 
       if (branchId == null || authToken == null || fiscalYear == null) {
         print('Error: branchId, authToken, or fiscalYear is null');
+        _errorMessage = 'Required authentication data is missing.';
         _isLoading = false;
         notifyListeners();
         return;
       }
 
-      final url = Uri.parse(
-          // '${dotenv.env['base_url']}api/FcmDeviceToken/DeviceTokenPost/${dotenv.env['SA_PROJECT_ID']}/messages:send');
-          '${dotenv.env['base_url']}api/FcmDeviceToken/DeviceTokenPost');
-
+      final url = Uri.parse('$baseUrl/api/FcmDeviceToken/DeviceTokenPost');
       final headers = {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $authToken',
@@ -91,30 +122,55 @@ class FcmnotificationProvider with ChangeNotifier {
 
       if (response.statusCode == 200) {
         print('FCM token sent successfully');
+        _errorMessage = '';
         _isLoading = false;
         notifyListeners();
       } else {
         print('Failed to send FCM token: ${response.body}');
+        _errorMessage = 'Failed to send FCM token: ${response.statusCode}';
         _isLoading = false;
         notifyListeners();
       }
     } catch (error) {
       print('Error occurred while sending FCM token: $error');
+      _errorMessage = 'Error occurred while sending FCM token: $error';
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  Future<void> sendFcmDeviceTokenPostAnonymous(
+  Future<bool> sendFcmDeviceTokenPostAnonymous(
       String fcmDeviceTokenPostAnonymous, String applicationId) async {
     final String severkey = await getAcessToken();
     try {
       _isLoading = true;
+      _errorMessage = '';
       notifyListeners();
 
-      final url = Uri.parse(
-          // '${dotenv.env['base_url']}api/FcmDeviceToken/DeviceTokenPostAnonymous//${dotenv.env['SA_PROJECT_ID']}/messages:send');
-          '${dotenv.env['base_url']}api/FcmDeviceToken/DeviceTokenPostAnonymous');
+      // Check if applicationId is not null or empty
+      if (applicationId.isEmpty) {
+        _errorMessage = 'Application ID (Hospital Code) cannot be empty.';
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+
+      final baseUrl = await _getBaseUrl();
+      log('FCM Token1: $fcmDeviceTokenPostAnonymous');
+      log('Application ID2: $applicationId');
+      log('Base URL3: $baseUrl');
+
+      if (baseUrl == null) {
+        _errorMessage = 'Base URL not found. Please enter hospital code again.';
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+      await _storeBaseUrl(baseUrl);
+
+      final url =
+          Uri.parse('$baseUrl/api/FcmDeviceToken/DeviceTokenPostAnonymous');
+      log('Request URL: $url');
 
       final headers = {
         'Content-Type': 'application/json',
@@ -125,27 +181,36 @@ class FcmnotificationProvider with ChangeNotifier {
         "ApplicationId": applicationId,
       });
 
+      log('Request Body: $body');
+
       final response = await http.post(
         url,
         headers: headers,
         body: body,
       );
 
-      print('Response status: ${response.statusCode}');
+      log('Response status: ${response.statusCode}');
+      log('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
-        print('FCMDeviceTokenPostAnonymous token sent successfully');
+        log('FCMDeviceTokenPostAnonymous token sent successfully');
+        _errorMessage = '';
         _isLoading = false;
         notifyListeners();
+        return true;
       } else {
-        print('Failed to send FCM token: ${response.body}');
+        log('Failed to send FCM token: ${response.body}');
+        _errorMessage = 'Failed to send FCM token: ${response.statusCode}';
         _isLoading = false;
         notifyListeners();
+        return false;
       }
     } catch (error) {
-      print('Error occurred while sending FCM token: $error');
+      log('Error occurred while sending FCM token: $error');
+      _errorMessage = 'Error occurred while sending FCM token: $error';
       _isLoading = false;
       notifyListeners();
+      return false;
     }
   }
 }

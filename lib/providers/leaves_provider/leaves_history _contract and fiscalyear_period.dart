@@ -2,9 +2,10 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
+import 'package:hrms_app/storage/hosptial_code_storage.dart';
 import 'package:hrms_app/models/leaves/leave_history_models.dart';
+
 
 class LeaveContractandFiscalYearProvider extends ChangeNotifier {
   List<LeaveContractPeriodAndFiscalYeAR> _leaveContractList = [];
@@ -19,7 +20,7 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
   String? _branchId;
   String? _token;
   String? _fiscalYear;
-
+  final HosptialCodeStorage _hospitalCodeStorage = HosptialCodeStorage();
   List<LeaveContractPeriodAndFiscalYeAR> get leaveFiscalYearList =>
       _leaveFiscalYearList;
   List<LeaveContractPeriodAndFiscalYeAR> get leaveContractList =>
@@ -29,6 +30,14 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
       _leavecontractandfiscalIdDetails;
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
+  Future<String?> _getBaseUrl() async {
+    return await _hospitalCodeStorage.getBaseUrl();
+  }
+
+  Future<void> _storeBaseUrl(String baseUrl) async {
+    await _hospitalCodeStorage.storeBaseUrl(baseUrl);
+    debugPrint("Stored Base URL of leave : $baseUrl");
+  }
 
   ///  Fetch all contracts (Initial Call)
   Future<void> fetchLeaveContracts() async {
@@ -48,9 +57,19 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
         notifyListeners();
         return;
       }
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errorMessage = 'Base URL not found. Please enter hospital code again.';
+        debugPrint(_errorMessage);
+        _isLoading = false;
+        notifyListeners();
 
-      String urlGetContracts =
-          "${dotenv.env['base_url']}api/LeaveApplication/GetContracts";
+        return;
+      }
+
+      // Store the base URL to ensure it’s persisted
+      await _storeBaseUrl(baseUrl);
+      String urlGetContracts = "$baseUrl/api/LeaveApplication/GetContracts";
 
       final headers = {
         'Authorization': 'Bearer $_token',
@@ -60,7 +79,8 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
 
       final response =
           await http.get(Uri.parse(urlGetContracts), headers: headers);
-
+      print(response.body);
+      print(response.statusCode);
       if (response.statusCode == 200) {
         final List<dynamic> contractListJson = json.decode(response.body);
         _leaveContractList = contractListJson
@@ -98,9 +118,20 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
         notifyListeners();
         return;
       }
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errorMessage = 'Base URL not found. Please enter hospital code again.';
+        debugPrint(_errorMessage);
+        _isLoading = false;
+        notifyListeners();
 
+        return;
+      }
+
+      // Store the base URL to ensure it’s persisted
+      await _storeBaseUrl(baseUrl);
       final String urlFiscalYear =
-          "${dotenv.env['base_url']}api/LeaveApplication/GetContractFiscalYearByContctId/$contractId";
+          "$baseUrl/api/LeaveApplication/GetContractFiscalYearByContctId/$contractId";
 
       final headers = {
         'Authorization': 'Bearer $_token',
@@ -157,11 +188,23 @@ class LeaveContractandFiscalYearProvider extends ChangeNotifier {
         notifyListeners();
         return;
       }
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errorMessage = 'Base URL not found. Please enter hospital code again.';
+        debugPrint(_errorMessage);
+        _isLoading = false;
+        notifyListeners();
+
+        return;
+      }
+
+      // Store the base URL to ensure it’s persisted
+      await _storeBaseUrl(baseUrl);
 
       final String urlContractandFiscalYear =
-          "${dotenv.env['base_url']}api/LeaveApplication/EmployeeLeaveHistoryByContractIdAndFiscalYearId/$contractId/$fiscalYearId"; //table to get
+          "$baseUrl/api/LeaveApplication/EmployeeLeaveHistoryByContractIdAndFiscalYearId/$contractId/$fiscalYearId"; //table to get
       final String employeeLeavesByContractIdAndFiscalYearId =
-          "${dotenv.env['base_url']}api/LeaveApplication/EmployeeLeavesByContractIdAndFiscalYearId/$contractId/$fiscalYearId"; //leave details
+          "$baseUrl/api/LeaveApplication/EmployeeLeavesByContractIdAndFiscalYearId/$contractId/$fiscalYearId"; //leave details
       final headers = {
         'Authorization': 'Bearer $_token',
         'workingBranchId': _branchId!,

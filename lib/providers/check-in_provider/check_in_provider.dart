@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
+import 'package:hrms_app/storage/hosptial_code_storage.dart';
 import 'package:hrms_app/models/check_in_models/check_in_history%20.dart';
+
 
 class CheckInProvider with ChangeNotifier {
   bool _loading = false;
@@ -19,12 +20,21 @@ class CheckInProvider with ChangeNotifier {
 
   String? get aDDress => _address;
   final SecureStorageService _secureStorageService = SecureStorageService();
-
+  final HosptialCodeStorage _hospitalCodeStorage = HosptialCodeStorage();
   bool get loading => _loading;
   String get errorMessage => _errorMessage;
   String? get successMessage => _successMessage;
   String? get latitude => _latitude;
   String? get longitude => _longitude;
+
+  Future<String?> _getBaseUrl() async {
+    return await _hospitalCodeStorage.getBaseUrl();
+  }
+
+  Future<void> _storeBaseUrl(String baseUrl) async {
+    await _hospitalCodeStorage.storeBaseUrl(baseUrl);
+    debugPrint("Stored Base URL of payroll: $baseUrl");
+  }
 
   Future<void> punchPost() async {
     _setLoading(true);
@@ -73,8 +83,16 @@ class CheckInProvider with ChangeNotifier {
             '${address[0].name}, ${address[0].locality}, ${address[0].administrativeArea}';
       }
 
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errorMessage = 'No base URL found';
+        notifyListeners();
+        return;
+      }
+      // Store the base URL to ensure it’s persisted
+      await _storeBaseUrl(baseUrl);
       final response = await http.post(
-        Uri.parse('${dotenv.env['base_url']}api/Employee/PunchPost'),
+        Uri.parse('$baseUrl/api/Employee/PunchPost'),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
@@ -175,8 +193,16 @@ class CheckInProvider with ChangeNotifier {
         return;
       }
 
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errorMessage = 'No base URL found';
+        notifyListeners();
+        return;
+      }
+      // Store the base URL to ensure it’s persisted
+      await _storeBaseUrl(baseUrl);
       final response = await http.get(
-        Uri.parse('${dotenv.env['base_url']}api/Employee/GetTodayPunches'),
+        Uri.parse('$baseUrl/api/Employee/GetTodayPunches'),
         headers: {
           'Authorization': 'Bearer $_token',
           'workingBranchId': _branchId,

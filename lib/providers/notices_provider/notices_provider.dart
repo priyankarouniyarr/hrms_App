@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
+import 'package:hrms_app/storage/hosptial_code_storage.dart';
 import 'package:hrms_app/models/notices_models/notices_models.dart';
 
 class NoticesProvider with ChangeNotifier {
@@ -12,6 +12,15 @@ class NoticesProvider with ChangeNotifier {
 
   String get errorMessage => _errorMessage;
   final SecureStorageService _secureStorageService = SecureStorageService();
+  final HosptialCodeStorage _hospitalCodeStorage = HosptialCodeStorage();
+  Future<String?> _getBaseUrl() async {
+    return await _hospitalCodeStorage.getBaseUrl();
+  }
+
+  Future<void> _storeBaseUrl(String baseUrl) async {
+    await _hospitalCodeStorage.storeBaseUrl(baseUrl);
+    debugPrint("Stored Base URL: $baseUrl");
+  }
 
   Future<void> fetchNotice() async {
     try {
@@ -25,9 +34,19 @@ class NoticesProvider with ChangeNotifier {
       if (branchId == null || token == null || fiscalYear == null) {
         throw Exception('No branchId or token found');
       }
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errorMessage =
+            ('Base URL not found. Please enter hospital code again.');
+        notifyListeners();
 
+        return;
+      }
+
+      // Store the base URL to ensure it’s persisted
+      await _storeBaseUrl(baseUrl);
       final response = await http.get(
-        Uri.parse('${dotenv.env['base_url']}api/Notice/GetAllNotices'),
+        Uri.parse('$baseUrl/api/Notice/GetAllNotices'),
         headers: {
           'Authorization': 'Bearer $token',
           "workingBranchId": branchId,
@@ -58,9 +77,20 @@ class NoticesProvider with ChangeNotifier {
       if (branchId == null || token == null || fiscalYear == null) {
         throw Exception('No branchId or token found');
       }
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errorMessage =
+            ('Base URL not found. Please enter hospital code again.');
+        notifyListeners();
+
+        return;
+      }
+
+      // Store the base URL to ensure it’s persisted
+      await _storeBaseUrl(baseUrl);
 
       final response = await http.get(
-        Uri.parse('${dotenv.env['base_url']}api/Notice/GetNoticeById/1'),
+        Uri.parse('$baseUrl/api/Notice/GetNoticeById/1'),
         headers: {
           'Authorization': 'Bearer $token',
           "workingBranchId": branchId,

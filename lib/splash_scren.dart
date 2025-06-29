@@ -42,8 +42,10 @@ class _SplashScreenState extends State<SplashScreen> {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final fcmNotificationProvider =
           Provider.of<FcmnotificationProvider>(context, listen: false);
-
+      print("yes");
       await authProvider.loadToken();
+      print("token: ${authProvider.token}");
+
       await authProvider.loadUsername();
       await authProvider.loadRefreshToken();
       String? fcmToken = await FirebaseMessaging.instance.getToken();
@@ -81,10 +83,10 @@ class _SplashScreenState extends State<SplashScreen> {
         }
       } else {
         //  ✅ Send FCM token as anonymous (not logged in)
-        if (fcmToken != null && applicationId == null) {
-          await fcmNotificationProvider.sendFcmDeviceTokenPostAnonymous(
-              fcmToken, applicationId ?? '');
-        }
+        //if (fcmToken != null && applicationId == null) {
+        //   await fcmNotificationProvider.sendFcmDeviceTokenPostAnonymous(
+        //       fcmToken, applicationId ?? '');
+        // }
       }
 
       Navigator.pushReplacement(

@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
+import 'package:hrms_app/storage/hosptial_code_storage.dart';
 import 'package:hrms_app/models/leaves/leave_history_models.dart';
 
 class LeaveProvider extends ChangeNotifier {
@@ -14,6 +14,7 @@ class LeaveProvider extends ChangeNotifier {
   bool _isLoading = false;
   String _errorMessage = '';
   final SecureStorageService _secureStorageService = SecureStorageService();
+  final HosptialCodeStorage _hospitalCodeStorage = HosptialCodeStorage();
   String? _branchId;
   String? _token;
   String? _fiscalYear;
@@ -27,6 +28,14 @@ class LeaveProvider extends ChangeNotifier {
   List<LeaveApplication> get leaveNotApprovals => _leaveNotApproval;
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
+  Future<String?> _getBaseUrl() async {
+    return await _hospitalCodeStorage.getBaseUrl();
+  }
+
+  Future<void> _storeBaseUrl(String baseUrl) async {
+    await _hospitalCodeStorage.storeBaseUrl(baseUrl);
+    debugPrint("Stored Base URL of payroll: $baseUrl");
+  }
 
   Future<void> fetchEmployeeLeaveHistory() async {
     _isLoading = true;
@@ -45,14 +54,24 @@ class LeaveProvider extends ChangeNotifier {
         notifyListeners();
         return;
       }
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errorMessage = 'Base URL not found. Please enter hospital code again.';
+        debugPrint(_errorMessage);
+        _isLoading = false;
+        notifyListeners();
 
-      String url =
-          "${dotenv.env['base_url']}api/LeaveApplication/EmployeeLeaveHistory";
+        return;
+      }
+
+      // Store the base URL to ensure it’s persisted
+      await _storeBaseUrl(baseUrl);
+      String url = "$baseUrl/api/LeaveApplication/EmployeeLeaveHistory";
       String url1 =
-          "${dotenv.env['base_url']}api/LeaveApplication/ApprovedEmployeeLeavesToCome";
+          "$baseUrl/api/LeaveApplication/ApprovedEmployeeLeavesToCome";
 
       String url2 =
-          "${dotenv.env['base_url']}api/LeaveApplication/NotApprovedEmployeeLeavesToCome";
+          "$baseUrl/api/LeaveApplication/NotApprovedEmployeeLeavesToCome";
 
       final headers = {
         'Authorization': 'Bearer $_token',

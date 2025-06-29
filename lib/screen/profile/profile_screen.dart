@@ -9,12 +9,12 @@ import 'package:hrms_app/screen/profile/workingexperience.dart';
 import 'package:hrms_app/screen/profile/subcategories/traning.dart';
 import 'package:hrms_app/screen/profile/subcategories/documents.dart';
 import 'package:hrms_app/providers/profile_providers/profile_provider.dart';
+import 'package:hrms_app/providers/login_screen_provider/auth_provider.dart';
 import 'package:hrms_app/screen/profile/subcategories/insurance.details.dart';
 import 'package:hrms_app/screen/profile/subcategories/employement_contracts.dart';
 import 'package:hrms_app/screen/profile/subcategories/personal_information%20.dart';
 import 'package:hrms_app/screen/profile/subcategories/work%20and%20shift%20information.dart';
 import 'package:hrms_app/screen/profile/subcategories/qualifications%20and%20experiences.dart';
-import 'package:hrms_app/providers/login_screen_provider/auth_provider.dart'; // Import the AuthProvider
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -251,6 +251,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         builder: (context) => HospitalCodeScreen(),
                       ),
                     );
+                    print(authProvider.token);
+
+                    print(authProvider.username);
+
+                    // print(authProvider.branchId);
                   },
                   child: const Padding(
                     padding: EdgeInsets.symmetric(vertical: 12),

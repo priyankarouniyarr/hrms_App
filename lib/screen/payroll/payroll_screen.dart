@@ -176,7 +176,7 @@ class _PayrollScreenState extends State<PayrollScreen> {
                 _buildSalaryTotalRow('Gross Total',
                     salaryProvider.monthSalary?.grossTotal.toString()),
                 _buildSalaryTotalRow('Net Total',
-                    salaryProvider.monthSalary?.grossTotal.toString()),
+                    salaryProvider.monthSalary?.netTotal.toString()),
               ],
             ],
           ),

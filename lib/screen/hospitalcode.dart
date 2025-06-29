@@ -1,10 +1,13 @@
+import 'dart:developer';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:hrms_app/constants/colors.dart';
 import 'package:hrms_app/screen/login%20screen.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:hrms_app/storage/hosptial_code_storage.dart';
-import 'package:pin_code_fields/pin_code_fields.dart'; 
+import 'package:hrms_app/providers/notifications/notification_provider.dart';
 import 'package:hrms_app/providers/hosptial_code_provider/hosptial_code_provider.dart';
 
 class HospitalCodeScreen extends StatefulWidget {
@@ -20,44 +23,74 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
     if (enteredCode.length == 6) {
       final provider =
           Provider.of<HospitalCodeProvider>(context, listen: false);
+      final fcmNotificationProvider =
+          Provider.of<FcmnotificationProvider>(context, listen: false);
+
+      // Clear any previous FCM error messages
+      fcmNotificationProvider.clearError();
+
+      // Fetch base URL for the hospital code
       await provider.fetchBaseUrl(enteredCode);
 
       if (provider.baseUrl.isNotEmpty) {
-        // Store the hospital code
         final hosptialcode = HosptialCodeStorage();
         await hosptialcode.storeHospitalCode(enteredCode);
 
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => LoginScreen()),
-          (route) => false,
-        );
+        // Get FCM token
+        String? fcmToken = await FirebaseMessaging.instance.getToken();
+        log("code is $enteredCode");
+
+        log("FCM Tokens in Hospital Code Screen: $fcmToken");
+
+        bool fcmSuccess = false;
+        if (fcmToken != null) {
+          // Call sendFcmDeviceTokenPostAnonymous and check result
+          await fcmNotificationProvider.sendFcmDeviceTokenPostAnonymous(
+            fcmToken,
+            enteredCode,
+          );
+          // Check if the FCM token was sent successfully (no error message)
+          fcmSuccess = fcmNotificationProvider.errorMessage.isEmpty;
+          log("FCM Token submission status: $fcmSuccess");
+        } else {
+          print("FCM Token is null");
+          fcmNotificationProvider.setErrorMessage("FCM token unavailable.");
+        }
+
+        if (!mounted) return;
+
+        // Navigate to LoginScreen only if FCM token submission was successful or no FCM token
+        if (fcmSuccess) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => LoginScreen()),
+            (route) => false,
+          );
+        }
       }
     }
   }
 
   void _clearOtpField() {
     setState(() {
-      enteredCode = ''; // Reset OTP field
+      enteredCode = '';
       _pinController.clear();
     });
-    _clearErrorMessage(); // Clear any error messages
+    _clearErrorMessage();
   }
 
   void _clearErrorMessage() {
     final provider = Provider.of<HospitalCodeProvider>(context, listen: false);
     provider.clearError();
-  }
-
-  @override
-  void dispose() {
-    _pinController.dispose();
-    super.dispose();
+    final fcmProvider =
+        Provider.of<FcmnotificationProvider>(context, listen: false);
+    fcmProvider.clearError();
   }
 
   @override
   Widget build(BuildContext context) {
     final hospitalProvider = context.watch<HospitalCodeProvider>();
+    final fcmNotificationProvider = context.watch<FcmnotificationProvider>();
 
     return Scaffold(
       backgroundColor: cardBackgroundColor,
@@ -83,8 +116,6 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
                 textAlign: TextAlign.justify,
               ),
               const SizedBox(height: 30),
-
-              // PIN Input Field using pin_code_fields
               PinCodeTextField(
                 appContext: context,
                 length: 6,
@@ -119,8 +150,7 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
                 onCompleted: (value) {
                   _validateAndSubmit();
                 },
-                onTap:
-                    _clearErrorMessage, // Clear error message when tapping the field
+                onTap: _clearErrorMessage,
               ),
               const SizedBox(height: 20),
               Row(
@@ -174,7 +204,8 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
                 ],
               ),
               const SizedBox(height: 20),
-              if (hospitalProvider.isLoading)
+              if (hospitalProvider.isLoading ||
+                  fcmNotificationProvider.isLoading)
                 const Center(child: CircularProgressIndicator()),
               if (hospitalProvider.errorMessage.isNotEmpty)
                 Padding(
@@ -183,6 +214,20 @@ class _HospitalCodeScreenState extends State<HospitalCodeScreen> {
                     children: [
                       Text(
                         hospitalProvider.errorMessage,
+                        style:
+                            const TextStyle(fontSize: 16, color: accentColor),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                  ),
+                ),
+              if (fcmNotificationProvider.errorMessage.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        fcmNotificationProvider.errorMessage,
                         style:
                             const TextStyle(fontSize: 16, color: accentColor),
                       ),

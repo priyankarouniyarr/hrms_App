@@ -82,19 +82,19 @@ class _WorkFlowViewAssignedState extends State<WorkFlowViewAssigned> {
                             )
                           ],
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "id",
-                              style: TextStyle(fontSize: 14.0),
-                            ),
-                            Text(
-                              "${ticket.id}",
-                              style: TextStyle(fontSize: 14.0),
-                            )
-                          ],
-                        ),
+                        //   Row(
+                        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //   children: [
+                        //     // Text(
+                        //     //   "id",
+                        //     //   style: TextStyle(fontSize: 14.0),
+                        //     // ),
+                        //     // Text(
+                        //     //   "${ticket.id}",
+                        //     //   style: TextStyle(fontSize: 14.0),
+                        //     // )
+                        //   ],
+                        // ),
                         Html(
                           data: ticket.description,
                           style: {

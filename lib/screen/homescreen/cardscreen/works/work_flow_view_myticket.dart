@@ -89,20 +89,20 @@ class _WorkFlowViewMyTicketState extends State<WorkFlowViewMyTicket> {
                           },
                         ),
 
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "id",
-                              style: TextStyle(fontSize: 14.0),
-                            ),
-                            Text(
-                              "${ticket.id}",
-                              style: TextStyle(fontSize: 14.0),
-                            )
-                          ],
-                        ),
-                        SizedBox(height: 8.0),
+                        // Row(
+                        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //   children: [
+                        //     Text(
+                        //       "id",
+                        //       style: TextStyle(fontSize: 14.0),
+                        //     ),
+                        //     Text(
+                        //       "${ticket.id}",
+                        //       style: TextStyle(fontSize: 14.0),
+                        //     )
+                        //   ],
+                        // ),
+                        // SizedBox(height: 8.0),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [

@@ -4,11 +4,13 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:hrms_app/storage/securestorage.dart';
+import 'package:hrms_app/storage/hosptial_code_storage.dart';
 import 'package:hrms_app/models/profile_models/profiles.models.dart';
+
 
 class EmployeeProvider with ChangeNotifier {
   final SecureStorageService secureStorageService = SecureStorageService();
-
+  final HosptialCodeStorage _hospitalCodeStorage = HosptialCodeStorage();
   final List<Employee> _employees = [];
   bool isLoading = false;
   String? _branch;
@@ -100,6 +102,15 @@ class EmployeeProvider with ChangeNotifier {
       EmployeeTemporaryAddress(
           addressLine1: '', city: '', ward: '', municipalName: '');
 
+  Future<String?> _getBaseUrl() async {
+    return await _hospitalCodeStorage.getBaseUrl();
+  }
+
+  Future<void> _storeBaseUrl(String baseUrl) async {
+    await _hospitalCodeStorage.storeBaseUrl(baseUrl);
+    debugPrint("Stored Base URL: $baseUrl");
+  }
+
   // Method to fetch employee details
   Future<void> fetchEmployeeDetails() async {
     try {
@@ -121,8 +132,20 @@ class EmployeeProvider with ChangeNotifier {
         return;
       }
 
-      final url =
-          Uri.parse('http://45.117.153.90:5004/api/Employee/GetEmployeeDetail');
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        errorMessage = 'Base URL not found. Please enter hospital code again.';
+        debugPrint(errorMessage);
+        isLoading = false;
+        notifyListeners();
+        return;
+      }
+
+      // Store the base URL to ensure it’s persisted
+      await _storeBaseUrl(baseUrl);
+
+      final url = Uri.parse('$baseUrl/api/Employee/GetEmployeeDetail');
+      debugPrint('Request URL: $url');
 
       // Make GET request to fetch employee details
       final response = await http.get(
@@ -260,6 +283,7 @@ class EmployeeProvider with ChangeNotifier {
       print("SocketException: $errorMessage");
     } catch (e) {
       errorMessage = 'Error: $e';
+      debugPrint("Error: $e");
     } finally {
       isLoading = false;
       notifyListeners();

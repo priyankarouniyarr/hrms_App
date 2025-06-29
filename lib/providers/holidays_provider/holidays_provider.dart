@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
+import 'package:hrms_app/storage/hosptial_code_storage.dart';
 import 'package:hrms_app/models/holidays/holidays_model.dart';
+
 
 class HolidayProvider with ChangeNotifier {
   List<Holidays> _pastHolidays = [];
@@ -13,9 +15,11 @@ class HolidayProvider with ChangeNotifier {
   List<Holidays> get pastHolidays => _pastHolidays;
   List<Holidays> get upcomingHolidays => _upcomingHolidays;
   List<Holidays> get allHolidays => _allHolidays;
+  String _errorMessage = '';
+  String get errorMessage => _errorMessage;
 
   final SecureStorageService _secureStorageService = SecureStorageService();
-
+  final HosptialCodeStorage _hospitalCodeStorage = HosptialCodeStorage();
   List<Map<String, dynamic>> get allHolidayDatePairs {
     List<Map<String, dynamic>> dates = [];
 
@@ -46,6 +50,15 @@ class HolidayProvider with ChangeNotifier {
     return dates;
   }
 
+  Future<String?> _getBaseUrl() async {
+    return await _hospitalCodeStorage.getBaseUrl();
+  }
+
+  Future<void> _storeBaseUrl(String baseUrl) async {
+    await _hospitalCodeStorage.storeBaseUrl(baseUrl);
+    debugPrint("Stored Base URL: $baseUrl");
+  }
+
   Future<void> fetchPastHolidays() async {
     try {
       final branchId =
@@ -58,10 +71,19 @@ class HolidayProvider with ChangeNotifier {
         throw Exception(
             'Missing required data: branchId, token, or fiscalYear');
       }
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errorMessage =
+            ('Base URL not found. Please enter hospital code again.');
+        notifyListeners();
 
+        return;
+      }
+
+      // Store the base URL to ensure it’s persisted
+      await _storeBaseUrl(baseUrl);
       final response = await http.get(
-        Uri.parse(
-            '${dotenv.env['base_url']}api/HolidayList/GetPastHolidayList'),
+        Uri.parse('$baseUrl/api/HolidayList/GetPastHolidayList'),
         headers: {
           'Authorization': 'Bearer $token',
           'workingBranchId': branchId,
@@ -96,10 +118,19 @@ class HolidayProvider with ChangeNotifier {
         throw Exception(
             'Missing required data: branchId, token, or fiscalYear');
       }
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errorMessage =
+            ('Base URL not found. Please enter hospital code again.');
+        notifyListeners();
+
+        return;
+      }
+      // Store the base URL to ensure it’s persisted
+      await _storeBaseUrl(baseUrl);
 
       final response = await http.get(
-        Uri.parse(
-            '${dotenv.env['base_url']}api/HolidayList/GetUpcommingHolidayList'),
+        Uri.parse('$baseUrl/api/HolidayList/GetUpcommingHolidayList'),
         headers: {
           'Authorization': 'Bearer $token',
           'workingBranchId': branchId,
@@ -133,9 +164,20 @@ class HolidayProvider with ChangeNotifier {
         throw Exception(
             'Missing required data: branchId, token, or fiscalYear');
       }
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errorMessage =
+            ('Base URL not found. Please enter hospital code again.');
+        notifyListeners();
+
+        return;
+      }
+
+      // Store the base URL to ensure it’s persisted
+      await _storeBaseUrl(baseUrl);
 
       final response = await http.get(
-        Uri.parse('${dotenv.env['base_url']}api/HolidayList/GetHolidayList'),
+        Uri.parse('$baseUrl/api/HolidayList/GetHolidayList'),
         headers: {
           'Authorization': 'Bearer $token',
           'workingBranchId': branchId,
@@ -152,7 +194,7 @@ class HolidayProvider with ChangeNotifier {
         throw Exception('Failed to load all holidays');
       }
     } catch (e) {
-      print("Error fetching all holidays: $e");
+      log("Error fetching all holidays: $e");
       throw e;
     }
   }

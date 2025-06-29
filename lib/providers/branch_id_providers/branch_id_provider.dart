@@ -1,8 +1,9 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
+import 'package:hrms_app/storage/hosptial_code_storage.dart';
 import 'package:hrms_app/models/branches_models/branch_id_models.dart';
 
 class BranchProvider with ChangeNotifier {
@@ -10,9 +11,8 @@ class BranchProvider with ChangeNotifier {
   String _errorMessage = '';
   List<BranchModel> _branches = [];
   String? _selectedBranchId;
-
   final SecureStorageService _secureStorageService = SecureStorageService();
-
+  final HosptialCodeStorage _hospitalCodeStorage = HosptialCodeStorage();
   bool get loading => _loading;
   String get errorMessage => _errorMessage;
   List<BranchModel> get branches => _branches;
@@ -20,7 +20,6 @@ class BranchProvider with ChangeNotifier {
 
   Future<void> setSelectedBranch(String branchId) async {
     _selectedBranchId = branchId;
-
     await _secureStorageService.writeData('workingBranchId', branchId);
     notifyListeners();
   }
@@ -28,11 +27,19 @@ class BranchProvider with ChangeNotifier {
   Future<void> loadSelectedBranch() async {
     String? storedBranchId =
         await _secureStorageService.readData('workingBranchId');
-
     if (storedBranchId != null) {
       _selectedBranchId = storedBranchId;
     }
     notifyListeners();
+  }
+
+  Future<String?> _getBaseUrl() async {
+    return await _hospitalCodeStorage.getBaseUrl();
+  }
+
+  Future<void> _storeBaseUrl(String baseUrl) async {
+    await _hospitalCodeStorage.storeBaseUrl(baseUrl);
+    debugPrint("Stored Base URL in branch: $baseUrl");
   }
 
   Future<void> fetchUserBranches() async {
@@ -44,17 +51,24 @@ class BranchProvider with ChangeNotifier {
         _setErrorMessage("No token found. Please log in again.");
         return;
       }
-
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _setErrorMessage(
+            "Base URL not found. Please enter hospital code again.");
+        return;
+      }
+      // Store the base URL to ensure it’s persisted
+      await _storeBaseUrl(baseUrl);
       final response = await http.get(
-        Uri.parse('${dotenv.env['base_url']}Account/GetUserBranches'),
+        Uri.parse('$baseUrl/Account/GetUserBranches'),
         headers: {
           "Content-Type": "application/json",
           "Authorization": "Bearer $token",
         },
       );
-
+      log("Fetching branches from: $baseUrl/Account/GetUserBranches");
       if (response.statusCode == 200) {
-        print("Response status: ${response.statusCode}");
+        log("Response status: ${response.statusCode}");
         List<dynamic> jsonData = json.decode(response.body);
         if (jsonData.isEmpty) {
           _branches = [];
@@ -66,11 +80,6 @@ class BranchProvider with ChangeNotifier {
         notifyListeners();
       } else {
         _setErrorMessage(" Failed to load branches");
-
-        // Navigator.pushReplacement(
-        //   context,
-        //   MaterialPageRoute(builder: (context) => OnboardScreen()),
-        // );
       }
     } catch (e) {
       _setErrorMessage("Error: $e");
@@ -81,6 +90,7 @@ class BranchProvider with ChangeNotifier {
 
   void _setLoading(bool value) {
     _loading = value;
+    _errorMessage = '';
     notifyListeners();
   }
 
@@ -95,11 +105,4 @@ class BranchProvider with ChangeNotifier {
       notifyListeners();
     }
   }
-
-  // void reset() {
-  //   _branches = [];
-  //   _selectedBranchId = null;
-  //   _setErrorMessage("");
-  //   notifyListeners();
-  // }
 }

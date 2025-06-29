@@ -33,7 +33,7 @@ class _TrainingState extends State<Training> {
         child: trainingProvider.isLoading
             ? const Center(child: CircularProgressIndicator())
             : trainingProvider.traning.isEmpty
-                ? const Center(child: Text("No record"))
+                ? const Center(child: Text("No training"))
                 : ListView.builder(
                     itemCount: trainingProvider.traning.length,
                     itemBuilder: (context, index) {

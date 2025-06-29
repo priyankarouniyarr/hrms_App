@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
+import 'package:hrms_app/storage/hosptial_code_storage.dart';
 import 'package:hrms_app/models/attendance%20_models/attendence_models.dart';
+
 
 class AttendanceProvider with ChangeNotifier {
   List<Attendance> _primaryShiftAttendance = [];
@@ -12,6 +13,7 @@ class AttendanceProvider with ChangeNotifier {
   String _errorMessage = '';
   final SecureStorageService _secureStorageService = SecureStorageService();
 
+  HosptialCodeStorage _hospitalCodeStorage = HosptialCodeStorage();
   String? _branchId;
   String? _token;
   String? _fiscalYear;
@@ -22,6 +24,15 @@ class AttendanceProvider with ChangeNotifier {
   String get errorMessage => _errorMessage;
 
   get attendanceReport => null;
+
+  Future<String?> _getBaseUrl() async {
+    return await _hospitalCodeStorage.getBaseUrl();
+  }
+
+  Future<void> _storeBaseUrl(String baseUrl) async {
+    await _hospitalCodeStorage.storeBaseUrl(baseUrl);
+    debugPrint("Stored Base URL: $baseUrl");
+  }
 
   Future<void> fetchAttendanceData() async {
     _branchId =
@@ -39,9 +50,18 @@ class AttendanceProvider with ChangeNotifier {
     notifyListeners();
 
     try {
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errorMessage = 'No base URL found';
+        notifyListeners();
+        return;
+      }
+      // Store the base URL to ensure it’s persisted
+      await _storeBaseUrl(baseUrl);
+
       final responsePrimary = await http.get(
         Uri.parse(
-            '${dotenv.env['base_url']}api/EmployeeAttendance/GetMyCurrentMonthAttendanceSheetPrimary'),
+            '$baseUrl/api/EmployeeAttendance/GetMyCurrentMonthAttendanceSheetPrimary'),
         headers: {
           'Authorization': 'Bearer $_token',
           'workingBranchId': _branchId!,
@@ -51,7 +71,7 @@ class AttendanceProvider with ChangeNotifier {
 
       final responseExtended = await http.get(
         Uri.parse(
-            '${dotenv.env['base_url']}api/EmployeeAttendance/GetMyCurrentMonthAttendanceSheetExtended'),
+            '$baseUrl/api/EmployeeAttendance/GetMyCurrentMonthAttendanceSheetExtended'),
         headers: {
           'Authorization': 'Bearer $_token',
           'workingBranchId': _branchId!,

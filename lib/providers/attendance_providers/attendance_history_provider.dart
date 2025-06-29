@@ -1,18 +1,19 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
+import 'package:hrms_app/storage/hosptial_code_storage.dart';
 import 'package:hrms_app/models/attendance%20_models/attendance_details_models.dart';
 
 class AttendanceDetailsProvider with ChangeNotifier {
   bool _isLoading = false;
   String _errorMessage = '';
   final SecureStorageService _secureStorageService = SecureStorageService();
-
+  final HosptialCodeStorage _hospitalCodeStorage = HosptialCodeStorage();
   AttendanceReport? _attendanceReport;
   String? _branchId;
   String? _token;
+
   String? _fiscalYear;
   List<String> _shiftTypes = ["Primary", "Extended"];
   List<String> _status = [
@@ -34,6 +35,15 @@ class AttendanceDetailsProvider with ChangeNotifier {
   List<AttendanceDetails> get detailsAttendance =>
       _detsilsAttendance; // Details attendance
 
+  Future<String?> _getBaseUrl() async {
+    return await _hospitalCodeStorage.getBaseUrl();
+  }
+
+  Future<void> _storeBaseUrl(String baseUrl) async {
+    await _hospitalCodeStorage.storeBaseUrl(baseUrl);
+    debugPrint("Stored Base URL of payroll: $baseUrl");
+  }
+
   Future<void> fetchAttendanceSummary(Filter filter) async {
     _isLoading = true;
     notifyListeners();
@@ -51,9 +61,21 @@ class AttendanceDetailsProvider with ChangeNotifier {
     }
 
     try {
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errorMessage = 'Base URL not found. Please enter hospital code again.';
+        debugPrint(_errorMessage);
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
+
+      // Store the base URL to ensure it’s persisted
+      await _storeBaseUrl(baseUrl);
+      debugPrint("Token: $_token");
+
       final response = await http.post(
-        Uri.parse(
-            '${dotenv.env['base_url']}api/EmployeeAttendance/GetMyAttendanceSummary'),
+        Uri.parse('$baseUrl/api/EmployeeAttendance/GetMyAttendanceSummary'),
         headers: {
           'Authorization': 'Bearer $_token',
           'Content-Type': 'application/json',

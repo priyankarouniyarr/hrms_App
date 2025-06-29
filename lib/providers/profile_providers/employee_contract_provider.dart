@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hrms_app/storage/securestorage.dart';
 import '../../models/profile_models/employee_contract.dart';
+import 'package:hrms_app/storage/hosptial_code_storage.dart';
 
 class EmployeeContractProvider with ChangeNotifier {
   List<EmployeeContract> _contracts = [];
@@ -13,23 +13,47 @@ class EmployeeContractProvider with ChangeNotifier {
   final SecureStorageService secureStorageService = SecureStorageService();
   String _errorMessage = '';
   String get errorMessage => _errorMessage;
+  final HosptialCodeStorage _hospitalCodeStorage = HosptialCodeStorage();
   List<EmployeeContract> get contracts => _contracts;
   bool get isLoading => _isLoading;
+  Future<String?> _getBaseUrl() async {
+    return await _hospitalCodeStorage.getBaseUrl();
+  }
 
-  Future<void> fetchEmployeeContracts() async {
+  Future<void> _storeBaseUrl(String baseUrl) async {
+    await _hospitalCodeStorage.storeBaseUrl(baseUrl);
+    log("Stored Base URL: $baseUrl");
+  }
+
+  Future<void> fetchEmployeeContracts(
+    BuildContext context,
+  ) async {
     _isLoading = true;
     notifyListeners();
 
     try {
+      // Access HospitalCodeProvider to get baseUrl
+      final baseUrl = await _getBaseUrl();
+      if (baseUrl == null) {
+        _errorMessage = 'Base URL not found. Please enter hospital code again.';
+        debugPrint(errorMessage);
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
+
+      // Store the base URL to ensure it’s persisted
+      await _storeBaseUrl(baseUrl);
+
       String? token = await secureStorageService.readData('auth_token');
       String? branchId =
           await secureStorageService.readData('selected_workingbranchId');
       String? fiscalYear =
           await secureStorageService.readData('selected_fiscal_year');
-      print("branchId: $branchId");
+      log("branchId: $branchId");
 
-      print("fiscalYear: $fiscalYear");
-      print("token: $token");
+      log("fiscalYear: $fiscalYear");
+      log("token: $token");
       if (token == null || branchId == null || fiscalYear == null) {
         _errorMessage = 'Token or BranchId is missing';
         _isLoading = false;
@@ -37,8 +61,8 @@ class EmployeeContractProvider with ChangeNotifier {
         notifyListeners(); // Notify listeners when an error occurs
         return;
       }
-      final url = Uri.parse(
-          '${dotenv.env['base_url']}api/EmployeeContract/GetEmployeeContracts');
+      final url =
+          Uri.parse('$baseUrl/api/EmployeeContract/GetEmployeeContracts');
 
       final response = await http.get(
         url,
