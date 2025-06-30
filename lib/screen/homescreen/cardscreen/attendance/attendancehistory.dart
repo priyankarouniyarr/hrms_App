@@ -166,26 +166,26 @@ class _AttendanceDetailsScreenState extends State<AttendanceDetailsScreen> {
                   ),
                 ),
                 SizedBox(height: 10),
-                Text(
-                  "Status",
-                  style: TextStyle(
-                    fontSize: 18,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                CustomDropdown(
-                  value: _selectedStatus,
-                  items: provider.status,
-                  hintText: "Status",
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedStatus = value;
-                    });
-                  },
-                ),
-                SizedBox(
-                  height: 20,
-                ),
+                // Text(
+                //   "Status",
+                //   style: TextStyle(
+                //     fontSize: 18,
+                //   ),
+                // ),
+                // const SizedBox(height: 10),
+                // CustomDropdown(
+                //   value: _selectedStatus,
+                //   items: provider.status,
+                //   hintText: "Status",
+                //   onChanged: (value) {
+                //     setState(() {
+                //       _selectedStatus = value;
+                //     });
+                //   },
+                // ),
+                // SizedBox(
+                //   height: 20,
+                // ),
                 GestureDetector(
                   onTap: () {
                     if (_selectedShiftValue != null &&

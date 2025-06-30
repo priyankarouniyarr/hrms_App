@@ -207,7 +207,7 @@ class FcmnotificationProvider with ChangeNotifier {
       }
     } catch (error) {
       log('Error occurred while sending FCM token: $error');
-      _errorMessage = 'Error occurred while sending FCM token: $error';
+      _errorMessage = 'Error occurred: $error';
       _isLoading = false;
       notifyListeners();
       return false;

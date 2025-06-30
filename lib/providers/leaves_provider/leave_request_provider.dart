@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:hrms_app/storage/securestorage.dart';
 import 'package:hrms_app/models/leaves/apply_leave.dart';
 import 'package:hrms_app/storage/hosptial_code_storage.dart';
@@ -212,7 +212,7 @@ class LeaveRequestProvider extends ChangeNotifier {
       };
 
       final requestBody = json.encode(request.toJson());
-      print('Sending request with body: $requestBody');
+    
 
       final response = await http.post(
         url,
@@ -220,8 +220,7 @@ class LeaveRequestProvider extends ChangeNotifier {
         body: requestBody,
       );
 
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+     
 
       if (response.statusCode == 200) {
         if (response.body.toLowerCase() == 'true') {
@@ -235,27 +234,27 @@ class LeaveRequestProvider extends ChangeNotifier {
           try {
             final responseData = json.decode(response.body);
             if (responseData['success'] == true) {
-              print("success");
+             
               return true;
             } else {
-              print("yes");
+            
               _errorMessage =
                   responseData['message'] ?? 'Leave application failed';
               return false;
             }
           } catch (e) {
-            print("no");
+          
             _errorMessage = 'Unexpected response format: ${response.body}';
             return false;
           }
         }
       } else {
-        print("no23");
+    
         _errorMessage = 'Request failed with status ${response.statusCode}';
         return false;
       }
     } catch (error) {
-      print("no45");
+  
       _errorMessage = "Error creating leave application: $error";
       return false;
     } finally {

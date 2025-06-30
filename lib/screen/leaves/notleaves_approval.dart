@@ -14,78 +14,78 @@ class NotApprovalLeaves extends StatefulWidget {
 }
 
 class _NotApprovalLeavesState extends State<NotApprovalLeaves> {
-  String? _selectedStatus = "Open";
-  final TextEditingController _primarystartcontroller = TextEditingController();
-  final TextEditingController _primaryenddatecontroller =
-      TextEditingController();
+  // String? _selectedStatus = "Open";
+  // final TextEditingController _primarystartcontroller = TextEditingController();
+  // final TextEditingController _primaryenddatecontroller =
+  //     TextEditingController();
 
-  DateTime? _startDate;
-  DateTime? _endDate;
+  // DateTime? _startDate;
+  // DateTime? _endDate;
 
-  bool _isInitialized = false;
-  bool _isLoading = false;
+  // bool _isInitialized = false;
+  // bool _isLoading = false;
   @override
-  void initState() {
-    super.initState();
-    final DateTime now = DateTime.now();
-    final DateTime oneMonthsAgo = DateTime(now.year, now.month - 1, now.day);
-    _startDate = oneMonthsAgo;
-    _endDate = now;
-    _primarystartcontroller.text =
-        DateFormat('yyyy-MM-dd').format(oneMonthsAgo);
-    _primaryenddatecontroller.text = DateFormat('yyyy-MM-dd').format(now);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _initializeData());
-  }
+  // void initState() {
+  //   super.initState();
+  //   // final DateTime now = DateTime.now();
+  //   // final DateTime oneMonthsAgo = DateTime(now.year, now.month - 1, now.day);
+  //   // _startDate = oneMonthsAgo;
+  //   // _endDate = now;
+  //   // _primarystartcontroller.text =
+  //   //     DateFormat('yyyy-MM-dd').format(oneMonthsAgo);
+  //   // _primaryenddatecontroller.text = DateFormat('yyyy-MM-dd').format(now);
+  //   // WidgetsBinding.instance.addPostFrameCallback((_) => _initializeData());
+  // }
 
-  @override
-  void dispose() {
-    _primarystartcontroller.dispose();
-    _primaryenddatecontroller.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _primarystartcontroller.dispose();
+  //   _primaryenddatecontroller.dispose();
+  //   super.dispose();
+  // }
 
-  Future<void> _initializeData() async {
-    setState(() => _isLoading = true);
+  // Future<void> _initializeData() async {
+  //   setState(() => _isLoading = true);
 
-    final requestTicket = NotApprovalLeaves(
+  //final requestTicket = NotApprovalLeaves(
 
-        // status: _selectedStatus ?? "",
+  // status: _selectedStatus ?? "",
 
-        // fromdate: _primarystartcontroller.text,
-        // todate: _primaryenddatecontroller.text,
+  // fromdate: _primarystartcontroller.text,
+  // todate: _primaryenddatecontroller.text,
 
-        );
-    try {} catch (e) {
-      print(e);
+  //       );
+  //   try {} catch (e) {
+  //     print(e);
 
-      // Handle error if needed
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-          _isInitialized = true;
-        });
-      }
-    }
-  }
+  //     // Handle error if needed
+  //   } finally {
+  //     if (mounted) {
+  //       setState(() {
+  //         _isLoading = false;
+  //         _isInitialized = true;
+  //       });
+  //     }
+  //   }
+  // }
 
-  void _applyFilters() {
-    setState(() => _isInitialized = false);
-  }
+  // void _applyFilters() {
+  //   setState(() => _isInitialized = false);
+  // }
 
-  void _clearFilters() {
-    final now = DateTime.now();
-    final oneMonthsAgo = DateTime(now.year, now.month - 1, now.day);
-    setState(() {
-      _selectedStatus = "Open";
-      _startDate = oneMonthsAgo;
-      _endDate = now;
-      _primarystartcontroller.text =
-          DateFormat('yyyy-MM-dd').format(oneMonthsAgo);
-      _primaryenddatecontroller.text = DateFormat('yyyy-MM-dd').format(now);
-    });
-    _applyFilters();
-  }
+  // void _clearFilters() {
+  //   final now = DateTime.now();
+  //   final oneMonthsAgo = DateTime(now.year, now.month - 1, now.day);
+  //   setState(() {
+  //     _selectedStatus = "Open";
+  //     _startDate = oneMonthsAgo;
+  //     _endDate = now;
+  //     _primarystartcontroller.text =
+  //         DateFormat('yyyy-MM-dd').format(oneMonthsAgo);
+  //     _primaryenddatecontroller.text = DateFormat('yyyy-MM-dd').format(now);
+  //   });
+  //   _applyFilters();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +97,7 @@ class _NotApprovalLeavesState extends State<NotApprovalLeaves> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              _buildFilterSection(),
+              //     _buildFilterSection(),
               const SizedBox(height: 8),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -234,78 +234,78 @@ class _NotApprovalLeavesState extends State<NotApprovalLeaves> {
     );
   }
 
-  Widget _buildFilterSection() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              // If you want to include dropdown filters later, add them here
-            ],
-          ),
-          Row(
-            children: [
-              _buildDateField(
-                "Start Date",
-                _primarystartcontroller,
-                _startDate,
-                (picked) {
-                  setState(() {
-                    _startDate = picked;
-                    _primarystartcontroller.text =
-                        DateFormat('yyyy-MM-dd').format(picked);
-                    if (_endDate != null && _endDate!.isBefore(picked)) {
-                      _endDate = null;
-                      _primaryenddatecontroller.clear();
-                    }
-                  });
-                },
-              ),
-              const SizedBox(width: 10),
-              _buildDateField(
-                "End Date",
-                _primaryenddatecontroller,
-                _endDate,
-                (picked) {
-                  setState(() {
-                    _endDate = picked;
-                    _primaryenddatecontroller.text =
-                        DateFormat('yyyy-MM-dd').format(picked);
-                  });
-                },
-                startDate: _startDate,
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              TextButton.icon(
-                onPressed: _clearFilters,
-                icon: const Icon(Icons.refresh, color: primarySwatch),
-                label: const Text('Clear Filters',
-                    style: TextStyle(color: primarySwatch)),
-              ),
-              ElevatedButton.icon(
-                onPressed: _applyFilters,
-                icon: const Icon(Icons.filter_alt),
-                label: const Text("Apply"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: cardBackgroundColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    side: const BorderSide(color: primarySwatch),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildFilterSection() {
+  //   return Padding(
+  //     padding: const EdgeInsets.all(8.0),
+  //     child: Column(
+  //       children: [
+  //         Row(
+  //           children: [
+  //             // If you want to include dropdown filters later, add them here
+  //           ],
+  //         ),
+  //         Row(
+  //           children: [
+  // //             _buildDateField(
+  // //               "Start Date",
+  //               _primarystartcontroller,
+  //               _startDate,
+  //               (picked) {
+  //                 setState(() {
+  //                   _startDate = picked;
+  //                   _primarystartcontroller.text =
+  //                       DateFormat('yyyy-MM-dd').format(picked);
+  //                   if (_endDate != null && _endDate!.isBefore(picked)) {
+  //                     _endDate = null;
+  //                     _primaryenddatecontroller.clear();
+  //                   }
+  //                 });
+  //               },
+  //             ),
+  //             const SizedBox(width: 10),
+  //             _buildDateField(
+  //               "End Date",
+  //               _primaryenddatecontroller,
+  //               _endDate,
+  //               (picked) {
+  //                 setState(() {
+  //                   _endDate = picked;
+  //                   _primaryenddatecontroller.text =
+  //                       DateFormat('yyyy-MM-dd').format(picked);
+  //                 });
+  //               },
+  //               startDate: _startDate,
+  //             ),
+  //           ],
+  //         ),
+  //         const SizedBox(height: 10),
+  //         Row(
+  //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //           children: [
+  //             TextButton.icon(
+  //               onPressed: _clearFilters,
+  //               icon: const Icon(Icons.refresh, color: primarySwatch),
+  //               label: const Text('Clear Filters',
+  //                   style: TextStyle(color: primarySwatch)),
+  //             ),
+  //             ElevatedButton.icon(
+  //               onPressed: _applyFilters,
+  //               icon: const Icon(Icons.filter_alt),
+  //               label: const Text("Apply"),
+  //               style: ElevatedButton.styleFrom(
+  //                 backgroundColor: cardBackgroundColor,
+  //                 shape: RoundedRectangleBorder(
+  //                   borderRadius: BorderRadius.circular(10),
+  //                   side: const BorderSide(color: primarySwatch),
+  //                 ),
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Expanded _buildDateField(
     String label,
@@ -349,7 +349,7 @@ class _NotApprovalLeavesState extends State<NotApprovalLeaves> {
               );
               if (picked != null) {
                 onPicked(picked);
-                _applyFilters();
+                //_applyFilters();
               }
             },
           ),
